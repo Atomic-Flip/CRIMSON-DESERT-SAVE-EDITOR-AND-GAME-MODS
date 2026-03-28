@@ -185,6 +185,39 @@ The editor handles the full save file crypto pipeline:
 
 ## Changelog
 
+### v2.5.4
+
+**New: Mod Compatibility — Export Patches (GPatch tab)**
+- **Export as JSON Patch** — Export your game file edits (ItemBuffs, MaxStacks, Storage, etc.) as a JSON file compatible with Nexus JSON Mod Manager. Tiny file, per-byte changes.
+- **Export as CDUMM ZIP** — Export as a ZIP for CrimsonDesert Ultimate Mods Manager. Drag into CDUMM to import. Takes 5-10 minutes (large PAZ file).
+- Exports save to `Exports/` folder next to the exe
+- Verified correct: JSON patches validated against game files after export
+- Makes our edits play nice with other mods instead of overwriting them
+
+**New: Unlock All Knowledge (Abyss Gates tab)**
+- Injects ALL 5,500+ knowledge entries from game data
+- Unlocks: most skills, ALL dyes/recipes/crafting manuals, full map + all fast travel, infinite ammo key items
+- Big warning dialog — map reveal CANNOT be undone
+- Auto-save prompt after applying
+
+**Improved: ItemBuffs Editor**
+- Rate stat cap removed — rates now support 0-255 (was hardcoded to 15). HealthRegen goes to 50, SkillExp to 10, etc.
+- **Edit Selected Stat Only** — click any stat row, set a value, apply to just that one entry without touching others
+- **Refinement Level selector** — choose which refinement level to apply presets to (Level 1, Level 2, etc.) instead of all at once
+- All auto-save prompts added (Reveal Map, Show Nexus, Unlock Knowledge)
+
+**New: Quest Editor (Tools > Quest Editor)**
+- Fix bugged quests blocking progression
+- Mark Quest Completed / Reset to In Progress
+- Add Quest as Completed (PARC Insert) — insert quests you haven't encountered yet
+- 633 quests + 5,450 missions with English display names from game localization
+- Quest Database tab — browse all 6,780 quests + missions from game data
+
+**Other**
+- Item Effects section hidden (moved to Dev mode)
+- Center status banner shows loading progress
+- Version 2.5.4
+
 ### v2.5.3
 
 **New: Quest Editor (Tools > Quest Editor)**
