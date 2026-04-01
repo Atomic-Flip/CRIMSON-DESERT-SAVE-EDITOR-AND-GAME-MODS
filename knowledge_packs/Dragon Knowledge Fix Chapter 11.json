@@ -1,0 +1,6757 @@
+{
+  "name": "Unlock All Knowledge",
+  "type": "knowledge",
+  "count": 1350,
+  "entries": [
+    {
+      "key": 1,
+      "name": "Knowledge_Kliff",
+      "display": "Kliff"
+    },
+    {
+      "key": 2,
+      "name": "Knowledge_Oongka",
+      "display": "Oongka"
+    },
+    {
+      "key": 3,
+      "name": "Knowledge_Yann",
+      "display": "Yann"
+    },
+    {
+      "key": 4,
+      "name": "Knowledge_Nairah",
+      "display": "Naira"
+    },
+    {
+      "key": 7,
+      "name": "Knowledge_Dwayne",
+      "display": "Duane"
+    },
+    {
+      "key": 9,
+      "name": "Knowledge_Ludvig",
+      "display": "Ludvig"
+    },
+    {
+      "key": 10,
+      "name": "Knowledge_Myordin",
+      "display": "Myurdin"
+    },
+    {
+      "key": 13,
+      "name": "Knowledge_Demian",
+      "display": "Damiane Spencer"
+    },
+    {
+      "key": 39,
+      "name": "Knowledge_Basteer",
+      "display": "Lucian Bastier"
+    },
+    {
+      "key": 48,
+      "name": "Knowledge_Grundir",
+      "display": "Grundir"
+    },
+    {
+      "key": 49,
+      "name": "Knowledge_Talk_Octabus",
+      "display": "Octavius"
+    },
+    {
+      "key": 51,
+      "name": "Knowledge_Shakatu",
+      "display": "Shakatu"
+    },
+    {
+      "key": 123,
+      "name": "Knowledge_GreyFur_Marius",
+      "display": "Marius"
+    },
+    {
+      "key": 1062,
+      "name": "Knowledge_Domestic_GreatDane",
+      "display": ""
+    },
+    {
+      "key": 1075,
+      "name": "Knowledge_Deer",
+      "display": "Deer"
+    },
+    {
+      "key": 1099,
+      "name": "Knowledge_Rat",
+      "display": "Rat"
+    },
+    {
+      "key": 1150,
+      "name": "Knowledge_Iguana",
+      "display": "Iguana"
+    },
+    {
+      "key": 1174,
+      "name": "Knowledge_Oyster_Toad",
+      "display": "Burrowing Toad"
+    },
+    {
+      "key": 1301,
+      "name": "Knowledge_Grasshopper",
+      "display": "Grasshopper"
+    },
+    {
+      "key": 1811,
+      "name": "Knowledge_Choppy",
+      "display": "Choppy"
+    },
+    {
+      "key": 1822,
+      "name": "Knowledge_Small_Grass_LandSpider",
+      "display": "Mossback Crab"
+    },
+    {
+      "key": 2601,
+      "name": "Knowledge_Lumiph_Horse",
+      "display": ""
+    },
+    {
+      "key": 2602,
+      "name": "Knowledge_Strapero_Horse",
+      "display": "Animal_Horse"
+    },
+    {
+      "key": 2603,
+      "name": "Knowledge_Dabrera_Horse",
+      "display": ""
+    },
+    {
+      "key": 2617,
+      "name": "Knowledge_White_Horse",
+      "display": "Royler"
+    },
+    {
+      "key": 2618,
+      "name": "Knowledge_Black_Horse",
+      "display": "Rokade"
+    },
+    {
+      "key": 5003,
+      "name": "Knowledge_SplitHorn_Boss_Bremer_CowHorn",
+      "display": "The Cows' Whereabouts"
+    },
+    {
+      "key": 5009,
+      "name": "Knowledge_SplitHorn_Boss_Ibano_Restorative",
+      "display": "Traces of a Goat Horn"
+    },
+    {
+      "key": 5020,
+      "name": "Knowledge_Witch_Kidnapped_Memory",
+      "display": "Eastern Witches' Objects"
+    },
+    {
+      "key": 5232,
+      "name": "Knowledge_CelesterCalling",
+      "display": "Charles Celeste's Call"
+    },
+    {
+      "key": 5253,
+      "name": "Knowledge_OrientalWitch_BrokenSailBoat",
+      "display": "Shipwreck on the Beach"
+    },
+    {
+      "key": 5287,
+      "name": "Knowledge_Ludvig_Boss_Danger_BlueMistVillage",
+      "display": "The Informant's Last Words"
+    },
+    {
+      "key": 5956,
+      "name": "Knowledge_Calpheid_Liberation",
+      "display": "Calphade"
+    },
+    {
+      "key": 6102,
+      "name": "Knowledge_RibentainHideToken",
+      "display": "The Evil Deeds of the Monastery"
+    },
+    {
+      "key": 17001,
+      "name": "Knowledge_Potato",
+      "display": "Potato"
+    },
+    {
+      "key": 17002,
+      "name": "Knowledge_SweetPotato",
+      "display": "Sweet Potato"
+    },
+    {
+      "key": 17003,
+      "name": "Knowledge_Oats",
+      "display": "Oats"
+    },
+    {
+      "key": 17007,
+      "name": "Knowledge_Rasberry",
+      "display": "Raspberry"
+    },
+    {
+      "key": 17009,
+      "name": "Knowledge_Rosemary",
+      "display": "Rosemary"
+    },
+    {
+      "key": 17011,
+      "name": "Knowledge_Garlic",
+      "display": "Garlic"
+    },
+    {
+      "key": 17014,
+      "name": "Knowledge_Wheat",
+      "display": "Wheat"
+    },
+    {
+      "key": 17015,
+      "name": "Knowledge_Apple",
+      "display": "Apple"
+    },
+    {
+      "key": 17022,
+      "name": "Knowledge_Orange",
+      "display": "Orange"
+    },
+    {
+      "key": 17023,
+      "name": "Knowledge_Bean",
+      "display": "Beans"
+    },
+    {
+      "key": 17026,
+      "name": "Knowledge_Grape",
+      "display": "Grape"
+    },
+    {
+      "key": 17032,
+      "name": "Knowledge_Hericium",
+      "display": "Coral Mushroom"
+    },
+    {
+      "key": 17035,
+      "name": "Knowledge_Shiitake",
+      "display": "Oakwood Mushroom"
+    },
+    {
+      "key": 17044,
+      "name": "Knowledge_Blackberry",
+      "display": "Blackberry"
+    },
+    {
+      "key": 17045,
+      "name": "Knowledge_CopperOre",
+      "display": "Copper Ore"
+    },
+    {
+      "key": 17047,
+      "name": "Knowledge_IronStone",
+      "display": "Iron Ore"
+    },
+    {
+      "key": 17101,
+      "name": "Knowledge_Pink_Rosemary",
+      "display": "Pink Rosemary"
+    },
+    {
+      "key": 17107,
+      "name": "Knowledge_Haasam",
+      "display": "False Starwort"
+    },
+    {
+      "key": 17108,
+      "name": "Knowledge_Corn",
+      "display": "Corn"
+    },
+    {
+      "key": 17110,
+      "name": "Knowledge_Carrot",
+      "display": "Carrot"
+    },
+    {
+      "key": 17112,
+      "name": "Knowledge_Begonia",
+      "display": "Begonia"
+    },
+    {
+      "key": 17122,
+      "name": "Knowledge_White_Lavender",
+      "display": "White Lavender"
+    },
+    {
+      "key": 17134,
+      "name": "Knowledge_Diamond",
+      "display": "Diamond"
+    },
+    {
+      "key": 17137,
+      "name": "Knowledge_Ruby",
+      "display": "Garnet"
+    },
+    {
+      "key": 17138,
+      "name": "Knowledge_BlueStone",
+      "display": "Azurite"
+    },
+    {
+      "key": 17139,
+      "name": "Knowledge_WhiteStone",
+      "display": "Scolecite Ore"
+    },
+    {
+      "key": 25002,
+      "name": "AbyssGate_0002",
+      "display": "Axiom Archive"
+    },
+    {
+      "key": 25023,
+      "name": "AbyssGate_0023",
+      "display": "Sanctorum of Insight"
+    },
+    {
+      "key": 25079,
+      "name": "AbyssGate_0079",
+      "display": "Nest of Valor"
+    },
+    {
+      "key": 25083,
+      "name": "AbyssGate_0083",
+      "display": "Ascetic's Rest"
+    },
+    {
+      "key": 25140,
+      "name": "AbyssGate_0140",
+      "display": "Crescent Skybridge"
+    },
+    {
+      "key": 25151,
+      "name": "AbyssGate_0151",
+      "display": "Throne of Truth"
+    },
+    {
+      "key": 25176,
+      "name": "AbyssGate_0176",
+      "display": "Passage of Malice"
+    },
+    {
+      "key": 25251,
+      "name": "Abyss_Lv1",
+      "display": "Abyss Level 1"
+    },
+    {
+      "key": 25252,
+      "name": "Abyss_Lv2",
+      "display": "Abyss Level 2"
+    },
+    {
+      "key": 35002,
+      "name": "Knowledge_Black_Forest",
+      "display": "Black Forest"
+    },
+    {
+      "key": 35005,
+      "name": "Knowledge_The_Witchwoods",
+      "display": "The Witchwoods"
+    },
+    {
+      "key": 35006,
+      "name": "Knowledge_Savage_Wolf_Woods",
+      "display": "Duskwood"
+    },
+    {
+      "key": 35007,
+      "name": "Knowledge_Savage_Wolf_Peaks",
+      "display": "Everfrost"
+    },
+    {
+      "key": 35008,
+      "name": "Knowledge_Howling_Hill",
+      "display": "Haunted Hill"
+    },
+    {
+      "key": 35009,
+      "name": "Knowledge_Three_Saints_Falls",
+      "display": "Three Saints' Falls"
+    },
+    {
+      "key": 35010,
+      "name": "Knowledge_Hook_Ford",
+      "display": "Hook Rapids"
+    },
+    {
+      "key": 35013,
+      "name": "Knowledge_Rocca_Hill",
+      "display": "Rocca's Hill"
+    },
+    {
+      "key": 35015,
+      "name": "Knowledge_Anvil_Hill",
+      "display": "Anvil Hill"
+    },
+    {
+      "key": 35019,
+      "name": "Knowledge_Grace_Forest",
+      "display": "Hernand Highlands"
+    },
+    {
+      "key": 35022,
+      "name": "Knowledge_Unicorn_Cliff",
+      "display": "Unicorn Cliff"
+    },
+    {
+      "key": 35025,
+      "name": "Knowledge_Grace_River",
+      "display": "Willow River"
+    },
+    {
+      "key": 35026,
+      "name": "Knowledge_Lakemist_Valley",
+      "display": "Mistveil Forest"
+    },
+    {
+      "key": 35032,
+      "name": "Knowledge_Steel_Mountains",
+      "display": "Steel Mountains"
+    },
+    {
+      "key": 35033,
+      "name": "Knowledge_Shipwreck_Shore",
+      "display": "Shipwreck Shore"
+    },
+    {
+      "key": 35034,
+      "name": "Knowledge_Bowsprit_Cape",
+      "display": "Bowsprit Cape"
+    },
+    {
+      "key": 35036,
+      "name": "Knowledge_Lower_Nas_River",
+      "display": "Lower Nas River"
+    },
+    {
+      "key": 35038,
+      "name": "Knowledge_Deepfog_Basin",
+      "display": "Deepfog Basin"
+    },
+    {
+      "key": 35039,
+      "name": "Knowledge_The_Wolf_Fang",
+      "display": "Stormtalon Ridge"
+    },
+    {
+      "key": 35040,
+      "name": "Knowledge_The_Wolf_Molar",
+      "display": "The Sage's Peak"
+    },
+    {
+      "key": 35041,
+      "name": "Knowledge_Ancient_Rift",
+      "display": "Ancient Rift"
+    },
+    {
+      "key": 35042,
+      "name": "Knowledge_WolfTrap_Valley",
+      "display": "Drakesfall Gorge"
+    },
+    {
+      "key": 35045,
+      "name": "Knowledge_SilverWolf_Moutain",
+      "display": "Silver Wolf Mountain"
+    },
+    {
+      "key": 35047,
+      "name": "Knowledge_Kunsla_Wayward_Woods",
+      "display": "Wayward Woods"
+    },
+    {
+      "key": 35051,
+      "name": "Knowledge_Upper_Nas_River",
+      "display": "Upper Nas River"
+    },
+    {
+      "key": 35053,
+      "name": "Knowledge_Upper_Denn_River",
+      "display": "Upper Denn River"
+    },
+    {
+      "key": 35054,
+      "name": "Knowledge_Bay_of_Abundance",
+      "display": "Bay of Abundance"
+    },
+    {
+      "key": 35055,
+      "name": "Knowledge_Demeniss_Port",
+      "display": "Demeniss Port"
+    },
+    {
+      "key": 35056,
+      "name": "Knowledge_Striped_Serpent_Marsh",
+      "display": "Serpent Marsh"
+    },
+    {
+      "key": 35058,
+      "name": "Knowledge_Golden_Plains",
+      "display": "Golden Plains"
+    },
+    {
+      "key": 35059,
+      "name": "Knowledge_Kingshield_Mountain",
+      "display": "Kingshield Mountains"
+    },
+    {
+      "key": 35061,
+      "name": "Knowledge_Denn_River",
+      "display": "Denn River"
+    },
+    {
+      "key": 35063,
+      "name": "Knowledge_Horseshoe_Lake",
+      "display": "Horseshoe Lake"
+    },
+    {
+      "key": 35064,
+      "name": "Knowledge_Drywind_Valley",
+      "display": "Drywind Valley"
+    },
+    {
+      "key": 35065,
+      "name": "Knowledge_Regent_Rise",
+      "display": "Regent's Rise"
+    },
+    {
+      "key": 35066,
+      "name": "Knowledge_Snaketail_Wall",
+      "display": "Snaketail Wall"
+    },
+    {
+      "key": 35067,
+      "name": "Knowledge_Timberton",
+      "display": "Timberdale"
+    },
+    {
+      "key": 35069,
+      "name": "Knowledge_Swordbound_Cliff_of_Despair",
+      "display": "Cliff of Despair"
+    },
+    {
+      "key": 35070,
+      "name": "Knowledge_Chattering_Forest",
+      "display": "Chittering Forest"
+    },
+    {
+      "key": 35073,
+      "name": "Knowledge_Mount_Benus",
+      "display": "Mount Benus"
+    },
+    {
+      "key": 35074,
+      "name": "Knowledge_Wildberry_Thicket",
+      "display": "Blue Thicket"
+    },
+    {
+      "key": 35077,
+      "name": "Knowledge_Grey_Forest",
+      "display": "The Grey Forest"
+    },
+    {
+      "key": 35079,
+      "name": "Knowledge_Crimson_River",
+      "display": "Red River"
+    },
+    {
+      "key": 35080,
+      "name": "Knowledge_Beardtree_Swamp",
+      "display": "Beardtree Hills"
+    },
+    {
+      "key": 35094,
+      "name": "Knowledge_Black_Wall",
+      "display": "Black Wall"
+    },
+    {
+      "key": 35098,
+      "name": "Knowledge_Smoking_Lands",
+      "display": "Smoking Lands"
+    },
+    {
+      "key": 35100,
+      "name": "Knowledge_Thirsting_River",
+      "display": "Trivana Sound"
+    },
+    {
+      "key": 35102,
+      "name": "Knowledge_Lonely_Desert",
+      "display": "Forebearer's Barrens"
+    },
+    {
+      "key": 35103,
+      "name": "Knowledge_World_Navel",
+      "display": "World's Navel"
+    },
+    {
+      "key": 35105,
+      "name": "Knowledge_Conqueror_Wastelands",
+      "display": "Sovereign Wastes"
+    },
+    {
+      "key": 35106,
+      "name": "Knowledge_Crimson_Wall",
+      "display": "Crimson Wall"
+    },
+    {
+      "key": 35108,
+      "name": "Knowledge_Crimson_Mountains",
+      "display": "Crimson Mountains"
+    },
+    {
+      "key": 35109,
+      "name": "Knowledge_Rattlesnake_Steppe",
+      "display": "Rattlesnake Steppe"
+    },
+    {
+      "key": 35111,
+      "name": "Knowledge_Screaming_Precipice",
+      "display": "Howling Precipice"
+    },
+    {
+      "key": 35113,
+      "name": "Knowledge_Valley_of_Fire",
+      "display": "Valley of Fire"
+    },
+    {
+      "key": 35114,
+      "name": "Knowledge_Rockshard_Mountain",
+      "display": "Rockshard Mountain"
+    },
+    {
+      "key": 35115,
+      "name": "Knowledge_Sandshift_Basin",
+      "display": "Sandshift Basin"
+    },
+    {
+      "key": 35119,
+      "name": "Knowledge_Trader_Expanse",
+      "display": "Trader's Expanse"
+    },
+    {
+      "key": 35120,
+      "name": "Knowledge_Varnia_Gorge",
+      "display": "Varnia Gorge"
+    },
+    {
+      "key": 35123,
+      "name": "Knowledge_Hernand_Town",
+      "display": "Hernand Town"
+    },
+    {
+      "key": 35126,
+      "name": "Knowledge_Reventain_Monastery",
+      "display": "Reventine Monastery Region"
+    },
+    {
+      "key": 35128,
+      "name": "Knowledge_White_Mountains",
+      "display": "The Argent Peaks"
+    },
+    {
+      "key": 35133,
+      "name": "Knowledge_Mountain_of_Frozen_Souls",
+      "display": "Mountain of Frozen Souls"
+    },
+    {
+      "key": 35139,
+      "name": "Knowledge_Eastern_Hills",
+      "display": "Eastern Hills"
+    },
+    {
+      "key": 35143,
+      "name": "Knowledge_Crowclaw_Isle",
+      "display": "Crowtalon Isles"
+    },
+    {
+      "key": 35154,
+      "name": "Knowledge_Deadfire_Mountain",
+      "display": "Deadfire Mountain"
+    },
+    {
+      "key": 35157,
+      "name": "Knowledge_Shadow_Slope",
+      "display": "Shadow's Slope"
+    },
+    {
+      "key": 35167,
+      "name": "Knowledge_Breezeblown_Knoll",
+      "display": "Breezeblown Knoll"
+    },
+    {
+      "key": 35168,
+      "name": "Knowledge_Hexe_Sanctuary",
+      "display": "Hexe Sanctuary"
+    },
+    {
+      "key": 35245,
+      "name": "Knowledge_Demeniss_Town",
+      "display": "City of Demeniss"
+    },
+    {
+      "key": 35246,
+      "name": "Knowledge_Delesyia",
+      "display": "City of Delesyia"
+    },
+    {
+      "key": 35247,
+      "name": "Knowledge_Calphade",
+      "display": "Calphadean Territory"
+    },
+    {
+      "key": 35249,
+      "name": "Knowledge_Varnia",
+      "display": "City of Varnia"
+    },
+    {
+      "key": 35252,
+      "name": "Knowledge_Crookrock_Crag",
+      "display": "Crookstone Crag"
+    },
+    {
+      "key": 35273,
+      "name": "Knowledge_Delesyia_Rivermouth",
+      "display": "Delesyia Rivermouth"
+    },
+    {
+      "key": 35274,
+      "name": "Knowledge_Valley_of_the_Moon",
+      "display": "Valley of the Moon"
+    },
+    {
+      "key": 35275,
+      "name": "Knowledge_Shaded_Forest",
+      "display": "Arboria Forest"
+    },
+    {
+      "key": 35276,
+      "name": "Knowledge_Marauder_Pit",
+      "display": "Marauder's Pit"
+    },
+    {
+      "key": 35277,
+      "name": "Knowledge_Morning_Mist_Peaks",
+      "display": "Morning Mist Peaks"
+    },
+    {
+      "key": 35278,
+      "name": "Knowledge_Ghostrock_Forest",
+      "display": "Ghostrock Forest"
+    },
+    {
+      "key": 35279,
+      "name": "Knowledge_Giant_Yard",
+      "display": "Giant's Yard"
+    },
+    {
+      "key": 35280,
+      "name": "Valley_of_Vultures",
+      "display": "Valley of Grief"
+    },
+    {
+      "key": 35282,
+      "name": "Knowledge_Trembling_Woods",
+      "display": "Trembling Woods"
+    },
+    {
+      "key": 35283,
+      "name": "Knowledge_Salt_Road",
+      "display": "Saltroad"
+    },
+    {
+      "key": 40001,
+      "name": "Knowledge_Detect",
+      "display": "Focus"
+    },
+    {
+      "key": 40002,
+      "name": "Knowledge_CrowWing",
+      "display": "Flight"
+    },
+    {
+      "key": 40003,
+      "name": "Knowledge_SwordMastery_I",
+      "display": "Armed Combat"
+    },
+    {
+      "key": 40012,
+      "name": "Knowledge_RotationBash_II",
+      "display": "Expertise"
+    },
+    {
+      "key": 40013,
+      "name": "Knowledge_Lunge_I",
+      "display": "Stab"
+    },
+    {
+      "key": 40014,
+      "name": "Knowledge_DoubleKick",
+      "display": "Pump Kick"
+    },
+    {
+      "key": 40018,
+      "name": "Knowledge_JumpStep",
+      "display": "Vault"
+    },
+    {
+      "key": 40024,
+      "name": "Knowledge_Rush",
+      "display": "Blinding Flash Finisher"
+    },
+    {
+      "key": 40028,
+      "name": "Knowledge_Wrestle_Lariat",
+      "display": "Clothesline"
+    },
+    {
+      "key": 40030,
+      "name": "Knowledge_Wrestle_GiantSwing",
+      "display": "Giant Swing"
+    },
+    {
+      "key": 40034,
+      "name": "Knowledge_DropKick",
+      "display": "Dropkick"
+    },
+    {
+      "key": 40036,
+      "name": "Knowledge_MoveCutting_I",
+      "display": "Forward Slash"
+    },
+    {
+      "key": 40039,
+      "name": "Knowledge_Light_Reflection",
+      "display": "Blinding Flash"
+    },
+    {
+      "key": 40048,
+      "name": "Knowledge_RotationBash_NoDelay",
+      "display": "Proficiency"
+    },
+    {
+      "key": 40063,
+      "name": "Knowledge_Multi_Shot",
+      "display": "Multishot"
+    },
+    {
+      "key": 40064,
+      "name": "Knowledge_Evade_Shot",
+      "display": "Evasive Shot"
+    },
+    {
+      "key": 40065,
+      "name": "Knowledge_Charge_Shot",
+      "display": "Charged Shot"
+    },
+    {
+      "key": 40068,
+      "name": "Knowledge_BlackWolf",
+      "display": "Axiom Force"
+    },
+    {
+      "key": 40069,
+      "name": "Knowledge_TurnBash_I",
+      "display": "Spinning Slash"
+    },
+    {
+      "key": 40071,
+      "name": "Knowledge_MoveCutting_II",
+      "display": "Proficiency"
+    },
+    {
+      "key": 40072,
+      "name": "Knowledge_RotationBash_I",
+      "display": "Turning Slash"
+    },
+    {
+      "key": 40082,
+      "name": "Knowledge_CrowDash",
+      "display": "Aerial Roll"
+    },
+    {
+      "key": 40086,
+      "name": "Knowledge_JiJeongTa_I",
+      "display": "Force Palm"
+    },
+    {
+      "key": 40089,
+      "name": "Knowledge_JiJeongTa_II",
+      "display": "Proficiency"
+    },
+    {
+      "key": 40090,
+      "name": "Knowledge_DeadEyes",
+      "display": "Focused Shot"
+    },
+    {
+      "key": 40091,
+      "name": "Knowledge_RollShot",
+      "display": "Focused Evasive Shot"
+    },
+    {
+      "key": 40114,
+      "name": "Knowledge_BasicBow",
+      "display": "Marksmanship"
+    },
+    {
+      "key": 41013,
+      "name": "Knowledge_Dungeon_0013",
+      "display": "Hernand Sewers"
+    },
+    {
+      "key": 41019,
+      "name": "Knowledge_Dungeon_0019",
+      "display": "Hidden Prison of Demeniss"
+    },
+    {
+      "key": 42009,
+      "name": "Knowledge_Sage_Cave",
+      "display": "Specter's Hideout"
+    },
+    {
+      "key": 42026,
+      "name": "Knowledge_Striped_Snake_Marsh_Enlightenment_Cave",
+      "display": "Morning Mist Cave"
+    },
+    {
+      "key": 42033,
+      "name": "Knowledge_Moru_Hil_StoneBackCrab_Cave",
+      "display": "Anvil Hill Stoneback Crab Cave"
+    },
+    {
+      "key": 42063,
+      "name": "Knowledge_Gap_In_Boundaries",
+      "display": "Border's End"
+    },
+    {
+      "key": 1000000,
+      "name": "Knowledge_Wrestle",
+      "display": "Grappling"
+    },
+    {
+      "key": 1000001,
+      "name": "Knowledge_Wrestle_AirBodySlam",
+      "display": "Body Slam"
+    },
+    {
+      "key": 1000002,
+      "name": "Knowledge_Hernand_CelesterLetter",
+      "display": "Celeste's Confidential Letter"
+    },
+    {
+      "key": 1000004,
+      "name": "Knowledge_Node_Crim_ArimajahrCamp",
+      "display": "Arima-jahr Camp"
+    },
+    {
+      "key": 1000005,
+      "name": "Knowledge_Node_Crim_KhafijahrCamp",
+      "display": "Khafi-jahr Camp"
+    },
+    {
+      "key": 1000006,
+      "name": "Knowledge_Node_Abyss_Corridor",
+      "display": "Corridor of the Void"
+    },
+    {
+      "key": 1000007,
+      "name": "Knowledge_Node_Pink_Rosemary_Grove",
+      "display": "Pink Rosemary Patch"
+    },
+    {
+      "key": 1000008,
+      "name": "Knowledge_Node_Crim_GhadirjahrCamp",
+      "display": "Ghadir-jahr Camp"
+    },
+    {
+      "key": 1000009,
+      "name": "Knowledge_Node_Crim_QudimjahrCamp",
+      "display": "Qudim-jahr Camp"
+    },
+    {
+      "key": 1000010,
+      "name": "Knowledge_Node_Crim_YalwijahrCamp",
+      "display": "Yalwi-jahr Camp"
+    },
+    {
+      "key": 1000011,
+      "name": "Knowledge_Node_Crim_ShiqarjahrCamp",
+      "display": "Shiqar-jahr Camp"
+    },
+    {
+      "key": 1000012,
+      "name": "Knowledge_Tree_Brothers_Cliff",
+      "display": "Three Brothers' Cliff"
+    },
+    {
+      "key": 1000013,
+      "name": "Knowledge_JumpDoubleKick",
+      "display": "Flying Kick"
+    },
+    {
+      "key": 1000014,
+      "name": "Knowledge_SkyKick",
+      "display": "Meteor Kick"
+    },
+    {
+      "key": 1000015,
+      "name": "Knowledge_Her_Grace",
+      "display": "Grace Estate"
+    },
+    {
+      "key": 1000016,
+      "name": "Knowledge_Node_Her_HernandCastle",
+      "display": "Hernand Castle"
+    },
+    {
+      "key": 1000017,
+      "name": "Knowledge_Node_Her_HernandEastGate",
+      "display": "Hernand East Gate"
+    },
+    {
+      "key": 1000018,
+      "name": "Knowledge_Unique_Byron",
+      "display": "George Byron"
+    },
+    {
+      "key": 1000020,
+      "name": "Knowledge_Node_Crim_BaisunjahrCamp",
+      "display": "Baisun-jahr Camp"
+    },
+    {
+      "key": 1000022,
+      "name": "Knowledge_Node_Crim_AsaharamCamp",
+      "display": "Asaha-ram Camp"
+    },
+    {
+      "key": 1000024,
+      "name": "Knowledge_Evade_Shot_II",
+      "display": "Expertise"
+    },
+    {
+      "key": 1000026,
+      "name": "Knowledge_Node_Crim_KuhteramCamp",
+      "display": "Kuhte-ram Camp"
+    },
+    {
+      "key": 1000027,
+      "name": "Knowledge_Node_Crim_HariyahramCamp",
+      "display": "Hariyah-ram Camp"
+    },
+    {
+      "key": 1000029,
+      "name": "Knowledge_Node_Her_StoneTowerVillage",
+      "display": "Cairn House"
+    },
+    {
+      "key": 1000030,
+      "name": "Knowledge_Faction_Witch",
+      "display": "Witches"
+    },
+    {
+      "key": 1000031,
+      "name": "Knowledge_Node_Dem_FrameVillage",
+      "display": "Easelbury"
+    },
+    {
+      "key": 1000032,
+      "name": "Knowledge_Five_Finger_Mountain",
+      "display": "Five-Finger Mountain"
+    },
+    {
+      "key": 1000034,
+      "name": "Knowledge_EvadeAttack",
+      "display": "Evasive Slash"
+    },
+    {
+      "key": 1000035,
+      "name": "Knowledge_AbyssRuins_Her_0007",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000037,
+      "name": "Knowledge_ShieldDash",
+      "display": "Charge"
+    },
+    {
+      "key": 1000038,
+      "name": "Knowledge_AbyssRuins_Her_0001",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000042,
+      "name": "Knowledge_Node_Dem_ReventineDigSite",
+      "display": "Western Dig Site"
+    },
+    {
+      "key": 1000044,
+      "name": "Knowledge_Node_Dem_WheelsmithWagonFactory",
+      "display": "Wheelsmith Wainwright"
+    },
+    {
+      "key": 1000047,
+      "name": "Knowledge_Node_Dem_SickForest",
+      "display": "Blighted Forest"
+    },
+    {
+      "key": 1000056,
+      "name": "Knowledge_Node_Neut_FreeswordHouse",
+      "display": "Freesword Dwelling"
+    },
+    {
+      "key": 1000061,
+      "name": "Knowledge_Node_Abyssone_0002",
+      "display": "Axiom Archive"
+    },
+    {
+      "key": 1000062,
+      "name": "Knowledge_Node_Abyssone_0009",
+      "display": "Crow's Nest"
+    },
+    {
+      "key": 1000065,
+      "name": "Knowledge_Node_Abyssone_0001",
+      "display": "Ethereal Pathway"
+    },
+    {
+      "key": 1000066,
+      "name": "Knowledge_Node_Begonia_Grove",
+      "display": "Begonia Patch"
+    },
+    {
+      "key": 1000070,
+      "name": "Knowledge_MainMenuView_All",
+      "display": "UI All Categories Interface"
+    },
+    {
+      "key": 1000076,
+      "name": "Knowledge_Node_Her_ReedField",
+      "display": "Reedwind Valley"
+    },
+    {
+      "key": 1000083,
+      "name": "Knowledge_KuKu_Pot",
+      "display": "Kuku Pot"
+    },
+    {
+      "key": 1000087,
+      "name": "Knowledge_Node_Abyssone_End_0005",
+      "display": "Light and Darkness"
+    },
+    {
+      "key": 1000088,
+      "name": "Knowledge_Node_Abyssone_End_0006",
+      "display": "Umbra Myurdin"
+    },
+    {
+      "key": 1000089,
+      "name": "Knowledge_Node_Her_HernandNorthGate",
+      "display": "Hernand North Gate"
+    },
+    {
+      "key": 1000091,
+      "name": "Knowledge_Node_Her_DeepForest",
+      "display": "Deepwoods"
+    },
+    {
+      "key": 1000098,
+      "name": "Knowledge_Node_Her_KharonsoLake",
+      "display": "Lake Kharonso"
+    },
+    {
+      "key": 1000100,
+      "name": "Knowledge_Nature",
+      "display": "Keen Senses"
+    },
+    {
+      "key": 1000101,
+      "name": "Knowledge_SubWeaponToggle",
+      "display": "Quick Swap"
+    },
+    {
+      "key": 1000104,
+      "name": "Knowledge_Node_Her_KharonsoVillage",
+      "display": "Kharonso"
+    },
+    {
+      "key": 1000106,
+      "name": "Knowledge_Calphade_Town",
+      "display": "City of Calphade"
+    },
+    {
+      "key": 1000109,
+      "name": "Knowledge_ShieldParryingDash",
+      "display": "Rush"
+    },
+    {
+      "key": 1000115,
+      "name": "Knowledge_AbyssRuins_Her_0002",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000125,
+      "name": "Knowledge_GuardianStone1",
+      "display": "The First Guardian Stone"
+    },
+    {
+      "key": 1000128,
+      "name": "Knowledge_Faction_SplitHornGuard",
+      "display": "Hornsplitter's Guards"
+    },
+    {
+      "key": 1000134,
+      "name": "Knowledge_Wrestle_Takedown",
+      "display": "Lariat"
+    },
+    {
+      "key": 1000137,
+      "name": "Knowledge_Greywolf_Detect_Unleash",
+      "display": "Focused Repulsion"
+    },
+    {
+      "key": 1000138,
+      "name": "Knowledge_Greywolf_Detect_SuperFocus",
+      "display": "Focused Insight"
+    },
+    {
+      "key": 1000147,
+      "name": "Knowledge_Node_Dem_Flame_Knights",
+      "display": "Flame Knights Castle"
+    },
+    {
+      "key": 1000148,
+      "name": "Knowledge_Fish_Meat",
+      "display": "Fish Fillet"
+    },
+    {
+      "key": 1000152,
+      "name": "Knowledge_AbyssRuins_Her_0014",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000166,
+      "name": "Knowledge_Alustain_Letter",
+      "display": "Alustin's Letter"
+    },
+    {
+      "key": 1000167,
+      "name": "Knowledge_AbyssRuins_Her_0015",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000169,
+      "name": "Knowledge_Hernand_RegionName",
+      "display": "Hernand"
+    },
+    {
+      "key": 1000170,
+      "name": "Knowledge_Demeniss_RegionName",
+      "display": "Demeniss"
+    },
+    {
+      "key": 1000172,
+      "name": "Knowledge_Pailunese_RegionName",
+      "display": "Pailune"
+    },
+    {
+      "key": 1000174,
+      "name": "Knowledge_CallVehicle",
+      "display": "Summon Mount"
+    },
+    {
+      "key": 1000175,
+      "name": "Knowledge_CallDragon",
+      "display": "Call Dragon"
+    },
+    {
+      "key": 1000176,
+      "name": "Knowledge_Calphade_RegionName",
+      "display": "Calphade"
+    },
+    {
+      "key": 1000177,
+      "name": "Knowledge_WinterMountain_Basin",
+      "display": "Everfrost Basin"
+    },
+    {
+      "key": 1000178,
+      "name": "Knowledge_Sunrise_Plain",
+      "display": "Sunrise Plains"
+    },
+    {
+      "key": 1000179,
+      "name": "Knowledge_Steel_Bay",
+      "display": "Bay of Steel"
+    },
+    {
+      "key": 1000181,
+      "name": "Knowledge_Sacred_Land",
+      "display": "Sacred Land"
+    },
+    {
+      "key": 1000182,
+      "name": "Knowledge_DennRiver_CentralWaterSource",
+      "display": "Central Denn River Basin"
+    },
+    {
+      "key": 1000183,
+      "name": "Knowledge_CrescentMoon_Lake",
+      "display": "Crescent Lake"
+    },
+    {
+      "key": 1000184,
+      "name": "Knowledge_Anvil_Riverside",
+      "display": "Anvil Riverside"
+    },
+    {
+      "key": 1000185,
+      "name": "Knowledge_Anvil_WaterSource",
+      "display": "Anvil Basin"
+    },
+    {
+      "key": 1000186,
+      "name": "Knowledge_Anvil_RiverTerrace_Zone",
+      "display": "Anvil Riverside Terrace"
+    },
+    {
+      "key": 1000187,
+      "name": "Knowledge_Riding_Wagon",
+      "display": ""
+    },
+    {
+      "key": 1000189,
+      "name": "Knowledge_Riding_Cannon",
+      "display": "Cannon"
+    },
+    {
+      "key": 1000190,
+      "name": "Knowledge_Faction_South_Bandit",
+      "display": ""
+    },
+    {
+      "key": 1000193,
+      "name": "Knowledge_Faction_Solumen_Church",
+      "display": "Church of Solumen"
+    },
+    {
+      "key": 1000196,
+      "name": "Knowledge_Collection_Prop_Picture_0060",
+      "display": "Study - Dignified Genius"
+    },
+    {
+      "key": 1000199,
+      "name": "Knowledge_AbyssRuins_Her_0003",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000210,
+      "name": "Knowledge_Interaction_Start",
+      "display": "Take, Steal, Open (Box), Gift"
+    },
+    {
+      "key": 1000211,
+      "name": "Knowledge_Faction_East_Bandit",
+      "display": ""
+    },
+    {
+      "key": 1000214,
+      "name": "Knowledge_Faction_RedWindTradingAssociation",
+      "display": "Redwind Merchant Guild"
+    },
+    {
+      "key": 1000216,
+      "name": "Knowledge_AbyssRuins_Her_0004",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000223,
+      "name": "Knowledge_AbyssRuins_Her_0005",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000227,
+      "name": "AbyssGate_0023_AbyssIsland",
+      "display": "Sanctorum of Insight"
+    },
+    {
+      "key": 1000230,
+      "name": "Knowledge_Evade_Shot_I",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1000235,
+      "name": "AbyssGate_0079_AbyssIsland",
+      "display": "Nest of Valor"
+    },
+    {
+      "key": 1000236,
+      "name": "AbyssGate_0083_AbyssIsland",
+      "display": "Ascetic's Rest"
+    },
+    {
+      "key": 1000249,
+      "name": "Knowledge_AbyssRuins_Dem_0001",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000251,
+      "name": "Knowledge_AbyssRuins_Dem_0003",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000253,
+      "name": "Knowledge_AbyssRuins_Dem_0005",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000255,
+      "name": "Knowledge_AbyssRuins_Del_0002",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000256,
+      "name": "Knowledge_AbyssRuins_Del_0003",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000258,
+      "name": "Knowledge_Node_Her_ScholastoneInstitute",
+      "display": "Scholastone Institute"
+    },
+    {
+      "key": 1000259,
+      "name": "Knowledge_AbyssRuins_Del_0005",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000260,
+      "name": "Knowledge_AbyssRuins_Kwe_0001",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000261,
+      "name": "Knowledge_Node_Her_ScholastoneArchive",
+      "display": "Scholastone Archive"
+    },
+    {
+      "key": 1000262,
+      "name": "Knowledge_Node_Her_KilndenKukuWorkshop",
+      "display": "Kilnden Workshop"
+    },
+    {
+      "key": 1000263,
+      "name": "Knowledge_AbyssRuins_Kwe_0002",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000264,
+      "name": "Knowledge_AbyssRuins_Kwe_0003",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000265,
+      "name": "Knowledge_AbyssRuins_Kwe_0004",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000266,
+      "name": "Knowledge_ByronMyurdin_Letter",
+      "display": "The Secret Pact of Byron and Myurdin"
+    },
+    {
+      "key": 1000267,
+      "name": "Knowledge_AbyssRuins_Kwe_0005",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000268,
+      "name": "Knowledge_AbyssRuins_CD_0001",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000269,
+      "name": "Knowledge_AbyssRuins_CD_0002",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000272,
+      "name": "Knowledge_AbyssRuins_CD_0005",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000273,
+      "name": "Knowledge_Faction_Celeste_Hernand",
+      "display": "PHM_Description_001"
+    },
+    {
+      "key": 1000274,
+      "name": "Knowledge_AbyssRuins_CD_0006",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000275,
+      "name": "Knowledge_AbyssRuins_CD_0007",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000276,
+      "name": "Knowledge_AnvilHill_Pool",
+      "display": "Anvil Hill Puddle"
+    },
+    {
+      "key": 1000279,
+      "name": "Knowledge_AbyssRuins_CD_0009",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000280,
+      "name": "Knowledge_AbyssRuins_CD_0010",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000283,
+      "name": "Knowledge_Node_Kwe_PailuneCampsite",
+      "display": "Pailune Camp"
+    },
+    {
+      "key": 1000285,
+      "name": "Knowledge_BlackWall_WaterSource",
+      "display": "Black Wall Basin"
+    },
+    {
+      "key": 1000287,
+      "name": "Knowledge_Halsius_Confluence",
+      "display": "Halssius Conflux"
+    },
+    {
+      "key": 1000289,
+      "name": "Knowledge_Echo_Cliff",
+      "display": "Precipice of Echoes"
+    },
+    {
+      "key": 1000290,
+      "name": "Knowledge_FoggyWind_HillsideStairs",
+      "display": "Mistwind Stepped Hillside"
+    },
+    {
+      "key": 1000291,
+      "name": "Knowledge_Winding_HillyArea",
+      "display": "Meandering Hills"
+    },
+    {
+      "key": 1000292,
+      "name": "Knowledge_Nas_Riverside",
+      "display": "Nas Riverside"
+    },
+    {
+      "key": 1000293,
+      "name": "Knowledge_WindPlateau_Mesa",
+      "display": "Windland Heights"
+    },
+    {
+      "key": 1000297,
+      "name": "Knowledge_Her_DyeColor_1",
+      "display": "Hernandian Dye No. 1"
+    },
+    {
+      "key": 1000324,
+      "name": "Knowledge_Tashkalp",
+      "display": "City of Tommaso"
+    },
+    {
+      "key": 1000328,
+      "name": "AbyssGate_0002_AbyssIsland",
+      "display": "Axiom Archive"
+    },
+    {
+      "key": 1000334,
+      "name": "Knowledge_Collection_Prop_Picture_0010",
+      "display": "Study - Hernand Castle"
+    },
+    {
+      "key": 1000336,
+      "name": "Knowledge_Node_Dem_ThornRoseSuppliesStorageCentral",
+      "display": "Thornbriar Central Food Storage"
+    },
+    {
+      "key": 1000340,
+      "name": "Knowledge_Node_Her_GlenbrightManor_Grace",
+      "display": "Glenbright Manor"
+    },
+    {
+      "key": 1000347,
+      "name": "Knowledge_Collection_Prop_Picture_0020",
+      "display": "Acclaimed - Silence of Dawn"
+    },
+    {
+      "key": 1000350,
+      "name": "Knowledge_Node_Her_GlenbrightFarm",
+      "display": "Glenbright Farm"
+    },
+    {
+      "key": 1000352,
+      "name": "Knowledge_Node_Her_SeniaVillage",
+      "display": "Senia"
+    },
+    {
+      "key": 1000360,
+      "name": "Knowledge_Faction_Solumen_Church_Hernand",
+      "display": "Hernandian Parish of Solumen"
+    },
+    {
+      "key": 1000361,
+      "name": "Knowledge_Unique_Marseille",
+      "display": "Ada Marshell"
+    },
+    {
+      "key": 1000363,
+      "name": "Knowledge_Paper_AbyssTeleport",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000372,
+      "name": "Knowledge_Damian_ShieldDash",
+      "display": "Charge"
+    },
+    {
+      "key": 1000375,
+      "name": "Knowledge_Damian_Wrestle",
+      "display": "Grappling"
+    },
+    {
+      "key": 1000385,
+      "name": "Knowledge_AbyssRuins_Her_0006",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000405,
+      "name": "Knowledge_Paper_HowToQuenching",
+      "display": "The Blacksmith's Advice"
+    },
+    {
+      "key": 1000427,
+      "name": "Knowledge_Node_Yellow_Rosemary_Grove",
+      "display": "Yellow Rosemary Patch"
+    },
+    {
+      "key": 1000429,
+      "name": "Knowledge_Node_White_Rosemary_Grove",
+      "display": "White Rosemary Patch"
+    },
+    {
+      "key": 1000433,
+      "name": "Knowledge_Node_Her_Mountain_of_Frozen_Souls_RestArea_0001",
+      "display": "Mountain of Frozen Souls Hearth"
+    },
+    {
+      "key": 1000436,
+      "name": "Knowledge_Spider",
+      "display": "Spider"
+    },
+    {
+      "key": 1000447,
+      "name": "Knowledge_Dem_Wells",
+      "display": "Wells Estate"
+    },
+    {
+      "key": 1000464,
+      "name": "Knowledge_Por_DyeColor_1",
+      "display": "Pororin Dye"
+    },
+    {
+      "key": 1000471,
+      "name": "Knowledge_AbyssRuins_Dem_0006",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000472,
+      "name": "Knowledge_Meat_I",
+      "display": "Lean Meat"
+    },
+    {
+      "key": 1000477,
+      "name": "Knowledge_Meat_II",
+      "display": "Fine Meat"
+    },
+    {
+      "key": 1000478,
+      "name": "Knowledge_AbyssRuins_Kwe_0006",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000480,
+      "name": "Knowledge_Meat_IV",
+      "display": "Marbled Meat"
+    },
+    {
+      "key": 1000481,
+      "name": "Knowledge_Meat_III",
+      "display": "Tender Meat"
+    },
+    {
+      "key": 1000483,
+      "name": "Knowledge_Bird_Meat",
+      "display": "Lean Bird Meat"
+    },
+    {
+      "key": 1000484,
+      "name": "Knowledge_Chicken_Meat",
+      "display": "Bird Meat"
+    },
+    {
+      "key": 1000485,
+      "name": "Knowledge_Lentils",
+      "display": "Lentils"
+    },
+    {
+      "key": 1000488,
+      "name": "Knowledge_peas",
+      "display": "Peas"
+    },
+    {
+      "key": 1000489,
+      "name": "Knowledge_Barley",
+      "display": "Barley"
+    },
+    {
+      "key": 1000490,
+      "name": "Knowledge_LinkBand",
+      "display": "Axiom Bracelet"
+    },
+    {
+      "key": 1000491,
+      "name": "Knowledge_WindPlateau_Canyon",
+      "display": "Windland Canyon"
+    },
+    {
+      "key": 1000492,
+      "name": "Knowledge_OrientalWitch",
+      "display": "Crisis of the Guests from the East"
+    },
+    {
+      "key": 1000493,
+      "name": "Knowledge_LungeAir",
+      "display": "Aerial Stab"
+    },
+    {
+      "key": 1000496,
+      "name": "Knowledge_Acorn",
+      "display": "Acorn"
+    },
+    {
+      "key": 1000499,
+      "name": "Knowledge_GreenField_Gorge",
+      "display": "Greenfield Gorge"
+    },
+    {
+      "key": 1000502,
+      "name": "Knowledge_Delesyian_Territory",
+      "display": "Republic of Delesyia"
+    },
+    {
+      "key": 1000503,
+      "name": "Knowledge_Strawberry",
+      "display": "Strawberry"
+    },
+    {
+      "key": 1000506,
+      "name": "Knowledge_GreenField_HillyArea",
+      "display": "Greenfield Highlands"
+    },
+    {
+      "key": 1000508,
+      "name": "Knowledge_HeavenlyAltar_Mesa",
+      "display": "Ethereal Altar Plateau"
+    },
+    {
+      "key": 1000511,
+      "name": "Knowledge_NasRiver_Estuary",
+      "display": "Nas River Estuary"
+    },
+    {
+      "key": 1000513,
+      "name": "Knowledge_BloodCoronation_Bastion_Traitor",
+      "display": "A Master's Death and Bastier"
+    },
+    {
+      "key": 1000520,
+      "name": "Knowledge_Alustin",
+      "display": "Alustin"
+    },
+    {
+      "key": 1000522,
+      "name": "Knowledge_Node_Her_HalsiusHospital",
+      "display": "St. Halssius's House of Healing"
+    },
+    {
+      "key": 1000523,
+      "name": "Knowledge_Node_Her_HalsiusTradePost",
+      "display": "Halssius Trading Post"
+    },
+    {
+      "key": 1000529,
+      "name": "Knowledge_Node_Her_HalsiusDrugstore",
+      "display": "Halssius Apothecary"
+    },
+    {
+      "key": 1000531,
+      "name": "Knowledge_Shadow_Whisper_Cave",
+      "display": "Shadow's Whisper Cave"
+    },
+    {
+      "key": 1000538,
+      "name": "Knowledge_Recipe_Fruit_Wine",
+      "display": "Wine"
+    },
+    {
+      "key": 1000543,
+      "name": "Knowledge_Unique_MoonHead",
+      "display": "The Lunar Reapers"
+    },
+    {
+      "key": 1000545,
+      "name": "Knowledge_Unique_Hexe_Marie",
+      "display": "Hexe Marie"
+    },
+    {
+      "key": 1000552,
+      "name": "Knowledge_Visione_Chip_GraceMansion",
+      "display": "Grace Manor"
+    },
+    {
+      "key": 1000560,
+      "name": "Knowledge_Unique_Varnia_Dragon",
+      "display": "Blackstar"
+    },
+    {
+      "key": 1000561,
+      "name": "Knowledge_Unique_AwakenCaliburn",
+      "display": "Corrupted Caliburn"
+    },
+    {
+      "key": 1000562,
+      "name": "Knowledge_Unique_MyurdinUmbra",
+      "display": "Myurdin, the Avatar of Umbra"
+    },
+    {
+      "key": 1000567,
+      "name": "Knowledge_Pailunese_Territory",
+      "display": "Tribal State of Pailune"
+    },
+    {
+      "key": 1000568,
+      "name": "Knowledge_Pailune_Town",
+      "display": "City of Pailune"
+    },
+    {
+      "key": 1000569,
+      "name": "Knowledge_Demenissian_Territory",
+      "display": "Kingdom of Demeniss"
+    },
+    {
+      "key": 1000570,
+      "name": "Knowledge_Ironwood_Cape",
+      "display": "Ironwood Cape"
+    },
+    {
+      "key": 1000571,
+      "name": "Knowledge_AbyssRuins_Her_0008",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000574,
+      "name": "Knowledge_MainMenuView_Main_Quest",
+      "display": "Main Quest Interface"
+    },
+    {
+      "key": 1000579,
+      "name": "Knowledge_Pororin_Bell_Hernand",
+      "display": "Bell Tolling in Hernand"
+    },
+    {
+      "key": 1000587,
+      "name": "Knowledge_Visione_Chip_Azureiansister",
+      "display": "Azerian Manor"
+    },
+    {
+      "key": 1000618,
+      "name": "Knowledge_Calpheid_Restored",
+      "display": "Restored Calphade"
+    },
+    {
+      "key": 1000643,
+      "name": "Knowledge_Node_Her_FortWarspike",
+      "display": "Fort Warspike"
+    },
+    {
+      "key": 1000646,
+      "name": "Knowledge_Parsley",
+      "display": "Parsley"
+    },
+    {
+      "key": 1000649,
+      "name": "Knowledge_Salt",
+      "display": "Salt"
+    },
+    {
+      "key": 1000680,
+      "name": "Knowledge_Ground_Witch",
+      "display": "Witches on the Ground"
+    },
+    {
+      "key": 1000697,
+      "name": "Knowledge_Marni_AirShip_II",
+      "display": "Sky Galleon"
+    },
+    {
+      "key": 1000702,
+      "name": "Knowledge_Sugar",
+      "display": "Sugar"
+    },
+    {
+      "key": 1000703,
+      "name": "Knowledge_Water",
+      "display": "Water"
+    },
+    {
+      "key": 1000704,
+      "name": "Knowledge_Cooking_Oil",
+      "display": "Cooking Oil"
+    },
+    {
+      "key": 1000706,
+      "name": "Knowledge_Ironwood_BasinPlain",
+      "display": "Ironwood Highland Plains"
+    },
+    {
+      "key": 1000708,
+      "name": "Knowledge_Collection_Prop_Bottle_Ceramic",
+      "display": ""
+    },
+    {
+      "key": 1000709,
+      "name": "Knowledge_Collection_Prop_Jar_Ceramic",
+      "display": ""
+    },
+    {
+      "key": 1000712,
+      "name": "Knowledge_Deer_Antler",
+      "display": "Long Horn"
+    },
+    {
+      "key": 1000715,
+      "name": "Knowledge_Ironwood_Lake",
+      "display": "Lake Ironwood"
+    },
+    {
+      "key": 1000716,
+      "name": "Knowledge_Ironwood_Forest",
+      "display": "Ironwood Forest"
+    },
+    {
+      "key": 1000733,
+      "name": "Knowledge_MarchellByron_Letter",
+      "display": "Anonymous Letter"
+    },
+    {
+      "key": 1000736,
+      "name": "Knowledge_AbyssRuins_Her_0031",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000737,
+      "name": "Knowledge_AbyssRuins_Her_0032",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000738,
+      "name": "Knowledge_Damian_Detect",
+      "display": "Focus"
+    },
+    {
+      "key": 1000740,
+      "name": "Knowledge_Node_Her_BellanorHuntingGrounds",
+      "display": "Bellanor Hunting Grounds"
+    },
+    {
+      "key": 1000741,
+      "name": "Knowledge_Faction_WolfPursuer",
+      "display": "Wolf Trackers"
+    },
+    {
+      "key": 1000742,
+      "name": "Knowledge_AbyssRuins_Her_0033",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000751,
+      "name": "Knowledge_Faction_Serkis",
+      "display": "House Serkis"
+    },
+    {
+      "key": 1000753,
+      "name": "Knowledge_Faction_Alfonso",
+      "display": "House Alfonso"
+    },
+    {
+      "key": 1000754,
+      "name": "Knowledge_Faction_Felix",
+      "display": "House Felix"
+    },
+    {
+      "key": 1000755,
+      "name": "Knowledge_Faction_GoldleafGuildhouse",
+      "display": "Goldleaf Merchant Guild"
+    },
+    {
+      "key": 1000756,
+      "name": "Knowledge_Faction_ScholarStoneInstitute",
+      "display": "Scholastone Institute"
+    },
+    {
+      "key": 1000759,
+      "name": "Knowledge_Faction_PororinVillage",
+      "display": "Pororin Forest Guardians"
+    },
+    {
+      "key": 1000761,
+      "name": "Knowledge_Collection_Prop_Bowl_Metal",
+      "display": "Metal Bowl"
+    },
+    {
+      "key": 1000762,
+      "name": "Knowledge_Ironwood_Coast",
+      "display": "Ironwood Shore"
+    },
+    {
+      "key": 1000763,
+      "name": "Knowledge_Faction_RegleGoblin",
+      "display": ""
+    },
+    {
+      "key": 1000764,
+      "name": "Knowledge_DennRiver_Estuary",
+      "display": "Denn River Estuary"
+    },
+    {
+      "key": 1000767,
+      "name": "Knowledge_Collection_Prop_Cup_Wood",
+      "display": "Wooden Mug"
+    },
+    {
+      "key": 1000772,
+      "name": "Knowledge_BismuthOre",
+      "display": "Bismuth Ore"
+    },
+    {
+      "key": 1000775,
+      "name": "Knowledge_RedStone",
+      "display": "Bloodstone"
+    },
+    {
+      "key": 1000776,
+      "name": "Knowledge_Grey_DyeColor_3",
+      "display": "Oliver's Dye"
+    },
+    {
+      "key": 1000777,
+      "name": "Knowledge_Faction_Azerian",
+      "display": "House Azerian"
+    },
+    {
+      "key": 1000780,
+      "name": "Knowledge_Faction_DemenissMP",
+      "display": ""
+    },
+    {
+      "key": 1000783,
+      "name": "Knowledge_Faction_Tariv",
+      "display": "Tariv Sorcerers"
+    },
+    {
+      "key": 1000786,
+      "name": "Knowledge_Faction_Demeniss_StrongHold",
+      "display": "Gregor's Soldiers"
+    },
+    {
+      "key": 1000789,
+      "name": "Knowledge_Faction_RufusVenmort",
+      "display": "Fortain Rebels"
+    },
+    {
+      "key": 1000790,
+      "name": "Knowledge_AbyssRuins_Her_0034",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000794,
+      "name": "Knowledge_Faction_Pailune",
+      "display": ""
+    },
+    {
+      "key": 1000795,
+      "name": "Knowledge_Faction_Skoghorn",
+      "display": "Skoghorn Tribe"
+    },
+    {
+      "key": 1000800,
+      "name": "Knowledge_Faction_Beighen",
+      "display": ""
+    },
+    {
+      "key": 1000807,
+      "name": "Knowledge_Faction_Delesyia",
+      "display": ""
+    },
+    {
+      "key": 1000808,
+      "name": "Knowledge_Faction_DelesyiaInstitute",
+      "display": "Delesyia National Institute"
+    },
+    {
+      "key": 1000809,
+      "name": "Knowledge_Recipe_Meat_Porridge",
+      "display": "Clear Soup"
+    },
+    {
+      "key": 1000815,
+      "name": "Knowledge_Faction_AIMarni",
+      "display": "H.A.L.L."
+    },
+    {
+      "key": 1000816,
+      "name": "Knowledge_AbyssRuins_Her_0035",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000826,
+      "name": "Knowledge_Faction_Varnia",
+      "display": "Varnia"
+    },
+    {
+      "key": 1000827,
+      "name": "Knowledge_Faction_Urdavah",
+      "display": "Urdavah"
+    },
+    {
+      "key": 1000832,
+      "name": "Knowledge_Faction_Desert_Harrier",
+      "display": ""
+    },
+    {
+      "key": 1000840,
+      "name": "Knowledge_Node_Her_PhonielRanch",
+      "display": "Phoniel Ranch"
+    },
+    {
+      "key": 1000844,
+      "name": "Knowledge_Recipe_Potion_StatBuff_Tier1_0004",
+      "display": "Haiden's Lesser Elixir"
+    },
+    {
+      "key": 1000848,
+      "name": "Knowledge_Faction_ReedDevil",
+      "display": "Reed Devil"
+    },
+    {
+      "key": 1000862,
+      "name": "Knowledge_Node_Her_WarspikeEastGate",
+      "display": "Warspike East Gate"
+    },
+    {
+      "key": 1000863,
+      "name": "Knowledge_Node_Her_WarspikeSouthGate",
+      "display": "Warspike South Gate"
+    },
+    {
+      "key": 1000867,
+      "name": "Knowledge_ThornRose_Mount",
+      "display": "Thornbriar Mountains"
+    },
+    {
+      "key": 1000869,
+      "name": "Knowledge_Faction_JiJeong_Temple",
+      "display": "Jijeong School"
+    },
+    {
+      "key": 1000870,
+      "name": "Knowledge_Stone_Quarry",
+      "display": "Stone"
+    },
+    {
+      "key": 1000886,
+      "name": "Knowledge_Specialty_Oil",
+      "display": "Lubricant"
+    },
+    {
+      "key": 1000908,
+      "name": "Knowledge_EvadeExplosionShot",
+      "display": "Explosive Evasive Shot"
+    },
+    {
+      "key": 1000925,
+      "name": "Knowledge_Benus_River",
+      "display": "Benus River"
+    },
+    {
+      "key": 1000926,
+      "name": "Knowledge_Breezeblown_Brook",
+      "display": "Breezeblown Brook"
+    },
+    {
+      "key": 1000929,
+      "name": "Knowledge_JiJeongTa_Cure",
+      "display": "Healing Force Palm"
+    },
+    {
+      "key": 1000947,
+      "name": "Knowledge_Dungeon_0036",
+      "display": "Marni's Laboratory"
+    },
+    {
+      "key": 1000948,
+      "name": "Knowledge_DragonFly",
+      "display": "Dragonfly"
+    },
+    {
+      "key": 1000949,
+      "name": "Knowledge_Gimmick_NoticeBoard",
+      "display": "Notice Board"
+    },
+    {
+      "key": 1000951,
+      "name": "Knowledge_Recipe_Bullet",
+      "display": "Bullet"
+    },
+    {
+      "key": 1000957,
+      "name": "Knowledge_GreyFur_Giles",
+      "display": "Giles"
+    },
+    {
+      "key": 1000959,
+      "name": "Knowledge_Unique_Master_Doo",
+      "display": "Master Du"
+    },
+    {
+      "key": 1000960,
+      "name": "Knowledge_AbyssRuins_Her_0036",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000962,
+      "name": "Knowledge_AbyssRuins_Her_0037",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000963,
+      "name": "Knowledge_AbyssRuins_Her_0038",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000964,
+      "name": "Knowledge_AbyssRuins_Her_0039",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000967,
+      "name": "Knowledge_AbyssRuins_Her_0040",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000968,
+      "name": "Knowledge_AbyssRuins_Her_0041",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000969,
+      "name": "Knowledge_AbyssRuins_Her_0042",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000970,
+      "name": "Knowledge_AbyssRuins_Her_0043",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000972,
+      "name": "Knowledge_AbyssRuins_Her_0044",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000974,
+      "name": "Knowledge_AbyssRuins_Her_0046",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000979,
+      "name": "Knowledge_AbyssRuins_Her_0047",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000980,
+      "name": "Knowledge_AbyssRuins_Her_0048",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000982,
+      "name": "Knowledge_Abyssgear_First",
+      "display": "Copper"
+    },
+    {
+      "key": 1000983,
+      "name": "Knowledge_AbyssRuins_Her_0049",
+      "display": "Kliff"
+    },
+    {
+      "key": 1000986,
+      "name": "Knowledge_AbyssRuins_Dem_0032",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1000987,
+      "name": "Knowledge_Node_Her_village",
+      "display": "Hernand Farmhouse"
+    },
+    {
+      "key": 1000988,
+      "name": "Knowledge_Dem_Azerian",
+      "display": "Azerian Estate"
+    },
+    {
+      "key": 1000989,
+      "name": "Knowledge_Dem_Byron",
+      "display": "Byron Estate"
+    },
+    {
+      "key": 1000998,
+      "name": "Knowledge_AbyssRuins_Dem_0034",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001003,
+      "name": "Knowledge_Finlay",
+      "display": "Finley"
+    },
+    {
+      "key": 1001004,
+      "name": "Knowledge_Harald",
+      "display": "Hailard"
+    },
+    {
+      "key": 1001005,
+      "name": "Knowledge_AbyssRuins_Dem_0035",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001006,
+      "name": "Knowledge_AbyssRuins_Dem_0036",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001008,
+      "name": "Knowledge_AbyssRuins_Dem_0037",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001009,
+      "name": "Knowledge_AbyssRuins_Dem_0038",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001010,
+      "name": "Knowledge_AbyssRuins_Dem_0039",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001011,
+      "name": "Knowledge_Unique_Stefan_Lanford",
+      "display": "Stefan Lanford"
+    },
+    {
+      "key": 1001012,
+      "name": "Knowledge_AbyssRuins_Dem_0040",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001014,
+      "name": "Knowledge_AbyssRuins_Dem_0041",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001017,
+      "name": "Knowledge_AbyssRuins_Dem_0042",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001018,
+      "name": "Knowledge_AbyssRuins_Dem_0043",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001019,
+      "name": "Knowledge_AbyssRuins_Dem_0044",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001023,
+      "name": "Knowledge_Node_Dem_JiJeongTower",
+      "display": "Jijeong Temple Pagoda"
+    },
+    {
+      "key": 1001026,
+      "name": "Knowledge_Marseille_SecretInfo",
+      "display": "Marshell's Information"
+    },
+    {
+      "key": 1001029,
+      "name": "Knowledge_Collection_Prop_Candle",
+      "display": "Candle"
+    },
+    {
+      "key": 1001033,
+      "name": "Knowledge_AbyssRuins_Her_0009",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001035,
+      "name": "Knowledge_AbyssRuins_Her_0011",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001036,
+      "name": "Knowledge_AbyssRuins_Her_0012",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001037,
+      "name": "Knowledge_AbyssRuins_Her_0013",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001038,
+      "name": "Knowledge_AbyssRuins_Dem_0007",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001040,
+      "name": "Knowledge_AbyssRuins_Dem_0009",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001041,
+      "name": "Knowledge_AbyssRuins_Dem_0010",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001042,
+      "name": "Knowledge_AbyssRuins_Dem_0011",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001043,
+      "name": "Knowledge_AbyssRuins_Del_0006",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001044,
+      "name": "Knowledge_AbyssRuins_Del_0007",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001045,
+      "name": "Knowledge_AbyssRuins_Del_0008",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001047,
+      "name": "Knowledge_AbyssRuins_Del_0010",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001049,
+      "name": "Knowledge_AbyssRuins_Del_0011",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001050,
+      "name": "Knowledge_AbyssRuins_Kwe_0007",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001059,
+      "name": "Knowledge_AbyssRuins_Dem_0048",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001064,
+      "name": "Knowledge_AbyssRuins_Kwe_0008",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001065,
+      "name": "Knowledge_AbyssRuins_Kwe_0009",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001066,
+      "name": "Knowledge_AbyssRuins_Kwe_0010",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001068,
+      "name": "Knowledge_Kukubird_MarniFirstMeet",
+      "display": "Visione"
+    },
+    {
+      "key": 1001069,
+      "name": "Knowledge_AbyssRuins_CD_0013",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001070,
+      "name": "Knowledge_AbyssRuins_CD_0014",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001075,
+      "name": "Knowledge_Collection_Prop_Chest",
+      "display": "Box"
+    },
+    {
+      "key": 1001076,
+      "name": "Knowledge_Draven",
+      "display": "Draven, the Crowcaller"
+    },
+    {
+      "key": 1001079,
+      "name": "Knowledge_Umbra_Boss",
+      "display": "Umbra"
+    },
+    {
+      "key": 1001083,
+      "name": "Knowledge_Marni_GolemDragon",
+      "display": "Golden Star"
+    },
+    {
+      "key": 1001084,
+      "name": "Knowledge_AbyssRuins_Del_0036",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001093,
+      "name": "Knowledge_WhiteCrow_Witch",
+      "display": "White Crow"
+    },
+    {
+      "key": 1001100,
+      "name": "Knowledge_MainMenuView_QuickSlot_Equip",
+      "display": "Quick Slot Equipment Interface"
+    },
+    {
+      "key": 1001104,
+      "name": "Knowledge_Her_Raine",
+      "display": "Renee's Poster"
+    },
+    {
+      "key": 1001112,
+      "name": "Knowledge_Collection_Prop_Tool",
+      "display": "Junk"
+    },
+    {
+      "key": 1001116,
+      "name": "Knowledge_DoubleJump",
+      "display": "Double Jump"
+    },
+    {
+      "key": 1001117,
+      "name": "Knowledge_JiJeongTa_Air",
+      "display": "Aerial Force Palm"
+    },
+    {
+      "key": 1001122,
+      "name": "Knowledge_Bently",
+      "display": "Bentley"
+    },
+    {
+      "key": 1001123,
+      "name": "Knowledge_AbyssRuins_Kwe_0031",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001124,
+      "name": "Knowledge_AbyssRuins_Kwe_0032",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001125,
+      "name": "Knowledge_AbyssRuins_Kwe_0033",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001126,
+      "name": "Knowledge_AbyssRuins_Kwe_0034",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001127,
+      "name": "Knowledge_AbyssRuins_Kwe_0035",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001128,
+      "name": "Knowledge_AbyssRuins_Kwe_0036",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001130,
+      "name": "Knowledge_AbyssRuins_Kwe_0038",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001131,
+      "name": "Knowledge_AbyssRuins_Kwe_0039",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001132,
+      "name": "Knowledge_AbyssRuins_Kwe_0040",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001135,
+      "name": "Knowledge_KailoktheHornsplitter",
+      "display": "Kailok, the Hornsplitter"
+    },
+    {
+      "key": 1001141,
+      "name": "Knowledge_Wood",
+      "display": "Timber"
+    },
+    {
+      "key": 1001142,
+      "name": "Knowledge_Fine_Wood",
+      "display": "Fine Timber"
+    },
+    {
+      "key": 1001144,
+      "name": "Knowledge_Leather",
+      "display": "Thin Hide"
+    },
+    {
+      "key": 1001145,
+      "name": "Knowledge_Bear_Leather",
+      "display": "Thick Hide"
+    },
+    {
+      "key": 1001148,
+      "name": "Knowledge_Deer_Leather",
+      "display": "Short Hair Hide"
+    },
+    {
+      "key": 1001151,
+      "name": "Knowledge_Collection_Prop_Lamp",
+      "display": "Lamp"
+    },
+    {
+      "key": 1001155,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0001",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001156,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0002",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001159,
+      "name": "Knowledge_Cheese",
+      "display": "Cheese"
+    },
+    {
+      "key": 1001162,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0009",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001168,
+      "name": "Knowledge_Demenissian",
+      "display": "Demenissian Territory"
+    },
+    {
+      "key": 1001169,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0023",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001195,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0079",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001196,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0083",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001204,
+      "name": "Knowledge_Recipe_CannonBall",
+      "display": "Small Cannonball"
+    },
+    {
+      "key": 1001205,
+      "name": "Knowledge_Animal_Bone",
+      "display": "Small Bone"
+    },
+    {
+      "key": 1001209,
+      "name": "AbyssGate_0205",
+      "display": "Horizon of Incident"
+    },
+    {
+      "key": 1001210,
+      "name": "Knowledge_Faction_Antumbra",
+      "display": ""
+    },
+    {
+      "key": 1001212,
+      "name": "Knowledge_Spider_Web",
+      "display": "Spider Web"
+    },
+    {
+      "key": 1001213,
+      "name": "Knowledge_Clout",
+      "display": "Cloth Piece"
+    },
+    {
+      "key": 1001214,
+      "name": "Knowledge_Wool",
+      "display": "Fleece"
+    },
+    {
+      "key": 1001230,
+      "name": "Knowledge_Sunrise_Beach",
+      "display": "Sunrise Coast"
+    },
+    {
+      "key": 1001231,
+      "name": "Knowledge_Windbreath_Hill",
+      "display": "Hushwind Hills"
+    },
+    {
+      "key": 1001239,
+      "name": "Knowledge_AbyssRuins_CD_0031",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001241,
+      "name": "Knowledge_AbyssRuins_CD_0033",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001242,
+      "name": "Knowledge_AbyssRuins_CD_0034",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001244,
+      "name": "AbyssGate_0205_AbyssIsland",
+      "display": "Horizon of Incident"
+    },
+    {
+      "key": 1001245,
+      "name": "Knowledge_AbyssBridgeGate",
+      "display": "Skybridge Gate"
+    },
+    {
+      "key": 1001258,
+      "name": "Knowledge_AbyssRuinsCreatureCore",
+      "display": "Abyss Cell"
+    },
+    {
+      "key": 1001261,
+      "name": "Knowledge_TradeShopSellPrice",
+      "display": "Abacus Effect"
+    },
+    {
+      "key": 1001262,
+      "name": "Knowledge_WolfForest",
+      "display": "Forest of Wolves"
+    },
+    {
+      "key": 1001287,
+      "name": "Knowledge_Grey_DyeColor_1",
+      "display": "Oliver's Dye"
+    },
+    {
+      "key": 1001288,
+      "name": "Knowledge_TradeShopSellPrice_I",
+      "display": "Scales Effect"
+    },
+    {
+      "key": 1001290,
+      "name": "Knowledge_Damian_SwordMastery_I",
+      "display": "Armed Combat"
+    },
+    {
+      "key": 1001297,
+      "name": "Knowledge_Damian_UnArmedMastery_I",
+      "display": "Unarmed Combat"
+    },
+    {
+      "key": 1001298,
+      "name": "Knowledge_Damian_UnArmedCombination",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1001304,
+      "name": "Knowledge_Living_Hoe",
+      "display": "Hoe"
+    },
+    {
+      "key": 1001320,
+      "name": "Knowledge_MarniInvitation",
+      "display": "Mysterious Invitation"
+    },
+    {
+      "key": 1001321,
+      "name": "Knowledge_Pororin_Forest",
+      "display": "Pororin Forest"
+    },
+    {
+      "key": 1001322,
+      "name": "Knowledge_MarniSecretBase",
+      "display": "Marni's Secret Base"
+    },
+    {
+      "key": 1001329,
+      "name": "Knowledge_AbyssRuins_Her_0016",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001330,
+      "name": "Knowledge_AbyssRuins_Her_0017",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001332,
+      "name": "Knowledge_AbyssRuins_Her_0018",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001333,
+      "name": "Knowledge_AbyssRuins_Her_0019",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001334,
+      "name": "Knowledge_Rhombus_Hills",
+      "display": "Rhombus Rocks"
+    },
+    {
+      "key": 1001337,
+      "name": "Knowledge_Rumbling_Gorge",
+      "display": "Brontide Gorge"
+    },
+    {
+      "key": 1001338,
+      "name": "Knowledge_AquaticToned_Ridge",
+      "display": "Waterbright Terrace"
+    },
+    {
+      "key": 1001339,
+      "name": "Knowledge_Meandering_Hillside",
+      "display": "Meandering Water Knoll"
+    },
+    {
+      "key": 1001340,
+      "name": "Knowledge_Oakleaf_Cove",
+      "display": "Oak Leaf Bay"
+    },
+    {
+      "key": 1001341,
+      "name": "Knowledge_Rivercrest_Terraces",
+      "display": "Riverbed Terrace"
+    },
+    {
+      "key": 1001342,
+      "name": "Knowledge_Riverside_Plateau",
+      "display": "Riverbanks Plateau"
+    },
+    {
+      "key": 1001343,
+      "name": "Knowledge_Hillside_Field",
+      "display": "Plain Hill"
+    },
+    {
+      "key": 1001344,
+      "name": "Knowledge_BayOfAbundance_Beach",
+      "display": "Shore of Abundance"
+    },
+    {
+      "key": 1001345,
+      "name": "Knowledge_Writhing_Hill",
+      "display": "Wiggling Hill"
+    },
+    {
+      "key": 1001347,
+      "name": "Knowledge_JiJeong_Temple_Training",
+      "display": "Scattered Teachings"
+    },
+    {
+      "key": 1001352,
+      "name": "Knowledge_Collection_Prop_Dyewater_0001",
+      "display": "Bright Red Dye"
+    },
+    {
+      "key": 1001355,
+      "name": "Knowledge_Collection_Prop_Dyewater_0004",
+      "display": "Dark Red Dye"
+    },
+    {
+      "key": 1001388,
+      "name": "Knowledge_Collection_Prop_Dyewater_0037",
+      "display": "Rich Spring Green Dye"
+    },
+    {
+      "key": 1001392,
+      "name": "Knowledge_Collection_Prop_Dyewater_0041",
+      "display": "Bright Yellow Dye"
+    },
+    {
+      "key": 1001404,
+      "name": "Knowledge_Paper_Stamina_Hint",
+      "display": "Stamina"
+    },
+    {
+      "key": 1001405,
+      "name": "Knowledge_Paper_Nature_Hint",
+      "display": "Keen Senses"
+    },
+    {
+      "key": 1001419,
+      "name": "Knowledge_MarniMansion",
+      "display": "Marni's Manor"
+    },
+    {
+      "key": 1001422,
+      "name": "Knowledge_MainMenuView_Main_Skill",
+      "display": "Main Quest Skills Interface"
+    },
+    {
+      "key": 1001423,
+      "name": "Knowledge_AbyssRuins_CD_0036",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001434,
+      "name": "Knowledge_Damian_Wrestle_Takedown",
+      "display": "Lariat"
+    },
+    {
+      "key": 1001435,
+      "name": "Knowledge_Damian_Wrestle_ScrewDrive",
+      "display": "Screwdriver"
+    },
+    {
+      "key": 1001436,
+      "name": "Knowledge_Damian_CharacterClimb",
+      "display": "Back Hang"
+    },
+    {
+      "key": 1001453,
+      "name": "Knowledge_Damian_LegSwing",
+      "display": "Scissor Takedown"
+    },
+    {
+      "key": 1001463,
+      "name": "Knowledge_Damian_BasicBow",
+      "display": "Marksmanship"
+    },
+    {
+      "key": 1001464,
+      "name": "Knowledge_Damian_DeadEyes",
+      "display": "Focused Shot"
+    },
+    {
+      "key": 1001465,
+      "name": "Knowledge_Damian_RollShot",
+      "display": "Focused Evasive Shot"
+    },
+    {
+      "key": 1001475,
+      "name": "Knowledge_Sebastian",
+      "display": "Sebastian"
+    },
+    {
+      "key": 1001478,
+      "name": "Knowledge_Node_Crim_DesertOasis_Patience",
+      "display": "Well of Patience"
+    },
+    {
+      "key": 1001487,
+      "name": "Knowledge_Visione_Chip_Mansion_Marseille_Memory_I",
+      "display": "Lady Azerian's Whereabouts"
+    },
+    {
+      "key": 1001488,
+      "name": "Knowledge_Visione_Chip_Mansion_Marseille_Memory_II",
+      "display": "Bastier's Co-conspirators"
+    },
+    {
+      "key": 1001489,
+      "name": "Knowledge_Visione_Chip_Mansion_Byron_Memory",
+      "display": "Memory of Byron Manor"
+    },
+    {
+      "key": 1001491,
+      "name": "Knowledge_AbyssRuins_CD_0040",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001502,
+      "name": "Knowledge_Paper_FromYann",
+      "display": "Yann's Letter"
+    },
+    {
+      "key": 1001503,
+      "name": "Knowledge_Visione_Chip_Bloodcoronation",
+      "display": "The Blood Coronation"
+    },
+    {
+      "key": 1001511,
+      "name": "Knowledge_Grey_DyeColor_5",
+      "display": "Oliver's Dye"
+    },
+    {
+      "key": 1001516,
+      "name": "Knowledge_Grey_DyeColor_10",
+      "display": "Oliver's Dye"
+    },
+    {
+      "key": 1001541,
+      "name": "Knowledge_Damian_ShieldGlider",
+      "display": "Flight"
+    },
+    {
+      "key": 1001542,
+      "name": "Knowledge_Damian_ShieldGlider_MoveFast",
+      "display": "Swift Flight"
+    },
+    {
+      "key": 1001545,
+      "name": "Knowledge_Gun_Powder",
+      "display": "Gunpowder"
+    },
+    {
+      "key": 1001546,
+      "name": "Knowledge_Cog",
+      "display": "Cogwheel"
+    },
+    {
+      "key": 1001550,
+      "name": "Knowledge_Damian_Nature",
+      "display": "Keen Senses"
+    },
+    {
+      "key": 1001553,
+      "name": "Knowledge_Damian_ShieldJustGuard_Attack",
+      "display": "Counter"
+    },
+    {
+      "key": 1001569,
+      "name": "AbyssGate_End0007",
+      "display": "End 0007"
+    },
+    {
+      "key": 1001576,
+      "name": "Knowledge_Cockroach",
+      "display": "Cockroach"
+    },
+    {
+      "key": 1001582,
+      "name": "Knowledge_GnatWide",
+      "display": "Medium Fly"
+    },
+    {
+      "key": 1001637,
+      "name": "Knowledge_Red_Spotted_Purple",
+      "display": "Red-Spotted Purple Butterfly"
+    },
+    {
+      "key": 1001648,
+      "name": "Knowledge_Node_Dem_FrozenTower",
+      "display": "Spire of Frost"
+    },
+    {
+      "key": 1001651,
+      "name": "Knowledge_Minigame_ArrowShot",
+      "display": "Archery Contest"
+    },
+    {
+      "key": 1001652,
+      "name": "Knowledge_Golems",
+      "display": "Stonewalker"
+    },
+    {
+      "key": 1001657,
+      "name": "Knowledge_Neophasia_Terlooii",
+      "display": "White Butterfly"
+    },
+    {
+      "key": 1001664,
+      "name": "Knowledge_Living_ToolAxe",
+      "display": "Logging Axe"
+    },
+    {
+      "key": 1001666,
+      "name": "Knowledge_Node_Her_PervinFort",
+      "display": "Fort Perwin"
+    },
+    {
+      "key": 1001667,
+      "name": "Knowledge_Node_Her_PervinGate",
+      "display": "Perwin Gate"
+    },
+    {
+      "key": 1001668,
+      "name": "Knowledge_Node_Her_PervinPrisonCamp",
+      "display": "Perwin Prison Camp"
+    },
+    {
+      "key": 1001669,
+      "name": "Knowledge_Node_Her_PervinQuarry",
+      "display": "Perwin Quarry"
+    },
+    {
+      "key": 1001670,
+      "name": "Knowledge_Node_Her_PervinTradePost",
+      "display": "Perwin Trading Post"
+    },
+    {
+      "key": 1001671,
+      "name": "Knowledge_Node_Her_FortAnvil",
+      "display": "Fort Anvil"
+    },
+    {
+      "key": 1001672,
+      "name": "Knowledge_Node_Her_RaidersBase",
+      "display": "Wild Raiders Camp"
+    },
+    {
+      "key": 1001676,
+      "name": "Knowledge_Node_Her_DragonKillCastle",
+      "display": "Drakesfall Castle"
+    },
+    {
+      "key": 1001678,
+      "name": "Knowledge_Node_Her_OakenshieldManor_Serkis",
+      "display": "Oakenshield Manor"
+    },
+    {
+      "key": 1001680,
+      "name": "Knowledge_Node_Her_CapraPasture",
+      "display": "Capra Pasture"
+    },
+    {
+      "key": 1001681,
+      "name": "Knowledge_Node_Her_SpringtideWatermill",
+      "display": "Springtide Mill"
+    },
+    {
+      "key": 1001682,
+      "name": "Knowledge_Node_Her_TorchlightBeacon",
+      "display": "Torchlight Beacon"
+    },
+    {
+      "key": 1001684,
+      "name": "Knowledge_Node_Her_IvyVillage",
+      "display": "Ivynook"
+    },
+    {
+      "key": 1001685,
+      "name": "Knowledge_Node_Her_HuntersHut",
+      "display": "Hunter's Cabin"
+    },
+    {
+      "key": 1001687,
+      "name": "Knowledge_Node_Her_BluemontManor_Rupert",
+      "display": "Bluemont Manor"
+    },
+    {
+      "key": 1001688,
+      "name": "Knowledge_Node_Her_BluemontWineHouse",
+      "display": "Bluemont Cask House"
+    },
+    {
+      "key": 1001689,
+      "name": "Knowledge_Node_Her_MeshleyTrapMaker",
+      "display": "Meshley Trapsmith"
+    },
+    {
+      "key": 1001690,
+      "name": "Knowledge_Node_Her_InksworthPrinter",
+      "display": "Inksworth Bindery"
+    },
+    {
+      "key": 1001691,
+      "name": "Knowledge_Node_Her_KarinQuarry",
+      "display": "Karin Quarry"
+    },
+    {
+      "key": 1001692,
+      "name": "Knowledge_Living_Hammer",
+      "display": "Hammer"
+    },
+    {
+      "key": 1001695,
+      "name": "Knowledge_Living_Shovel",
+      "display": "Shovel"
+    },
+    {
+      "key": 1001700,
+      "name": "Knowledge_Living_PickAxe",
+      "display": "Pickaxe"
+    },
+    {
+      "key": 1001704,
+      "name": "Knowledge_Damian_Summon_DroneAssault",
+      "display": "Blade Sentinel"
+    },
+    {
+      "key": 1001709,
+      "name": "Knowledge_CrowFeather",
+      "display": "Crow Feather"
+    },
+    {
+      "key": 1001710,
+      "name": "Knowledge_Taeguk_Seal",
+      "display": "Mystical Storage"
+    },
+    {
+      "key": 1001712,
+      "name": "Knowledge_Node_Cal_CalphadeSouthEastGate",
+      "display": "Calphade South Gate"
+    },
+    {
+      "key": 1001713,
+      "name": "Knowledge_Node_Cal_CalphadeOutpost",
+      "display": "Calphade Outpost"
+    },
+    {
+      "key": 1001715,
+      "name": "Knowledge_Node_Cal_SouthWatch_Post",
+      "display": "Southern Sentry Post"
+    },
+    {
+      "key": 1001716,
+      "name": "Knowledge_Node_Cal_SouthBorder_Post",
+      "display": "Southern Guard Post"
+    },
+    {
+      "key": 1001717,
+      "name": "Knowledge_Node_Cal_CenterBorder_Post",
+      "display": "Central Guard Post"
+    },
+    {
+      "key": 1001718,
+      "name": "Knowledge_Node_Cal_NorthBorder_Post",
+      "display": "Northern Guard Post"
+    },
+    {
+      "key": 1001724,
+      "name": "Knowledge_Faction_KharonsoVillage",
+      "display": ""
+    },
+    {
+      "key": 1001725,
+      "name": "Knowledge_Node_Villosa_Grove",
+      "display": "Dunbaria Patch"
+    },
+    {
+      "key": 1001730,
+      "name": "Knowledge_Faction_Thorel_Demeniss",
+      "display": ""
+    },
+    {
+      "key": 1001735,
+      "name": "Knowledge_Faction_Wells",
+      "display": ""
+    },
+    {
+      "key": 1001737,
+      "name": "Knowledge_Faction_EntHunter",
+      "display": "Mistwood Hunters"
+    },
+    {
+      "key": 1001739,
+      "name": "Knowledge_Faction_LongleafTree",
+      "display": "Longleaf Tribe"
+    },
+    {
+      "key": 1001744,
+      "name": "Knowledge_Mabongpa",
+      "display": "Nature's Snare"
+    },
+    {
+      "key": 1001749,
+      "name": "Knowledge_Faction_GorthakIron",
+      "display": "Ironflame Orcs"
+    },
+    {
+      "key": 1001751,
+      "name": "Knowledge_Faction_Dewhaven",
+      "display": "Ironwheel of Dewhaven"
+    },
+    {
+      "key": 1001752,
+      "name": "Knowledge_Faction_RedfoxTrade",
+      "display": "Redfox Merchants"
+    },
+    {
+      "key": 1001755,
+      "name": "Knowledge_Faction_Tashkalp",
+      "display": ""
+    },
+    {
+      "key": 1001756,
+      "name": "Knowledge_JiJeongTa_Deep",
+      "display": "Focused Force Palm"
+    },
+    {
+      "key": 1001759,
+      "name": "Knowledge_AbyssRuins_Her_0020",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001760,
+      "name": "Knowledge_Tathagata",
+      "display": "Falling Palm"
+    },
+    {
+      "key": 1001761,
+      "name": "Knowledge_Faction_SandSages",
+      "display": "Sage of the Desert"
+    },
+    {
+      "key": 1001762,
+      "name": "Knowledge_Faction_WhitesandChapel",
+      "display": "Whitesand Retreat"
+    },
+    {
+      "key": 1001767,
+      "name": "Knowledge_Faction_GiantsYardResearch",
+      "display": "Giant's Yard Research Group"
+    },
+    {
+      "key": 1001771,
+      "name": "Knowledge_Faction_CrowBrothers",
+      "display": ""
+    },
+    {
+      "key": 1001780,
+      "name": "Knowledge_Node_Her_HernandChurch",
+      "display": "Church of Hernand"
+    },
+    {
+      "key": 1001785,
+      "name": "Knowledge_Paper_TaxStatement",
+      "display": "Tax Notice"
+    },
+    {
+      "key": 1001789,
+      "name": "Knowledge_UnArmedMastery_I",
+      "display": "Unarmed Combat"
+    },
+    {
+      "key": 1001799,
+      "name": "Knowledge_Her_Alfonso",
+      "display": "Alfonso Estate"
+    },
+    {
+      "key": 1001800,
+      "name": "Knowledge_Her_Scholastone",
+      "display": "Scholastone"
+    },
+    {
+      "key": 1001801,
+      "name": "Knowledge_Her_Loppet",
+      "display": "Roberts Estate"
+    },
+    {
+      "key": 1001803,
+      "name": "Knowledge_Node_Her_Serkis",
+      "display": "Serkis Estate"
+    },
+    {
+      "key": 1001804,
+      "name": "Knowledge_Dem_Ellimoor",
+      "display": "Elemore Estate"
+    },
+    {
+      "key": 1001805,
+      "name": "Knowledge_Dem_Musket",
+      "display": "Musket Military Base"
+    },
+    {
+      "key": 1001809,
+      "name": "Knowledge_Node_Her_GreymaneCamp",
+      "display": "Howling Hill"
+    },
+    {
+      "key": 1001810,
+      "name": "Knowledge_Node_Her_LioncrestManor_Alfonso",
+      "display": "Lioncrest Manor"
+    },
+    {
+      "key": 1001811,
+      "name": "Knowledge_Node_Her_TimberhamSawmill",
+      "display": "Timberham Sawmill"
+    },
+    {
+      "key": 1001812,
+      "name": "Knowledge_Node_Her_TimberhamLumbermill",
+      "display": "Lioncrest Watchtower"
+    },
+    {
+      "key": 1001813,
+      "name": "Knowledge_Rain_Forest",
+      "display": "Rainforest"
+    },
+    {
+      "key": 1001818,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0140",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001821,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0151",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001824,
+      "name": "Knowledge_AbyssRuins_AbyssIsland_0162",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1001825,
+      "name": "Knowledge_Marni_Domain",
+      "display": "Delesyia Territory"
+    },
+    {
+      "key": 1001828,
+      "name": "Knowledge_Node_Dem_ScorchrockCastle",
+      "display": "Scorchrock Castle"
+    },
+    {
+      "key": 1001833,
+      "name": "Knowledge_Node_Crim_RedRockFarm",
+      "display": "Redrock Farm"
+    },
+    {
+      "key": 1001836,
+      "name": "Knowledge_Node_Her_Riverward_SpearsendStation",
+      "display": "Spearhead Posthouse"
+    },
+    {
+      "key": 1001837,
+      "name": "Knowledge_Node_Her_Riverward_ArroweyeStation",
+      "display": "Arroweye Posthouse"
+    },
+    {
+      "key": 1001838,
+      "name": "Knowledge_Node_Her_Riverward_IronhoofStation",
+      "display": "Steelhoof Posthouse"
+    },
+    {
+      "key": 1001839,
+      "name": "Knowledge_Node_Her_Riverward_IronhammerStation",
+      "display": "Ironhammer Posthouse"
+    },
+    {
+      "key": 1001840,
+      "name": "Knowledge_Node_Her_WillkommPost",
+      "display": "Vilkom Outpost"
+    },
+    {
+      "key": 1001845,
+      "name": "Knowledge_Node_Kwe_SteinnfellFortress_Gate",
+      "display": "Steinnfell Fortress Gate"
+    },
+    {
+      "key": 1001873,
+      "name": "Knowledge_Dewhaven_Domain",
+      "display": "Dewhaven Territory"
+    },
+    {
+      "key": 1001874,
+      "name": "Knowledge_Valgash_Domain",
+      "display": "Gorthak Territory"
+    },
+    {
+      "key": 1001880,
+      "name": "Knowledge_Darkness_King_Anti_Blizzard_Lamp",
+      "display": "Darksworn Blizzard-Suppressing Stone Lantern"
+    },
+    {
+      "key": 1001882,
+      "name": "Knowledge_Node_Dem_NorthOutpost",
+      "display": "North Demeniss Outpost"
+    },
+    {
+      "key": 1001883,
+      "name": "Knowledge_Node_Her_North_GoldleafBlackMarket",
+      "display": "Goldleaf Trading Post"
+    },
+    {
+      "key": 1001884,
+      "name": "Knowledge_Node_Her_East_GoldleafBlackMarket",
+      "display": "Goldleaf Trading Post"
+    },
+    {
+      "key": 1001886,
+      "name": "Knowledge_Node_Her_Cal_GoldleafBlackMarket",
+      "display": "Goldleaf Trading Post"
+    },
+    {
+      "key": 1001888,
+      "name": "Knowledge_Faction_Roberts",
+      "display": "House Roberts"
+    },
+    {
+      "key": 1001889,
+      "name": "Knowledge_Faction_Vellua",
+      "display": "Vellua Fishermen's Guild"
+    },
+    {
+      "key": 1001894,
+      "name": "AbyssTransmitter_0009",
+      "display": "Crow's Nest"
+    },
+    {
+      "key": 1001895,
+      "name": "Knowledge_Living_Broom",
+      "display": "Broom"
+    },
+    {
+      "key": 1001897,
+      "name": "Knowledge_Living_FishingRod",
+      "display": "Fishing Rod"
+    },
+    {
+      "key": 1001899,
+      "name": "Knowledge_Faction_Grace",
+      "display": "House Grace"
+    },
+    {
+      "key": 1001900,
+      "name": "Knowledge_Faction_HalsiusHospital",
+      "display": "St. Halssius's House of Healing"
+    },
+    {
+      "key": 1001901,
+      "name": "Knowledge_Faction_BleedBlade",
+      "display": ""
+    },
+    {
+      "key": 1001902,
+      "name": "Knowledge_Faction_Slum",
+      "display": "Beggars' Alliance"
+    },
+    {
+      "key": 1001904,
+      "name": "Knowledge_Faction_ShieldLanford",
+      "display": ""
+    },
+    {
+      "key": 1001905,
+      "name": "Knowledge_Faction_LonelyJackal",
+      "display": "Lonely Jackals"
+    },
+    {
+      "key": 1001906,
+      "name": "Knowledge_Faction_Marchell",
+      "display": "House Marshell"
+    },
+    {
+      "key": 1001907,
+      "name": "Knowledge_Faction_Elimoor",
+      "display": "House Elemore"
+    },
+    {
+      "key": 1001908,
+      "name": "Knowledge_Faction_Byron",
+      "display": "House Byron"
+    },
+    {
+      "key": 1001909,
+      "name": "Knowledge_Faction_SilvermoonTroll",
+      "display": "Silvermoon Trade Collective"
+    },
+    {
+      "key": 1001910,
+      "name": "Knowledge_Faction_SteelArrows",
+      "display": ""
+    },
+    {
+      "key": 1001911,
+      "name": "Knowledge_Faction_Nobility1Knytlingar",
+      "display": "Knytlingar Clan"
+    },
+    {
+      "key": 1001912,
+      "name": "Knowledge_Faction_Nobility2Stjar",
+      "display": "Stjar Clan"
+    },
+    {
+      "key": 1001914,
+      "name": "Knowledge_Faction_StarVillage",
+      "display": "Marni's Tinkertons"
+    },
+    {
+      "key": 1001918,
+      "name": "Knowledge_Faction_GoblinSandfang",
+      "display": "Sandfang Marauders"
+    },
+    {
+      "key": 1001921,
+      "name": "Knowledge_Faction_ThiefDusksong",
+      "display": ""
+    },
+    {
+      "key": 1001925,
+      "name": "Knowledge_Faction_SilverMorten",
+      "display": "Cassius Morten"
+    },
+    {
+      "key": 1001930,
+      "name": "Knowledge_Pailunese_Domain",
+      "display": "Pailune"
+    },
+    {
+      "key": 1001931,
+      "name": "Knowledge_Odeck_Domain",
+      "display": "Odeck Territory"
+    },
+    {
+      "key": 1001932,
+      "name": "Knowledge_Skoghorn_Domain",
+      "display": "Skoghorn Territory"
+    },
+    {
+      "key": 1001933,
+      "name": "Knowledge_Beighen_Domain",
+      "display": "Beighen Territory"
+    },
+    {
+      "key": 1001935,
+      "name": "Knowledge_Varnian_Domain",
+      "display": "Varnian Territory"
+    },
+    {
+      "key": 1001936,
+      "name": "Knowledge_Tashkalpan_Domain",
+      "display": "Tommasoan Territory"
+    },
+    {
+      "key": 1001942,
+      "name": "Knowledge_Her_Turnuli",
+      "display": "Turnali's Poster"
+    },
+    {
+      "key": 1001946,
+      "name": "Knowledge_Dem_Marchell",
+      "display": "Marshell Estate"
+    },
+    {
+      "key": 1001958,
+      "name": "AbyssTransmitter_0023",
+      "display": "Sanctorum of Insight"
+    },
+    {
+      "key": 1001962,
+      "name": "AbyssTransmitter_0079",
+      "display": "Nest of Valor"
+    },
+    {
+      "key": 1001969,
+      "name": "Knowledge_BloodCoronation_Readmemory_I",
+      "display": "General Bastier's Wrongdoings"
+    },
+    {
+      "key": 1001970,
+      "name": "Knowledge_BloodCoronation_Readmemory_II",
+      "display": "Duke Caliburn's Downfall"
+    },
+    {
+      "key": 1001971,
+      "name": "Knowledge_BloodCoronation_Readmemory_III",
+      "display": "The Vanished Countess Azerian"
+    },
+    {
+      "key": 1001972,
+      "name": "Knowledge_MyurdinHint",
+      "display": "Myurdin's Lead"
+    },
+    {
+      "key": 1001973,
+      "name": "Knowledge_MasterDooTest_JijeongTemple",
+      "display": "Master Du's Training: Jijeong Temple"
+    },
+    {
+      "key": 1001974,
+      "name": "Knowledge_MasterDooTest_TriStar",
+      "display": "Master Du's Training: Urdavah"
+    },
+    {
+      "key": 1001975,
+      "name": "Knowledge_MasterDooTest_OldKliff",
+      "display": "Master Du's Training: Abyss"
+    },
+    {
+      "key": 1001977,
+      "name": "Knowledge_BlackBear_Tank",
+      "display": "Black Bear Siege Engine"
+    },
+    {
+      "key": 1002001,
+      "name": "Knowledge_Node_Kingshield_NorthGreyManeTemple",
+      "display": "Kingshield Mountains Northern Shrine"
+    },
+    {
+      "key": 1002002,
+      "name": "Knowledge_Node_NasRiver_GreyManeTemple",
+      "display": "Nas River Shrine"
+    },
+    {
+      "key": 1002003,
+      "name": "Knowledge_Node_SunrisePlain_GreyManeTemple",
+      "display": "Sunrise Plains Shrine"
+    },
+    {
+      "key": 1002009,
+      "name": "Knowledge_JiJeong_Temple_Damaged_BuddhaStatues",
+      "display": "Peace Amidst Chaos"
+    },
+    {
+      "key": 1002012,
+      "name": "Knowledge_Rhett",
+      "display": "Rhett"
+    },
+    {
+      "key": 1002013,
+      "name": "Knowledge_Rare_Collect_Mercury",
+      "display": "Mercury"
+    },
+    {
+      "key": 1002026,
+      "name": "AbyssTransmitter_0140",
+      "display": "Crescent Skybridge"
+    },
+    {
+      "key": 1002035,
+      "name": "Knowledge_Node_Her_HowlingHillCamp",
+      "display": "Haunted Hill Camp"
+    },
+    {
+      "key": 1002037,
+      "name": "Knowledge_Cheriwoone",
+      "display": "Renee"
+    },
+    {
+      "key": 1002041,
+      "name": "AbyssTransmitter_0162",
+      "display": "Monolith Crown"
+    },
+    {
+      "key": 1002051,
+      "name": "Knowledge_Beighen_Basement",
+      "display": "The Truth of the Underground Storage"
+    },
+    {
+      "key": 1002054,
+      "name": "Knowledge_Beighen_BlueFang",
+      "display": "Mysterious Faction within Beighen"
+    },
+    {
+      "key": 1002055,
+      "name": "Knowledge_Beighen_Tolstein",
+      "display": "Leader of the Blue Fangs"
+    },
+    {
+      "key": 1002056,
+      "name": "Knowledge_Beighen_Investigation",
+      "display": "Beighen Investigation Complete"
+    },
+    {
+      "key": 1002058,
+      "name": "Knowledge_Investigation_Beighen_Basement",
+      "display": "Secret Society's Base"
+    },
+    {
+      "key": 1002061,
+      "name": "Knowledge_Epilogue_Ending",
+      "display": "Beginning and End"
+    },
+    {
+      "key": 1002088,
+      "name": "Knowledge_Node_Dem_BanditCamp_I",
+      "display": "Ironwood Forest Bandit Camp"
+    },
+    {
+      "key": 1002116,
+      "name": "Knowledge_Node_Her_GreystoneManor_Felix",
+      "display": "Hillside Manor"
+    },
+    {
+      "key": 1002117,
+      "name": "Knowledge_Node_Her_WycliffeMappery",
+      "display": "Wycliffe Mappery"
+    },
+    {
+      "key": 1002118,
+      "name": "Knowledge_Node_Her_RodbelFishingDock",
+      "display": "Rodbel Fishing Dock"
+    },
+    {
+      "key": 1002119,
+      "name": "Knowledge_Node_Her_EmbernestBeacon",
+      "display": "Embernest Beacon"
+    },
+    {
+      "key": 1002120,
+      "name": "Knowledge_Node_Her_SouthQuarry",
+      "display": "Southern Quarry"
+    },
+    {
+      "key": 1002121,
+      "name": "Knowledge_Node_Her_Slum",
+      "display": "Communal Training Grounds"
+    },
+    {
+      "key": 1002122,
+      "name": "Knowledge_Node_Her_BeggarsEnd",
+      "display": "Beggar's End"
+    },
+    {
+      "key": 1002123,
+      "name": "Knowledge_Node_Her_TheScrapfold",
+      "display": "The Scrapfold"
+    },
+    {
+      "key": 1002124,
+      "name": "Knowledge_Node_Her_PororinVillage",
+      "display": "Pororin"
+    },
+    {
+      "key": 1002125,
+      "name": "Knowledge_Node_Her_CastlewoodRuins",
+      "display": "Castlewood Ruins"
+    },
+    {
+      "key": 1002127,
+      "name": "Knowledge_Node_Her_FlorindaleVillage",
+      "display": "Florindale"
+    },
+    {
+      "key": 1002129,
+      "name": "Knowledge_Beighen_Investigation_Hint_Basement",
+      "display": "Beighen Investigation Hint I"
+    },
+    {
+      "key": 1002130,
+      "name": "Knowledge_Beighen_Investigation_Hint_Faction",
+      "display": "Beighen Investigation Hint II"
+    },
+    {
+      "key": 1002131,
+      "name": "Knowledge_Node_Her_VelluaVillage",
+      "display": "Vellua"
+    },
+    {
+      "key": 1002132,
+      "name": "Knowledge_Beighen_Investigation_Hint_Leader",
+      "display": "Beighen Investigation Hint III"
+    },
+    {
+      "key": 1002134,
+      "name": "Knowledge_Faction_BlueFang",
+      "display": "Blue Fangs"
+    },
+    {
+      "key": 1002138,
+      "name": "Knowledge_Node_Her_RuinedChapel",
+      "display": "Ruined Chapel"
+    },
+    {
+      "key": 1002139,
+      "name": "Knowledge_Node_Her_EastGoblinCamp",
+      "display": "Eastern Goblin Camp"
+    },
+    {
+      "key": 1002141,
+      "name": "Knowledge_Node_Her_GoldleafGuildhouse",
+      "display": "Goldleaf Guildhouse"
+    },
+    {
+      "key": 1002142,
+      "name": "Knowledge_Node_Her_MuckrootRanch",
+      "display": "Muckroot Ranch"
+    },
+    {
+      "key": 1002143,
+      "name": "Knowledge_Node_Her_CoalvaleWorkshop",
+      "display": "Coalvale Workshop"
+    },
+    {
+      "key": 1002144,
+      "name": "Knowledge_Node_Her_EquinsherSaddlery",
+      "display": "Equinsher Saddlery"
+    },
+    {
+      "key": 1002145,
+      "name": "Knowledge_Node_Her_GoldleafTradepost",
+      "display": "Goldleaf Trading Post"
+    },
+    {
+      "key": 1002146,
+      "name": "Knowledge_Node_Her_StreamsidePier",
+      "display": "Nas River Fishing Dock"
+    },
+    {
+      "key": 1002147,
+      "name": "Knowledge_Node_Her_BloomwoodRanch",
+      "display": "Bloomwood Ranch"
+    },
+    {
+      "key": 1002148,
+      "name": "Knowledge_Node_GoldleafGuildhouse_Child_04",
+      "display": "Thinker's Meadow"
+    },
+    {
+      "key": 1002149,
+      "name": "Knowledge_Node_Her_GoldenFistsArena",
+      "display": "Goldenfist Arena"
+    },
+    {
+      "key": 1002150,
+      "name": "Knowledge_Node_Her_TimberWagonFactory",
+      "display": "Timberturner Wainwright"
+    },
+    {
+      "key": 1002152,
+      "name": "Knowledge_Node_Dem_ThornRoseFort",
+      "display": "Thornbriar Fortress"
+    },
+    {
+      "key": 1002153,
+      "name": "Knowledge_Node_Dem_ThornRoseGuardPost",
+      "display": "Thornbriar Guard Post"
+    },
+    {
+      "key": 1002154,
+      "name": "Knowledge_Node_Dem_ThornRoseSouthGate",
+      "display": "Thornbriar South Gate"
+    },
+    {
+      "key": 1002155,
+      "name": "Knowledge_Node_Dem_ThornRoseFoodStorage",
+      "display": "Thornbriar Food Storage"
+    },
+    {
+      "key": 1002156,
+      "name": "Knowledge_Node_Dem_ThornRoseOutpost",
+      "display": "Thornbriar Outpost"
+    },
+    {
+      "key": 1002163,
+      "name": "Knowledge_Node_Dem_BloodsteelSouthGate",
+      "display": "Bloodsteel South Gate"
+    },
+    {
+      "key": 1002166,
+      "name": "Knowledge_Node_Her_FortHellwood",
+      "display": "Fort Hellwood"
+    },
+    {
+      "key": 1002167,
+      "name": "Knowledge_Node_Her_HellwoodInnerGate",
+      "display": "Hellwood Inner Gate"
+    },
+    {
+      "key": 1002170,
+      "name": "Knowledge_Node_Her_TheFlyingCatfish",
+      "display": "The Singing Catfish"
+    },
+    {
+      "key": 1002171,
+      "name": "Knowledge_Node_Her_SunsetVillage",
+      "display": "Sunset Valley"
+    },
+    {
+      "key": 1002172,
+      "name": "Knowledge_Node_Kwe_Pailune",
+      "display": "Pailune"
+    },
+    {
+      "key": 1002173,
+      "name": "Knowledge_Node_Kwe_PailuneEastGate",
+      "display": "Pailune East Gate"
+    },
+    {
+      "key": 1002174,
+      "name": "Knowledge_Node_Kwe_PailuneSouthGate",
+      "display": "Pailune South Gate"
+    },
+    {
+      "key": 1002175,
+      "name": "Knowledge_Node_Kwe_Watergate",
+      "display": "Pailune Floodgate"
+    },
+    {
+      "key": 1002176,
+      "name": "Knowledge_Node_Kwe_PailuneBeacon",
+      "display": "Pailune Beacon"
+    },
+    {
+      "key": 1002177,
+      "name": "Knowledge_Node_Kwe_SequoiaForest",
+      "display": "Sequoia Forest"
+    },
+    {
+      "key": 1002179,
+      "name": "Knowledge_Node_Kwe_SkoghornVillage",
+      "display": "Skoghorn"
+    },
+    {
+      "key": 1002183,
+      "name": "Knowledge_Node_Kwe_SkoghornFarm",
+      "display": "Skoghorn Farm"
+    },
+    {
+      "key": 1002185,
+      "name": "Knowledge_Node_Kwe_RedLake",
+      "display": "Crimson Lake"
+    },
+    {
+      "key": 1002189,
+      "name": "Knowledge_Node_Kwe_BolsteinnRuins",
+      "display": "Volstein Ruins"
+    },
+    {
+      "key": 1002194,
+      "name": "Knowledge_Node_Kwe_LongrootsVillage",
+      "display": "Longroots"
+    },
+    {
+      "key": 1002195,
+      "name": "Knowledge_Node_Kwe_RidgehunterLeatherMaker",
+      "display": "Ridgehunter Tannery"
+    },
+    {
+      "key": 1002197,
+      "name": "Knowledge_Node_Kwe_BeighenVillage",
+      "display": "Beighen"
+    },
+    {
+      "key": 1002198,
+      "name": "Knowledge_Node_Kwe_BeighenCandlery",
+      "display": "Beighen Candlery"
+    },
+    {
+      "key": 1002199,
+      "name": "Knowledge_Node_Kwe_BeighenBasketMaker",
+      "display": "Beighen Weavery"
+    },
+    {
+      "key": 1002200,
+      "name": "Knowledge_Node_Kwe_AshclawKeep",
+      "display": "Ashclaw Keep"
+    },
+    {
+      "key": 1002202,
+      "name": "Knowledge_Node_Kwe_VatnhollFortress",
+      "display": "Vat'nholl Fortress"
+    },
+    {
+      "key": 1002203,
+      "name": "Knowledge_Node_Kwe_SteinnfellFortress",
+      "display": "Steinnfell Fortress"
+    },
+    {
+      "key": 1002205,
+      "name": "Knowledge_Node_Kwe_AshclawOutpost",
+      "display": "Ashclaw Outpost"
+    },
+    {
+      "key": 1002206,
+      "name": "Knowledge_Node_Kwe_AshclawGate",
+      "display": "Ashclaw Gate"
+    },
+    {
+      "key": 1002207,
+      "name": "Knowledge_Node_Kwe_AshclawSlaveCamp",
+      "display": "Ashclaw Slave Camp"
+    },
+    {
+      "key": 1002211,
+      "name": "Knowledge_Node_Kwe_SvinholtRanch",
+      "display": "Svinholt Ranch"
+    },
+    {
+      "key": 1002213,
+      "name": "Knowledge_Node_Kwe_WolfsnareTrapsmith",
+      "display": "Wolfsnare Trapsmith"
+    },
+    {
+      "key": 1002214,
+      "name": "Knowledge_Visione_Chip_MarniFirstMeet",
+      "display": "Visione"
+    },
+    {
+      "key": 1002217,
+      "name": "Knowledge_Node_Kwe_TotemfeltVillage",
+      "display": "Totemfelt"
+    },
+    {
+      "key": 1002218,
+      "name": "Knowledge_Node_Kwe_ValgrindTomb",
+      "display": "Valgrind Tomb"
+    },
+    {
+      "key": 1002219,
+      "name": "Knowledge_Node_Kwe_VannsteinLake",
+      "display": "Vannstein Lake"
+    },
+    {
+      "key": 1002220,
+      "name": "Knowledge_Node_Cal_CalphadeCastle",
+      "display": "Calphade Castle"
+    },
+    {
+      "key": 1002221,
+      "name": "Knowledge_Node_Cal_CalphadeSouthGate",
+      "display": "Calphade Gate"
+    },
+    {
+      "key": 1002222,
+      "name": "Knowledge_Node_Cal_CalphadeNorthGate",
+      "display": "Calphade North Gate"
+    },
+    {
+      "key": 1002223,
+      "name": "Knowledge_Node_Cal_CalphadeBeacon",
+      "display": "Calphade Beacon"
+    },
+    {
+      "key": 1002224,
+      "name": "Knowledge_Node_Cal_CalphadeSouthDepot",
+      "display": "Calphade Southern Depot"
+    },
+    {
+      "key": 1002225,
+      "name": "Knowledge_Node_Cal_CalphadeNorthDepot",
+      "display": "Calphade Northern Depot"
+    },
+    {
+      "key": 1002228,
+      "name": "Knowledge_Node_Cal_CalphadeRefinery",
+      "display": "Calphade Siege Armory"
+    },
+    {
+      "key": 1002230,
+      "name": "Knowledge_Node_Cal_CalphadeLoggingCamp",
+      "display": "Calphade Logging Camp"
+    },
+    {
+      "key": 1002231,
+      "name": "Knowledge_Node_Cal_ThalwyndVillage",
+      "display": "Thalwynd"
+    },
+    {
+      "key": 1002232,
+      "name": "Knowledge_Node_Cal_CalphadeTrainingField",
+      "display": "Calphade Training Field"
+    },
+    {
+      "key": 1002234,
+      "name": "Knowledge_Node_Cal_CalphadeFarm",
+      "display": "Calphade Farmhouse"
+    },
+    {
+      "key": 1002235,
+      "name": "Knowledge_Node_Cal_HohenmarkRuins",
+      "display": "Hoenmark Ruins"
+    },
+    {
+      "key": 1002238,
+      "name": "Knowledge_Node_Cal_CalphadeChurch",
+      "display": "Church of Calphade"
+    },
+    {
+      "key": 1002247,
+      "name": "Knowledge_Node_Dem_DemenissCastle",
+      "display": "Demeniss Castle"
+    },
+    {
+      "key": 1002249,
+      "name": "Knowledge_Node_Dem_DemenissZoo",
+      "display": "Demeniss Wildlife Park"
+    },
+    {
+      "key": 1002250,
+      "name": "Knowledge_Node_Her_DrakefallWatchtowerArea",
+      "display": "Drakesfall Watchtower"
+    },
+    {
+      "key": 1002255,
+      "name": "Knowledge_Node_Dem_SwiftStables",
+      "display": "Breesman Pasture"
+    },
+    {
+      "key": 1002258,
+      "name": "Knowledge_Node_Dem_TruthGate",
+      "display": "The Gate of Truth"
+    },
+    {
+      "key": 1002259,
+      "name": "Knowledge_Node_Dem_RoofRock",
+      "display": "Sheltering Rocks"
+    },
+    {
+      "key": 1002260,
+      "name": "Knowledge_Node_Dem_TalkingRock",
+      "display": "Chattering Rocks"
+    },
+    {
+      "key": 1002266,
+      "name": "Knowledge_Node_Dem_WestCourt",
+      "display": "Western Court"
+    },
+    {
+      "key": 1002267,
+      "name": "Knowledge_Node_Dem_CowbellRanch",
+      "display": "Cowbell Ranch"
+    },
+    {
+      "key": 1002268,
+      "name": "Knowledge_Node_Dem_WindmereManor_Byron",
+      "display": "Windmere Manor"
+    },
+    {
+      "key": 1002269,
+      "name": "Knowledge_Node_Dem_HoneywoodBeeFarm",
+      "display": "Honeywood Apiary"
+    },
+    {
+      "key": 1002272,
+      "name": "Knowledge_Node_Dem_BurnhandQuarry",
+      "display": "Burnhand Quarry"
+    },
+    {
+      "key": 1002274,
+      "name": "Knowledge_Node_Dem_DemenissHorseMarket",
+      "display": "Demeniss Horse Fair"
+    },
+    {
+      "key": 1002276,
+      "name": "Knowledge_Node_Dem_SlopeseedFarm",
+      "display": "Slopeseed Farm"
+    },
+    {
+      "key": 1002277,
+      "name": "Knowledge_Node_Dem_SundellFarm",
+      "display": "Sundell Farm"
+    },
+    {
+      "key": 1002279,
+      "name": "Knowledge_Node_Dem_SeedrowFarm",
+      "display": "Seedrow Farm"
+    },
+    {
+      "key": 1002280,
+      "name": "Knowledge_Node_Dem_CattlefoldRanch",
+      "display": "Cattlefold Ranch"
+    },
+    {
+      "key": 1002281,
+      "name": "Knowledge_Node_Dem_GreenpondFarm",
+      "display": "Greenpond Farm"
+    },
+    {
+      "key": 1002283,
+      "name": "Knowledge_Node_Dem_StronghoofHorseGearMaker",
+      "display": "Stronghoof Saddlery"
+    },
+    {
+      "key": 1002284,
+      "name": "Knowledge_Node_Dem_StronghelmFactory",
+      "display": "Stronghelm Forge"
+    },
+    {
+      "key": 1002285,
+      "name": "Knowledge_Node_Dem_DemenissCathedral",
+      "display": "Cathedral of Demeniss"
+    },
+    {
+      "key": 1002286,
+      "name": "Knowledge_Node_Dem_EastDemenissChurch",
+      "display": "Church of East Demeniss"
+    },
+    {
+      "key": 1002287,
+      "name": "Knowledge_Node_Dem_WestDemenissChurch",
+      "display": "Church of West Demeniss"
+    },
+    {
+      "key": 1002288,
+      "name": "Knowledge_Node_Dem_DemenissOrphanage",
+      "display": "Demeniss Orphanage"
+    },
+    {
+      "key": 1002289,
+      "name": "Knowledge_Node_Dem_JijeongTemple",
+      "display": "Jijeong Temple"
+    },
+    {
+      "key": 1002295,
+      "name": "Knowledge_Node_Dem_IronStronghold",
+      "display": "Fort Ironclad"
+    },
+    {
+      "key": 1002296,
+      "name": "Knowledge_Node_Dem_TombstoneWorkshop",
+      "display": "Headstone Workshop"
+    },
+    {
+      "key": 1002297,
+      "name": "Knowledge_Node_Dem_IronwoodPottery",
+      "display": "Ironwood Pottery"
+    },
+    {
+      "key": 1002298,
+      "name": "Knowledge_Node_Her_HillguardOutpost",
+      "display": "Hilgard Outpost"
+    },
+    {
+      "key": 1002299,
+      "name": "Knowledge_Node_Dem_IronwoodFarmhouse",
+      "display": "Ironwood Farmhouse"
+    },
+    {
+      "key": 1002300,
+      "name": "Knowledge_Node_Dem_IronwoodFarm",
+      "display": "Ironwood Farm"
+    },
+    {
+      "key": 1002301,
+      "name": "Knowledge_Node_Dem_ForestAltar",
+      "display": "Bamboo Forest Seonangdang"
+    },
+    {
+      "key": 1002302,
+      "name": "Knowledge_Node_Dem_AzerianManor",
+      "display": "Azerian Manor"
+    },
+    {
+      "key": 1002303,
+      "name": "Knowledge_Node_Dem_PurringtonFarm",
+      "display": "Furlington Farm"
+    },
+    {
+      "key": 1002304,
+      "name": "Knowledge_Node_Dem_HayscentFarm",
+      "display": "Hayscent Farm"
+    },
+    {
+      "key": 1002305,
+      "name": "Knowledge_Node_Dem_GreenfieldFarm",
+      "display": "Greenfield Farm"
+    },
+    {
+      "key": 1002306,
+      "name": "Knowledge_Node_Dem_StonewellFarm",
+      "display": "Stonewell Farm"
+    },
+    {
+      "key": 1002307,
+      "name": "Knowledge_Node_Dem_SouthCourt",
+      "display": "Southern Court"
+    },
+    {
+      "key": 1002308,
+      "name": "Knowledge_Node_Dem_SouthWagonFactory",
+      "display": "Southcourt Wainwright"
+    },
+    {
+      "key": 1002309,
+      "name": "Knowledge_Node_Dem_LacusFarm",
+      "display": "Lacus Farm"
+    },
+    {
+      "key": 1002310,
+      "name": "Knowledge_Node_Dem_CanalsideFarm",
+      "display": "Canalside Farm"
+    },
+    {
+      "key": 1002311,
+      "name": "Knowledge_Node_Dem_RustleleafFarm",
+      "display": "Rustleleaf Farm"
+    },
+    {
+      "key": 1002312,
+      "name": "Knowledge_Node_Dem_PecusRanch",
+      "display": "Pecus Ranch"
+    },
+    {
+      "key": 1002313,
+      "name": "Knowledge_Node_Dem_GrassfieldRanch",
+      "display": "Meadowlark Ranch"
+    },
+    {
+      "key": 1002314,
+      "name": "Knowledge_Node_Dem_SouthDemenissGate",
+      "display": "Demeniss South Gate"
+    },
+    {
+      "key": 1002315,
+      "name": "Knowledge_Node_Dem_WestDemenissGate",
+      "display": "Demeniss West Gate"
+    },
+    {
+      "key": 1002318,
+      "name": "Knowledge_Node_Kwe_StellenManor",
+      "display": "Stellen Manor"
+    },
+    {
+      "key": 1002319,
+      "name": "Knowledge_Node_Dem_EyeOfIce",
+      "display": "Eye of Ice"
+    },
+    {
+      "key": 1002324,
+      "name": "Knowledge_Node_Dem_GoldenTradePost",
+      "display": "Golden Trading Post"
+    },
+    {
+      "key": 1002325,
+      "name": "Knowledge_Node_Dem_TarivVillage",
+      "display": "Tariv"
+    },
+    {
+      "key": 1002328,
+      "name": "Knowledge_ByronMansion_I",
+      "display": "Investigating the Byron Manor - Myurdin and Byron"
+    },
+    {
+      "key": 1002329,
+      "name": "Knowledge_Node_Dem_SungroveManor_Marcella",
+      "display": "Sungrove Manor"
+    },
+    {
+      "key": 1002330,
+      "name": "Knowledge_Node_Dem_BlueGoldDyehouse",
+      "display": "Ashergold Dyehouse"
+    },
+    {
+      "key": 1002331,
+      "name": "Knowledge_Node_Dem_ClearBellFarm",
+      "display": "Bluebell Farm"
+    },
+    {
+      "key": 1002333,
+      "name": "Knowledge_Node_Dem_TheLaughingMarionette",
+      "display": "The Laughing Marionette"
+    },
+    {
+      "key": 1002337,
+      "name": "Knowledge_Node_Neut_WineTradePost",
+      "display": "Gearmelt Trading Post"
+    },
+    {
+      "key": 1002338,
+      "name": "Knowledge_Node_Dem_EastCourt",
+      "display": "Eastern Court"
+    },
+    {
+      "key": 1002339,
+      "name": "Knowledge_Node_Dem_IronbarrelWeaponFactory",
+      "display": "Ironbarrel Armory"
+    },
+    {
+      "key": 1002340,
+      "name": "Knowledge_Node_Dem_BulwarkWeaponFactory",
+      "display": "Volwork Armory"
+    },
+    {
+      "key": 1002341,
+      "name": "Knowledge_Node_Dem_VinewoodWinery",
+      "display": "Vinewood Winery"
+    },
+    {
+      "key": 1002342,
+      "name": "Knowledge_Node_Dem_HayroofFarm",
+      "display": "Hayroof Farm"
+    },
+    {
+      "key": 1002343,
+      "name": "Knowledge_Node_Dem_JoyfairMarketplace",
+      "display": "Brookfield Marketplace"
+    },
+    {
+      "key": 1002344,
+      "name": "Knowledge_Node_Dem_WhitemillFarm",
+      "display": "Whitemill Farm"
+    },
+    {
+      "key": 1002345,
+      "name": "Knowledge_Node_Crim_FortMusket",
+      "display": "Fort Musket"
+    },
+    {
+      "key": 1002346,
+      "name": "Knowledge_Node_Crim_Musket1Outpost",
+      "display": "Musket First Outpost"
+    },
+    {
+      "key": 1002347,
+      "name": "Knowledge_Node_Crim_Musket2Outpost",
+      "display": "Musket Second Outpost"
+    },
+    {
+      "key": 1002348,
+      "name": "Knowledge_BlackWolf_Pull",
+      "display": "Winch"
+    },
+    {
+      "key": 1002349,
+      "name": "Knowledge_CrowWing_MoveFast",
+      "display": "Swift Flight"
+    },
+    {
+      "key": 1002351,
+      "name": "Knowledge_CloneAttack",
+      "display": "Nature's Echo"
+    },
+    {
+      "key": 1002352,
+      "name": "Knowledge_LungeCatch",
+      "display": "Skewering Stab"
+    },
+    {
+      "key": 1002354,
+      "name": "Knowledge_Node_Neut_Delpheon",
+      "display": "Gate of Peace"
+    },
+    {
+      "key": 1002356,
+      "name": "Knowledge_Node_Neut_DelpheonNorthCamp",
+      "display": "Gate of Peace: Northern Camp"
+    },
+    {
+      "key": 1002361,
+      "name": "Knowledge_Node_Dem_OakBarrelWineMaker",
+      "display": "Oakbarrel Winery"
+    },
+    {
+      "key": 1002362,
+      "name": "Knowledge_Node_Dem_HexeSanctuary",
+      "display": "Hexe Sanctuary"
+    },
+    {
+      "key": 1002363,
+      "name": "Knowledge_Node_Dem_UrnGrave",
+      "display": "Clay Urn Necropolis"
+    },
+    {
+      "key": 1002364,
+      "name": "Knowledge_Node_Dem_ForgottenTomb",
+      "display": "Forgotten Tomb"
+    },
+    {
+      "key": 1002365,
+      "name": "Knowledge_Node_Dem_SulfurSprings",
+      "display": "Brimstone Springs"
+    },
+    {
+      "key": 1002366,
+      "name": "Knowledge_Node_Dem_HollowHaven",
+      "display": "Hollow Haven"
+    },
+    {
+      "key": 1002373,
+      "name": "Knowledge_Node_Dem_DemArmyCamp",
+      "display": "Demeniss Supply Camp"
+    },
+    {
+      "key": 1002376,
+      "name": "Knowledge_Node_Del_DelesyiaCastle",
+      "display": "Delesyia Castle"
+    },
+    {
+      "key": 1002377,
+      "name": "Knowledge_Node_Del_PortDelesyia",
+      "display": "Port Delesyia"
+    },
+    {
+      "key": 1002380,
+      "name": "Knowledge_Node_Neut_GorthakIronMaker",
+      "display": "Gorthak Ironworks"
+    },
+    {
+      "key": 1002382,
+      "name": "Knowledge_Node_Neut_GorthakStorage",
+      "display": "Gorthak Warehouse"
+    },
+    {
+      "key": 1002383,
+      "name": "Knowledge_Node_Neut_ZarganTankFactory",
+      "display": "Zargan Tankworks"
+    },
+    {
+      "key": 1002384,
+      "name": "Knowledge_Node_Neut_GrunlOutpost",
+      "display": "Grunlore Outpost"
+    },
+    {
+      "key": 1002385,
+      "name": "Knowledge_Node_Neut_KrallFoundry",
+      "display": "Krall Foundry"
+    },
+    {
+      "key": 1002386,
+      "name": "Knowledge_Node_Neut_YulgarBeacon",
+      "display": "Yulgar Beacon"
+    },
+    {
+      "key": 1002387,
+      "name": "Knowledge_Node_Neut_BragokShipFactory",
+      "display": "Bravgork Shipyard"
+    },
+    {
+      "key": 1002388,
+      "name": "Knowledge_Node_Del_WindCliffFort",
+      "display": "Fort Windridge"
+    },
+    {
+      "key": 1002391,
+      "name": "Knowledge_Node_Del_DesolateWyvernNest",
+      "display": "Desolate Wyvern Nest"
+    },
+    {
+      "key": 1002392,
+      "name": "Knowledge_Node_Del_ForgottenWyvernNest",
+      "display": "Forgotten Wyvern Nest"
+    },
+    {
+      "key": 1002395,
+      "name": "Knowledge_Node_Del_StonewardPort",
+      "display": "Stoneward Harbor"
+    },
+    {
+      "key": 1002403,
+      "name": "Knowledge_Node_Del_MarniWorkshop",
+      "display": "Marni's Masterium"
+    },
+    {
+      "key": 1002404,
+      "name": "Knowledge_Node_Del_SaltMine",
+      "display": "Salt Mine"
+    },
+    {
+      "key": 1002405,
+      "name": "Knowledge_Node_Del_MarniWorkshopEastGate",
+      "display": "Masterium East Gate"
+    },
+    {
+      "key": 1002406,
+      "name": "Knowledge_Node_Del_MarniWorkshopNorthEastGate",
+      "display": "Masterium Northeast Gate"
+    },
+    {
+      "key": 1002407,
+      "name": "Knowledge_Node_Del_MarniCliffSecretBase",
+      "display": "Marni's Hideout"
+    },
+    {
+      "key": 1002408,
+      "name": "Knowledge_Node_Del_DelesyianInstitute",
+      "display": "The Delesyian Institute"
+    },
+    {
+      "key": 1002409,
+      "name": "Knowledge_Node_Del_MarniPark",
+      "display": "Marni Park"
+    },
+    {
+      "key": 1002410,
+      "name": "Knowledge_Bank_Goorba",
+      "display": "Grover"
+    },
+    {
+      "key": 1002413,
+      "name": "Knowledge_Node_Del_DelesyiaDyehouse",
+      "display": "Delesyia Dyehouse"
+    },
+    {
+      "key": 1002418,
+      "name": "Knowledge_Node_Del_SweetbloomPlantation",
+      "display": "Sweetbloom Plantation"
+    },
+    {
+      "key": 1002420,
+      "name": "Knowledge_Node_Her_CarriageWorkshop_00",
+      "display": "Hernand Wagon Fence"
+    },
+    {
+      "key": 1002421,
+      "name": "Knowledge_Node_Del_DelesyiaChurch",
+      "display": "Church of Delesyia"
+    },
+    {
+      "key": 1002422,
+      "name": "Knowledge_Node_Del_MarniLab",
+      "display": "Marni's Laboratorium"
+    },
+    {
+      "key": 1002424,
+      "name": "Knowledge_Node_Del_MarniLabGate",
+      "display": "Marni's Laboratorium Gate"
+    },
+    {
+      "key": 1002425,
+      "name": "Knowledge_Node_Del_ExperimentFacility",
+      "display": "Experiment Facility"
+    },
+    {
+      "key": 1002426,
+      "name": "Knowledge_Node_Del_LabWatchtower",
+      "display": "Laboratorium Lookout"
+    },
+    {
+      "key": 1002427,
+      "name": "Knowledge_Node_Del_MarniAirLab",
+      "display": "Aeronautical Research Base"
+    },
+    {
+      "key": 1002435,
+      "name": "Knowledge_Node_Del_ValvegardWallFort",
+      "display": "Valvegard Garrison"
+    },
+    {
+      "key": 1002436,
+      "name": "Knowledge_Node_Del_WallFortDrainagePipes",
+      "display": "Drainage Pipes"
+    },
+    {
+      "key": 1002444,
+      "name": "Knowledge_Node_Del_StonebackCrabWetlands",
+      "display": "Stoneback Crab Wetlands"
+    },
+    {
+      "key": 1002445,
+      "name": "Knowledge_Node_Del_RivershackPier",
+      "display": "Estuary Dock"
+    },
+    {
+      "key": 1002450,
+      "name": "Knowledge_Node_Neut_MarnisOutpost",
+      "display": "Marni's Outpost"
+    },
+    {
+      "key": 1002458,
+      "name": "Knowledge_Node_Del_SilverbrookRuins",
+      "display": "Silverbrook Ruins"
+    },
+    {
+      "key": 1002461,
+      "name": "Knowledge_Node_Crim_Varnia",
+      "display": "Varnia"
+    },
+    {
+      "key": 1002465,
+      "name": "Knowledge_Node_Crim_VarniaSaltroadCamp",
+      "display": "Varnia Saltroad Camp"
+    },
+    {
+      "key": 1002466,
+      "name": "Knowledge_Node_Crim_Urdavah",
+      "display": "Great Gate of Urdavah"
+    },
+    {
+      "key": 1002469,
+      "name": "Knowledge_Node_Crim_Tashkalp",
+      "display": "Tommaso"
+    },
+    {
+      "key": 1002471,
+      "name": "Knowledge_Node_Crim_TashkalpBeacon",
+      "display": "Tommaso Beacon"
+    },
+    {
+      "key": 1002472,
+      "name": "Knowledge_Node_Crim_RightEyeWatchtower",
+      "display": "Right Eye Watchtower"
+    },
+    {
+      "key": 1002474,
+      "name": "Knowledge_Node_Crim_HyenaDen",
+      "display": "Hyena Den"
+    },
+    {
+      "key": 1002475,
+      "name": "Knowledge_Node_Crim_BoneArena",
+      "display": "The Bonepit"
+    },
+    {
+      "key": 1002490,
+      "name": "Knowledge_Node_Crim_RedsandHelmhole",
+      "display": "Redsand Helmhole"
+    },
+    {
+      "key": 1002493,
+      "name": "Knowledge_Node_Crim_HowlsandsCamp",
+      "display": "Howlsands Camp"
+    },
+    {
+      "key": 1002499,
+      "name": "Knowledge_Node_Crim_EnlightenShrine",
+      "display": "Cloister of Enlightenment"
+    },
+    {
+      "key": 1002500,
+      "name": "Knowledge_Node_Crim_BurhumVillage",
+      "display": "Burhum"
+    },
+    {
+      "key": 1002502,
+      "name": "Knowledge_Node_Crim_WhitesandPrayHouse",
+      "display": "Whitesand Retreat"
+    },
+    {
+      "key": 1002503,
+      "name": "Knowledge_Node_Crim_RedMountainFort",
+      "display": "Crimson Mountains Fortress"
+    },
+    {
+      "key": 1002504,
+      "name": "Knowledge_Node_Crim_FallenAbyss",
+      "display": "Abyss Debris"
+    },
+    {
+      "key": 1002506,
+      "name": "Knowledge_Node_Crim_RuinsExcavation",
+      "display": "Ruins Excavation"
+    },
+    {
+      "key": 1002507,
+      "name": "Knowledge_Node_Crim_TimewornRuins",
+      "display": "Timeworn Ruins"
+    },
+    {
+      "key": 1002512,
+      "name": "Knowledge_Node_Her_WetFogCabin",
+      "display": "Deepfog Cabin"
+    },
+    {
+      "key": 1002523,
+      "name": "Knowledge_Node_Crim_SuramahdBazaar",
+      "display": "Suhramahd Bazaar"
+    },
+    {
+      "key": 1002529,
+      "name": "Knowledge_Node_Crim_IguanaHatchery",
+      "display": "Iguana Hatchery"
+    },
+    {
+      "key": 1002533,
+      "name": "Knowledge_Node_Crim_KurmaniRedtree",
+      "display": "Redtree Forest"
+    },
+    {
+      "key": 1002534,
+      "name": "Knowledge_Node_Crim_DryRiver",
+      "display": "Serpenthead Valley"
+    },
+    {
+      "key": 1002539,
+      "name": "Knowledge_Node_Crim_CrescentSkyway",
+      "display": "Crescent Skybridge"
+    },
+    {
+      "key": 1002540,
+      "name": "Knowledge_Node_Dem_BigRockCrown",
+      "display": "Monolith Crown"
+    },
+    {
+      "key": 1002543,
+      "name": "Knowledge_Node_Crim_TruthThrone",
+      "display": "Throne of Truth"
+    },
+    {
+      "key": 1002551,
+      "name": "Knowledge_Node_Del_BraveNest",
+      "display": "Nest of Valor"
+    },
+    {
+      "key": 1002560,
+      "name": "Knowledge_Node_Dem_GuruHaven",
+      "display": "Ascetic's Rest"
+    },
+    {
+      "key": 1002561,
+      "name": "Knowledge_Node_Her_MindAltar",
+      "display": "Sanctorum of Insight"
+    },
+    {
+      "key": 1002569,
+      "name": "Knowledge_ByronMansion_II",
+      "display": "Investigating the Byron Manor - Byron and Marshell"
+    },
+    {
+      "key": 1002573,
+      "name": "Knowledge_Node_Her_Ruins_0005",
+      "display": "Hernandian Ruins"
+    },
+    {
+      "key": 1002576,
+      "name": "Knowledge_Recipe_Bread",
+      "display": "Bread"
+    },
+    {
+      "key": 1002582,
+      "name": "Knowledge_Collection_Prop_Bottle_Glass",
+      "display": "Glass Container"
+    },
+    {
+      "key": 1002583,
+      "name": "Knowledge_Collection_Prop_Bottle_Wood",
+      "display": "Wooden Container"
+    },
+    {
+      "key": 1002592,
+      "name": "Knowledge_Damian_ShieldThrow_I",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1002608,
+      "name": "Knowledge_Stallholder_2",
+      "display": "Bloomwood Ranch Street Vendor"
+    },
+    {
+      "key": 1002610,
+      "name": "Knowledge_Node_Crim_Ruins_0015",
+      "display": "Desert Ruins"
+    },
+    {
+      "key": 1002612,
+      "name": "Knowledge_Node_Abyssone_End_0001",
+      "display": "Dimensional Bonds"
+    },
+    {
+      "key": 1002613,
+      "name": "Knowledge_Node_Dem_JumpTower",
+      "display": "Spire of Soaring"
+    },
+    {
+      "key": 1002614,
+      "name": "Knowledge_Node_Crim_SunTower",
+      "display": "Spire of the Sun"
+    },
+    {
+      "key": 1002615,
+      "name": "Knowledge_Node_Kwe_SpireOfRingingTruth",
+      "display": "Spire of Ringing Truth"
+    },
+    {
+      "key": 1002616,
+      "name": "Knowledge_Node_Her_SpireOfTheStars",
+      "display": "Spire of the Stars"
+    },
+    {
+      "key": 1002617,
+      "name": "Knowledge_Node_Dem_WisdomTower",
+      "display": "Spire of Insight"
+    },
+    {
+      "key": 1002619,
+      "name": "Knowledge_Node_Del_ClockTower",
+      "display": "Spire of Clockwork"
+    },
+    {
+      "key": 1002621,
+      "name": "Knowledge_Node_Her_SanctumOfAbsolution",
+      "display": "Sanctum of Absolution"
+    },
+    {
+      "key": 1002622,
+      "name": "Knowledge_Node_Her_SanctumOfTemperance",
+      "display": "Sanctum of Temperance"
+    },
+    {
+      "key": 1002623,
+      "name": "Knowledge_Node_Her_SanctumOfBenediction",
+      "display": "Sanctum of Benediction"
+    },
+    {
+      "key": 1002626,
+      "name": "Knowledge_Node_Her_SanctumOfPenitence",
+      "display": "Sanctum of Penitence"
+    },
+    {
+      "key": 1002627,
+      "name": "Knowledge_Node_Her_SanctumOfSolace",
+      "display": "Sanctum of Solace"
+    },
+    {
+      "key": 1002632,
+      "name": "Knowledge_Node_Del_SanctumOfMortification",
+      "display": "Sanctum of Mortification"
+    },
+    {
+      "key": 1002633,
+      "name": "Knowledge_Node_Del_SanctumOfVeneration",
+      "display": "Sanctum of Veneration"
+    },
+    {
+      "key": 1002648,
+      "name": "Knowledge_Node_Her_WitchHouse",
+      "display": "Witch's House"
+    },
+    {
+      "key": 1002670,
+      "name": "Knowledge_Node_Her_AnvilRiversideBanditCamp",
+      "display": "Anvil Riverside Bandit Camp"
+    },
+    {
+      "key": 1002678,
+      "name": "Knowledge_Node_Dem_HiddenEstate",
+      "display": "Secluded Private Property"
+    },
+    {
+      "key": 1002683,
+      "name": "Knowledge_Node_Her_AnvilHillBanditCamp",
+      "display": "Anvil Hill Bandit Camp"
+    },
+    {
+      "key": 1002687,
+      "name": "Knowledge_Node_Crim_ShadowdeepForest",
+      "display": "Gloomy Forest"
+    },
+    {
+      "key": 1002695,
+      "name": "Knowledge_Node_Kwe_ForestRing",
+      "display": "Forest Altar"
+    },
+    {
+      "key": 1002699,
+      "name": "Knowledge_Node_Kwe_SnowleafHaven",
+      "display": "Snowgrass Hearth"
+    },
+    {
+      "key": 1002705,
+      "name": "Knowledge_Node_Kwe_FrostFortressSite",
+      "display": "Frostveiled Castle Ruins"
+    },
+    {
+      "key": 1002706,
+      "name": "Knowledge_Node_Kwe_TreeshadeCabin",
+      "display": "Leafshade Cabin"
+    },
+    {
+      "key": 1002710,
+      "name": "Knowledge_RollCancel",
+      "display": "Evasive Roll"
+    },
+    {
+      "key": 1002718,
+      "name": "Knowledge_Rare_Collect_Chlorella",
+      "display": "Green Algae"
+    },
+    {
+      "key": 1002719,
+      "name": "Knowledge_Beetle",
+      "display": "Beetle"
+    },
+    {
+      "key": 1002720,
+      "name": "Knowledge_Rhinoceros_Beetle",
+      "display": "Rhinoceros Beetle"
+    },
+    {
+      "key": 1002724,
+      "name": "Knowledge_Longhorn_Beetle",
+      "display": "Longhorn Beetle"
+    },
+    {
+      "key": 1002741,
+      "name": "Knowledge_LungeCombination",
+      "display": "Swift Stab"
+    },
+    {
+      "key": 1002743,
+      "name": "Knowledge_JustEvade",
+      "display": "Dodge"
+    },
+    {
+      "key": 1002745,
+      "name": "Knowledge_AbyssRuins_Her_0021",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002746,
+      "name": "Knowledge_AbyssRuins_Her_0022",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002747,
+      "name": "Knowledge_AbyssRuins_Her_0023",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002748,
+      "name": "Knowledge_AbyssRuins_Her_0024",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002750,
+      "name": "Knowledge_AbyssRuins_Her_0026",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002751,
+      "name": "Knowledge_AbyssRuins_Her_0027",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002752,
+      "name": "Knowledge_AbyssRuins_Her_0028",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002753,
+      "name": "Knowledge_AbyssRuins_Her_0029",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002754,
+      "name": "Knowledge_AbyssRuins_Her_0030",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002755,
+      "name": "Knowledge_AbyssRuins_Dem_0012",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002756,
+      "name": "Knowledge_AbyssRuins_Dem_0013",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002757,
+      "name": "Knowledge_AbyssRuins_Dem_0014",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002758,
+      "name": "Knowledge_AbyssRuins_Dem_0015",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002759,
+      "name": "Knowledge_AbyssRuins_Dem_0016",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002760,
+      "name": "Knowledge_AbyssRuins_Dem_0017",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002761,
+      "name": "Knowledge_AbyssRuins_Dem_0018",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002762,
+      "name": "Knowledge_AbyssRuins_Dem_0019",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002763,
+      "name": "Knowledge_AbyssRuins_Dem_0020",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002765,
+      "name": "Knowledge_AbyssRuins_Dem_0022",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002766,
+      "name": "Knowledge_AbyssRuins_Dem_0023",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002767,
+      "name": "Knowledge_AbyssRuins_Dem_0024",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002768,
+      "name": "Knowledge_AbyssRuins_Dem_0025",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002770,
+      "name": "Knowledge_AbyssRuins_Dem_0027",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002771,
+      "name": "Knowledge_AbyssRuins_Dem_0028",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002772,
+      "name": "Knowledge_AbyssRuins_Dem_0029",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002775,
+      "name": "Knowledge_AbyssRuins_Del_0013",
+      "display": "Copper"
+    },
+    {
+      "key": 1002776,
+      "name": "Knowledge_AbyssRuins_Del_0014",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002779,
+      "name": "Knowledge_AbyssRuins_Del_0017",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002780,
+      "name": "Knowledge_AbyssRuins_Del_0018",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002782,
+      "name": "Knowledge_AbyssRuins_Del_0020",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002786,
+      "name": "Knowledge_AbyssRuins_Del_0024",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002787,
+      "name": "Knowledge_AbyssRuins_Del_0025",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002789,
+      "name": "Knowledge_AbyssRuins_Del_0027",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002790,
+      "name": "Knowledge_AbyssRuins_Del_0028",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002791,
+      "name": "Knowledge_AbyssRuins_Del_0029",
+      "display": "Currency"
+    },
+    {
+      "key": 1002793,
+      "name": "Knowledge_AbyssRuins_Kwe_0012",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002796,
+      "name": "Knowledge_AbyssRuins_Kwe_0015",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002797,
+      "name": "Knowledge_AbyssRuins_Kwe_0016",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002798,
+      "name": "Knowledge_AbyssRuins_Kwe_0017",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002799,
+      "name": "Knowledge_AbyssRuins_Kwe_0018",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002800,
+      "name": "Knowledge_AbyssRuins_Kwe_0019",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002801,
+      "name": "Knowledge_AbyssRuins_Kwe_0020",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002802,
+      "name": "Knowledge_AbyssRuins_Kwe_0021",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002804,
+      "name": "Knowledge_AbyssRuins_Kwe_0023",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002811,
+      "name": "Knowledge_AbyssRuins_Kwe_0030",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002812,
+      "name": "Knowledge_AbyssRuins_CD_0016",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002814,
+      "name": "Knowledge_AbyssRuins_CD_0018",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002815,
+      "name": "Knowledge_AbyssRuins_CD_0019",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002816,
+      "name": "Knowledge_AbyssRuins_CD_0020",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002818,
+      "name": "Knowledge_AbyssRuins_CD_0022",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002823,
+      "name": "Knowledge_AbyssRuins_CD_0027",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002824,
+      "name": "Knowledge_AbyssRuins_CD_0028",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002825,
+      "name": "Knowledge_AbyssRuins_CD_0029",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002826,
+      "name": "Knowledge_AbyssRuins_CD_0030",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1002833,
+      "name": "Knowledge_Minigame_Armwrest",
+      "display": "Arm Wrestling"
+    },
+    {
+      "key": 1002846,
+      "name": "Knowledge_Recipe_Fish_Porridge",
+      "display": "Fish Porridge"
+    },
+    {
+      "key": 1002859,
+      "name": "Knowledge_Recipe_Meat_Vegetable_Porridge",
+      "display": "Meat and Vegetable Porridge"
+    },
+    {
+      "key": 1002908,
+      "name": "Knowledge_Node_Dem_SolarAndLunarMaze",
+      "display": "Celestial Maze"
+    },
+    {
+      "key": 1002979,
+      "name": "Knowledge_Faction_MarniLab",
+      "display": "Society of Progress"
+    },
+    {
+      "key": 1002980,
+      "name": "Knowledge_Faction_MarniAirLab",
+      "display": "Delesyian Aerial Force"
+    },
+    {
+      "key": 1002983,
+      "name": "Knowledge_Faction_MarnisOutpost",
+      "display": "Cogknights"
+    },
+    {
+      "key": 1002991,
+      "name": "Knowledge_Faction_Desert_Villain",
+      "display": "Lords of Unclaimed Lands"
+    },
+    {
+      "key": 1003003,
+      "name": "Knowledge_Faction_ChocolateFactory",
+      "display": "Gearmelt Confectionery"
+    },
+    {
+      "key": 1003008,
+      "name": "Knowledge_Node_Crim_SouloftheWarriorCave",
+      "display": "Warrior's Soul Cave"
+    },
+    {
+      "key": 1003046,
+      "name": "Knowledge_Node_Del_AbandonedCabin_III",
+      "display": "Abandoned Cliffside Cabin"
+    },
+    {
+      "key": 1003060,
+      "name": "Knowledge_Node_Crim_Watchtower_I",
+      "display": "Crimson Mountains Watchtower"
+    },
+    {
+      "key": 1003068,
+      "name": "Knowledge_Node_Del_Watchtower_I",
+      "display": "Coast Windmill Watchtower"
+    },
+    {
+      "key": 1003070,
+      "name": "Knowledge_Node_Dem_DemenissPolice",
+      "display": "Demeniss Tribunal"
+    },
+    {
+      "key": 1003072,
+      "name": "Knowledge_Node_Her_Pervin_WatchTower",
+      "display": "Perwin Watchtower"
+    },
+    {
+      "key": 1003077,
+      "name": "Knowledge_Node_Dem_SulfurLake_WatchTower",
+      "display": "Brimstone Lake Watchtower"
+    },
+    {
+      "key": 1003079,
+      "name": "Knowledge_Tashkalpan_Territory",
+      "display": "Tashkalp"
+    },
+    {
+      "key": 1003088,
+      "name": "Knowledge_DeadEye_ChargeShot",
+      "display": "Focused Charged Shot"
+    },
+    {
+      "key": 1003090,
+      "name": "Knowledge_JiJeongTa_Far",
+      "display": "Force Current"
+    },
+    {
+      "key": 1003103,
+      "name": "Knowledge_Node_Crim_Ashen_Crevasse",
+      "display": "Ashen Rift"
+    },
+    {
+      "key": 1003107,
+      "name": "Knowledge_Node_Crim_DesolateStoneAltar",
+      "display": "Desolate Megalith Altar"
+    },
+    {
+      "key": 1003108,
+      "name": "Knowledge_Lift",
+      "display": "Nature's Grasp"
+    },
+    {
+      "key": 1003119,
+      "name": "Knowledge_Node_Dem_Shipwreck_0005",
+      "display": "Shipwreck Shore Wreckage"
+    },
+    {
+      "key": 1003143,
+      "name": "Knowledge_MasterDooTest_Hexe",
+      "display": "Master Du's Training: Insight"
+    },
+    {
+      "key": 1003144,
+      "name": "Knowledge_MasterDooTest_ShadowTemple",
+      "display": "Sanctum of Mortification"
+    },
+    {
+      "key": 1003150,
+      "name": "Knowledge_Small_Mechanical_Powerplant",
+      "display": "Small Battery"
+    },
+    {
+      "key": 1003155,
+      "name": "Knowledge_Node_Dem_SlantedFishingDock",
+      "display": "Creaky Fishing Dock"
+    },
+    {
+      "key": 1003171,
+      "name": "Knowledge_Node_Del_AncientRuins_0016",
+      "display": "Ancient Ruins"
+    },
+    {
+      "key": 1003185,
+      "name": "Knowledge_Node_Dem_AncientRuins_0030",
+      "display": "Ancient Ruins"
+    },
+    {
+      "key": 1003186,
+      "name": "Knowledge_Node_Her_AncientRuins_0031",
+      "display": "Ancient Ruins"
+    },
+    {
+      "key": 1003187,
+      "name": "Knowledge_Node_Her_AncientRuins_0032",
+      "display": "Ancient Ruins"
+    },
+    {
+      "key": 1003214,
+      "name": "Knowledge_Node_Del_VenusRiversideCabin",
+      "display": "Benus Riverside Cabin"
+    },
+    {
+      "key": 1003226,
+      "name": "Knowledge_Node_Crim_Urdavah_Title",
+      "display": "Urdavah"
+    },
+    {
+      "key": 1003230,
+      "name": "Knowledge_Node_Her_ForestCabin",
+      "display": "Cabin in the Forest"
+    },
+    {
+      "key": 1003240,
+      "name": "Knowledge_Node_Del_MarniMuseum",
+      "display": "Museum of Marni"
+    },
+    {
+      "key": 1003245,
+      "name": "Knowledge_TurnBash_II",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1003269,
+      "name": "Knowledge_Eavesdroppng",
+      "display": "Eavesdrop"
+    },
+    {
+      "key": 1003273,
+      "name": "Knowledge_Wrestle_Combination",
+      "display": "Lariat Follow-up"
+    },
+    {
+      "key": 1003274,
+      "name": "Knowledge_UnArmedCombination",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1003279,
+      "name": "Knowledge_HaDongTa",
+      "display": "Force Palm Pulse"
+    },
+    {
+      "key": 1003291,
+      "name": "Knowledge_Node_Her_AbandonedCabin_VI",
+      "display": "Abandoned Rocky Cliff Cabin"
+    },
+    {
+      "key": 1003311,
+      "name": "Knowledge_Recipe_KuKu_Dragon_Armor",
+      "display": "Blueprint II: Abyssal Fusion"
+    },
+    {
+      "key": 1003315,
+      "name": "Knowledge_Node_Cal_CalphadeGunpowderFactory",
+      "display": "Calphade Gunpowder Mill"
+    },
+    {
+      "key": 1003317,
+      "name": "Knowledge_Boss_Reward_DragonParts",
+      "display": "Golden Star's Component"
+    },
+    {
+      "key": 1003325,
+      "name": "Knowledge_Damian_ShieldThrow_II",
+      "display": "Expertise"
+    },
+    {
+      "key": 1003334,
+      "name": "Knowledge_Damian_HaDongTa",
+      "display": "Flurry of Kicks"
+    },
+    {
+      "key": 1003339,
+      "name": "Knowledge_Node_Her_CemeteryofReeds",
+      "display": "Reedfield Graves"
+    },
+    {
+      "key": 1003341,
+      "name": "Knowledge_Damian_ShieldThrow",
+      "display": "Shield Toss"
+    },
+    {
+      "key": 1003343,
+      "name": "Knowledge_Node_Kwe_DestructionTemple",
+      "display": "Cloister of Ruination"
+    },
+    {
+      "key": 1003346,
+      "name": "Knowledge_LegSwing",
+      "display": "Scissor Takedown"
+    },
+    {
+      "key": 1003359,
+      "name": "Knowledge_BlackWolf_Teleport",
+      "display": "Ambush"
+    },
+    {
+      "key": 1003370,
+      "name": "Knowledge_Node_Crim_OreVein_0004",
+      "display": "Desert Lake Gold Mine"
+    },
+    {
+      "key": 1003375,
+      "name": "Knowledge_Node_Her_RestArea_0004",
+      "display": "Borderside Hearth"
+    },
+    {
+      "key": 1003378,
+      "name": "Knowledge_Node_Kwe_RestArea_0007",
+      "display": "Snowy Plains Hearth"
+    },
+    {
+      "key": 1003392,
+      "name": "Knowledge_Node_Kwe_RestArea_0023",
+      "display": "Twinpath Western Hearth"
+    },
+    {
+      "key": 1003397,
+      "name": "Knowledge_Node_Kwe_RestArea_0028",
+      "display": "Skoghorn Hearth"
+    },
+    {
+      "key": 1003403,
+      "name": "Knowledge_Node_Her_RestArea_0035",
+      "display": "Chapelside Hearth"
+    },
+    {
+      "key": 1003412,
+      "name": "Knowledge_Node_Her_RestArea_0044",
+      "display": "Nas River Angler's Hearth"
+    },
+    {
+      "key": 1003415,
+      "name": "Knowledge_Node_Her_RestArea_0048",
+      "display": "Lavender Hearth"
+    },
+    {
+      "key": 1003417,
+      "name": "Knowledge_Node_Her_RestArea_0050",
+      "display": "Winterwind Hearth"
+    },
+    {
+      "key": 1003433,
+      "name": "Knowledge_Node_Del_RestArea_0067",
+      "display": "Morvane Railway Hearth"
+    },
+    {
+      "key": 1003448,
+      "name": "Knowledge_Node_Crim_RestArea_0082",
+      "display": "Rocky Creek Hearth"
+    },
+    {
+      "key": 1003460,
+      "name": "Knowledge_Node_Dem_IronStronghold_RestArea",
+      "display": "Fort Ironclad Cliffside Hearth"
+    },
+    {
+      "key": 1003465,
+      "name": "Knowledge_Node_Dem_IronStronghold_RestArea_0002",
+      "display": "Ironclad Fort Hearth"
+    },
+    {
+      "key": 1003466,
+      "name": "Knowledge_Node_Dem_ThornRoseFort_RestArea_0001",
+      "display": "Thornbriar Fortress Hearth"
+    },
+    {
+      "key": 1003467,
+      "name": "Knowledge_Damian_HeavenSpear_I",
+      "display": "Smiting Bolt"
+    },
+    {
+      "key": 1003468,
+      "name": "Knowledge_Damian_HeavenSpear_II",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1003470,
+      "name": "Knowledge_Damian_RotationBash_I",
+      "display": "Smiting Strike"
+    },
+    {
+      "key": 1003472,
+      "name": "Knowledge_Damian_RotationBash_II",
+      "display": "Expertise"
+    },
+    {
+      "key": 1003473,
+      "name": "Knowledge_Damian_TurnBash_I",
+      "display": "Sword Flurry"
+    },
+    {
+      "key": 1003474,
+      "name": "Knowledge_Damian_TurnBash_II",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1003475,
+      "name": "Knowledge_Damian_Lunge",
+      "display": "Piercing Light"
+    },
+    {
+      "key": 1003476,
+      "name": "Knowledge_Damian_LungeCombination",
+      "display": "Uppercut"
+    },
+    {
+      "key": 1003477,
+      "name": "Knowledge_Damian_LungeCatch",
+      "display": "Skewer"
+    },
+    {
+      "key": 1003480,
+      "name": "Knowledge_Damian_JumpDoubleKick",
+      "display": "Flying Kick"
+    },
+    {
+      "key": 1003481,
+      "name": "Knowledge_Damian_SkyKick",
+      "display": "Meteor Kick"
+    },
+    {
+      "key": 1003482,
+      "name": "Knowledge_MoveCutting_Expert",
+      "display": "Sure Hit"
+    },
+    {
+      "key": 1003492,
+      "name": "Knowledge_Damian_Wrestle_GrabSpinThrow",
+      "display": "Spinning Scissors Throw"
+    },
+    {
+      "key": 1003494,
+      "name": "Knowledge_Damian_SpinningKick",
+      "display": "Tornado Kick"
+    },
+    {
+      "key": 1003495,
+      "name": "Knowledge_Damian_DeadEye_ChargeShot",
+      "display": "Focused Charged Shot"
+    },
+    {
+      "key": 1003500,
+      "name": "Knowledge_Damian_Evade_Shot",
+      "display": "Evasive Shot"
+    },
+    {
+      "key": 1003501,
+      "name": "Knowledge_Damian_Evade_Shot_I",
+      "display": "Proficiency"
+    },
+    {
+      "key": 1003502,
+      "name": "Knowledge_Damian_Evade_Shot_II",
+      "display": "Expertise"
+    },
+    {
+      "key": 1003503,
+      "name": "Knowledge_Damian_AirGrab",
+      "display": "Aerial Grapple"
+    },
+    {
+      "key": 1003504,
+      "name": "Knowledge_Damian_HeavenSpear_Expert",
+      "display": "Sure Hit"
+    },
+    {
+      "key": 1003505,
+      "name": "Knowledge_RotationBash_Expert",
+      "display": "Rend Armor"
+    },
+    {
+      "key": 1003507,
+      "name": "Knowledge_Damian_RotationBash_Expert",
+      "display": "Rend Armor"
+    },
+    {
+      "key": 1003508,
+      "name": "Knowledge_Lunge_Expert",
+      "display": "Rend Armor"
+    },
+    {
+      "key": 1003510,
+      "name": "Knowledge_Damian_Lunge_Expert",
+      "display": "Rend Armor"
+    },
+    {
+      "key": 1003512,
+      "name": "Knowledge_Rope_AirPull",
+      "display": "Aerial Maneuver"
+    },
+    {
+      "key": 1003513,
+      "name": "Knowledge_Rope_AirSwing",
+      "display": "Aerial Swing"
+    },
+    {
+      "key": 1003518,
+      "name": "Knowledge_Taeguk_Unleash",
+      "display": "Nature's Retribution"
+    },
+    {
+      "key": 1003519,
+      "name": "Knowledge_Taeguk_Trap_I",
+      "display": "Nature's Snare"
+    },
+    {
+      "key": 1003521,
+      "name": "Knowledge_CloneAttack_MoveCutting",
+      "display": "Echoing Forward Slash"
+    },
+    {
+      "key": 1003522,
+      "name": "Knowledge_CloneAttack_TurnBash",
+      "display": "Echoing Spinning Slash"
+    },
+    {
+      "key": 1003523,
+      "name": "Knowledge_CloneAttack_Lunge",
+      "display": "Echoing Stab"
+    },
+    {
+      "key": 1003524,
+      "name": "Knowledge_ShieldJustGuard_Attack",
+      "display": "Counter"
+    },
+    {
+      "key": 1003525,
+      "name": "Knowledge_JiJeongTa_II_Finish",
+      "display": "Expertise"
+    },
+    {
+      "key": 1003528,
+      "name": "Knowledge_FistRock_Lake",
+      "display": "Fistboulder Lake"
+    },
+    {
+      "key": 1003534,
+      "name": "Knowledge_SplitHorn_Bremer_LostCow",
+      "display": "Missing Cows"
+    },
+    {
+      "key": 1003535,
+      "name": "Knowledge_SplitHorn_Ibano_GoatHorn",
+      "display": "Horn Thief"
+    },
+    {
+      "key": 1003536,
+      "name": "Knowledge_SplitHorn_Willian_FindSheep",
+      "display": "Missing Wooly"
+    },
+    {
+      "key": 1003537,
+      "name": "Knowledge_SplitHorn_ThiefCave",
+      "display": "Strange Noises from the Cave"
+    },
+    {
+      "key": 1003538,
+      "name": "Knowledge_Glass_CPU_Core",
+      "display": "Glass Cogwheel Tuner Core"
+    },
+    {
+      "key": 1003542,
+      "name": "Knowledge_ShakatuScroll",
+      "display": "Shakatu's Certificate"
+    },
+    {
+      "key": 1003549,
+      "name": "Knowledge_Node_Cal_HohenmarkRuins_RestArea_0001",
+      "display": "Hoenmark Ruins Hearth"
+    },
+    {
+      "key": 1003554,
+      "name": "Knowledge_Node_Crim_HowlsandsCamp_RestArea_0001",
+      "display": "Howlsands Camp Hearth"
+    },
+    {
+      "key": 1003555,
+      "name": "Knowledge_Alchemist_Key",
+      "display": "Engraved Key"
+    },
+    {
+      "key": 1003559,
+      "name": "AbyssTransmitter_0001",
+      "display": "Ethereal Pathway"
+    },
+    {
+      "key": 1003560,
+      "name": "AbyssTransmitter_0002",
+      "display": "Axiom Archive"
+    },
+    {
+      "key": 1003567,
+      "name": "Knowledge_Visione_Chip_Bremer",
+      "display": "The Missing Cow"
+    },
+    {
+      "key": 1003568,
+      "name": "Knowledge_Visione_Chip_Ibano",
+      "display": "Hornless Goat"
+    },
+    {
+      "key": 1003570,
+      "name": "Knowledge_Recipe_RevivalItemPartialRecovery",
+      "display": "Palmar Pill"
+    },
+    {
+      "key": 1003571,
+      "name": "Knowledge_CharacterClimb",
+      "display": "Back Hang"
+    },
+    {
+      "key": 1003573,
+      "name": "Knowledge_Visione_Chip_ThiefCave",
+      "display": "Lair of Animal Thieves"
+    },
+    {
+      "key": 1003574,
+      "name": "Knowledge_Visione_Chip_Witch_Kidnapped_Memory",
+      "display": "Memory of the Kidnapped Witch"
+    },
+    {
+      "key": 1003610,
+      "name": "Knowledge_AbyssRuins_AbyssIslandCore_0003",
+      "display": "Abyss Nexus"
+    },
+    {
+      "key": 1003658,
+      "name": "Knowledge_Minigame_Duel_Unarmed",
+      "display": "Unarmed Duel"
+    },
+    {
+      "key": 1003719,
+      "name": "Knowledge_Visione_Chip_OakenshieldManorhall",
+      "display": "Oakenshield Manor Reception Room"
+    },
+    {
+      "key": 1003769,
+      "name": "Knowledge_Visione_Chip_BumperCrop",
+      "display": "Bountiful Harvest"
+    },
+    {
+      "key": 1003790,
+      "name": "Knowledge_Minigame_Seotda",
+      "display": "Duo"
+    },
+    {
+      "key": 1003816,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_I",
+      "display": "Musket Ultimate Weapon Stronghold I"
+    },
+    {
+      "key": 1003817,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_II",
+      "display": "Musket Ultimate Weapon Stronghold II"
+    },
+    {
+      "key": 1003818,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_III",
+      "display": "Musket Ultimate Weapon Stronghold III"
+    },
+    {
+      "key": 1003825,
+      "name": "Knowledge_EastWitch_ReinDeer",
+      "display": "Eastern Witches' Deer"
+    },
+    {
+      "key": 1003829,
+      "name": "Knowledge_Frilled_Lizard",
+      "display": "Frilled-Neck Lizard"
+    },
+    {
+      "key": 1003847,
+      "name": "Knowledge_Recipe_Item_Stat_AbyssGear_MoveSpeedRate_LV1",
+      "display": "Haste"
+    },
+    {
+      "key": 1003852,
+      "name": "Knowledge_Snow_Golem",
+      "display": "Icewalker"
+    },
+    {
+      "key": 1003856,
+      "name": "Knowledge_Recipe_Item_Stat_AbyssGear_HpRegen_LV1",
+      "display": "Vitality"
+    },
+    {
+      "key": 1003890,
+      "name": "Knowledge_Marni_MachineAnt",
+      "display": "Clockwork Ant"
+    },
+    {
+      "key": 1003891,
+      "name": "Knowledge_Marni_MachineBeetle",
+      "display": "Clockwork Beetle"
+    },
+    {
+      "key": 1003892,
+      "name": "Knowledge_Marni_MachineMosquito",
+      "display": "Clockwork Mosquito"
+    },
+    {
+      "key": 1003893,
+      "name": "Knowledge_Marni_MachineDragonFly",
+      "display": "Clockwork Dragonfly"
+    },
+    {
+      "key": 1003894,
+      "name": "Knowledge_Small_MachineTank",
+      "display": "Small Combat Mechatank"
+    },
+    {
+      "key": 1003895,
+      "name": "Knowledge_Middle_MachineTank",
+      "display": "Medium Combat Mechatank"
+    },
+    {
+      "key": 1003897,
+      "name": "Knowledge_Marni_MachineKnight",
+      "display": "Machina Knight"
+    },
+    {
+      "key": 1003898,
+      "name": "Knowledge_Droid",
+      "display": "Factory Management Robot"
+    },
+    {
+      "key": 1003904,
+      "name": "Knowledge_Hexe_PotSoldier",
+      "display": "Hexe Earthen Soldier"
+    },
+    {
+      "key": 1003905,
+      "name": "Knowledge_Hexe_PotTwoHandSpear",
+      "display": "Hexe Earthen Spearman"
+    },
+    {
+      "key": 1003906,
+      "name": "Knowledge_Hexe_PotOneHandSword",
+      "display": "Hexe Earthen Swordsman"
+    },
+    {
+      "key": 1003907,
+      "name": "Knowledge_Hexe_PotWarrior",
+      "display": "Hexe Earthen Warrior"
+    },
+    {
+      "key": 1003908,
+      "name": "Knowledge_SkullKinight_Follower",
+      "display": "Skull Knight Followers"
+    },
+    {
+      "key": 1003910,
+      "name": "Knowledge_NatureCreature_Rush",
+      "display": "Wandershrub"
+    },
+    {
+      "key": 1003912,
+      "name": "Knowledge_NatureCreature_WoodObserver",
+      "display": "Tree Observer"
+    },
+    {
+      "key": 1004141,
+      "name": "Knowledge_SplitHorn_Boss_ThiefCave",
+      "display": "Illicit Trade in the Thieves' Lair"
+    },
+    {
+      "key": 1004142,
+      "name": "Knowledge_Node_Her_Temporary_Camp",
+      "display": "Freesword Encampment"
+    },
+    {
+      "key": 1004143,
+      "name": "Knowledge_Faction_WareHouse",
+      "display": "Private Storage"
+    },
+    {
+      "key": 1004146,
+      "name": "Knowledge_Witch",
+      "display": "Sylvia"
+    },
+    {
+      "key": 1004147,
+      "name": "Knowledge_Isolation_Witch_Hint",
+      "display": "The White Crow's Guidance"
+    },
+    {
+      "key": 1004269,
+      "name": "Knowledge_Stallholder_1_05",
+      "display": "Halssius Apothecary Street Vendor"
+    },
+    {
+      "key": 1004309,
+      "name": "Knowledge_Stallholder_5",
+      "display": "Beighen Street Vendor"
+    },
+    {
+      "key": 1004317,
+      "name": "Knowledge_Stallholder_6_03",
+      "display": "Pailune Castle Street Vendor"
+    },
+    {
+      "key": 1004335,
+      "name": "Knowledge_Node_Her_HerStore_Wanted",
+      "display": "Hernand Constabulary"
+    },
+    {
+      "key": 1004336,
+      "name": "Knowledge_Node_Cal_CalStore_Wanted",
+      "display": "Calphade Constabulary"
+    },
+    {
+      "key": 1004337,
+      "name": "Knowledge_Node_Kwe_PeiStore_Wanted",
+      "display": "Pailune Constabulary"
+    },
+    {
+      "key": 1004338,
+      "name": "Knowledge_Node_Dem_DemStore_Wanted",
+      "display": "Demeniss Constabulary"
+    },
+    {
+      "key": 1004339,
+      "name": "Knowledge_Node_Del_DelStore_Wanted",
+      "display": "Delesyia Constabulary"
+    },
+    {
+      "key": 1004340,
+      "name": "Knowledge_Node_Crim_TomStore_Wanted",
+      "display": "Tommaso Constabulary"
+    },
+    {
+      "key": 1004341,
+      "name": "Knowledge_Node_Crim_VarStore_Wanted",
+      "display": "Varnia Constabulary"
+    },
+    {
+      "key": 1004344,
+      "name": "Unknown_1004344",
+      "display": ""
+    },
+    {
+      "key": 1004345,
+      "name": "Unknown_1004345",
+      "display": ""
+    },
+    {
+      "key": 2147483039,
+      "name": "Knowledge_Recipe_Jerky",
+      "display": "Fine Jerky"
+    },
+    {
+      "key": 2147483040,
+      "name": "Knowledge_Recipe_Jerky_Pieces",
+      "display": "Jerky"
+    },
+    {
+      "key": 2147483041,
+      "name": "Knowledge_Recipe_Food_Dried_Fish",
+      "display": "Dried Fish"
+    },
+    {
+      "key": 2147483043,
+      "name": "Knowledge_Robot_Maker",
+      "display": "Marek"
+    },
+    {
+      "key": 2147483045,
+      "name": "Knowledge_Unique_Augustine",
+      "display": "Augustine"
+    },
+    {
+      "key": 2147483046,
+      "name": "Knowledge_Thompson",
+      "display": "Thomson"
+    },
+    {
+      "key": 2147483047,
+      "name": "Knowledge_AIMarni",
+      "display": "H.A.L.L."
+    },
+    {
+      "key": 2147483048,
+      "name": "Knowledge_Valgash",
+      "display": "Valgash"
+    },
+    {
+      "key": 2147483049,
+      "name": "Knowledge_Draper_Wells",
+      "display": "Drake Wells"
+    },
+    {
+      "key": 2147483050,
+      "name": "Knowledge_Unique_JiJeong",
+      "display": "Master Jijeong"
+    },
+    {
+      "key": 2147483051,
+      "name": "Knowledge_Unique_Polan",
+      "display": "Polan"
+    },
+    {
+      "key": 2147483052,
+      "name": "Knowledge_Witch_Usa",
+      "display": "Woosa"
+    },
+    {
+      "key": 2147483053,
+      "name": "Knowledge_Witch_Megu",
+      "display": "Maegu"
+    },
+    {
+      "key": 2147483054,
+      "name": "Knowledge_Colette",
+      "display": "Colette Azerian"
+    },
+    {
+      "key": 2147483055,
+      "name": "Knowledge_Tolstein",
+      "display": "Torstein"
+    },
+    {
+      "key": 2147483056,
+      "name": "Knowledge_Jameson",
+      "display": "Jameson"
+    },
+    {
+      "key": 2147483057,
+      "name": "Knowledge_Charles_Selester",
+      "display": "Charles Celeste"
+    },
+    {
+      "key": 2147483058,
+      "name": "Knowledge_NTM_Unique_Suspicious_Troll_Scholarsouth_470",
+      "display": "Grimrick"
+    },
+    {
+      "key": 2147483060,
+      "name": "Knowledge_Irkin",
+      "display": "Irkyn"
+    },
+    {
+      "key": 2147483062,
+      "name": "Knowledge_Grimnir",
+      "display": "Grimnir"
+    },
+    {
+      "key": 2147483063,
+      "name": "Knowledge_Marina",
+      "display": "Marina"
+    },
+    {
+      "key": 2147483064,
+      "name": "Knowledge_Unique_Imp_Banquet",
+      "display": "Kearush the Slayer"
+    },
+    {
+      "key": 2147483065,
+      "name": "Knowledge_CountGrace",
+      "display": "Alistair Grace"
+    },
+    {
+      "key": 2147483066,
+      "name": "Knowledge_ReedDevil",
+      "display": "Reed Devil"
+    },
+    {
+      "key": 2147483067,
+      "name": "Knowledge_Alan_Serkis",
+      "display": "Alan Serkis"
+    },
+    {
+      "key": 2147483068,
+      "name": "Knowledge_Hubert",
+      "display": "Hubert"
+    },
+    {
+      "key": 2147483069,
+      "name": "Knowledge_Boris",
+      "display": "Boris"
+    },
+    {
+      "key": 2147483070,
+      "name": "Knowledge_Willian",
+      "display": "Willian"
+    },
+    {
+      "key": 2147483071,
+      "name": "Knowledge_Ivano",
+      "display": "Ibano"
+    },
+    {
+      "key": 2147483072,
+      "name": "Knowledge_Bremer",
+      "display": "Bremer"
+    },
+    {
+      "key": 2147483073,
+      "name": "Knowledge_Barden_Midler",
+      "display": "Barden Middler"
+    },
+    {
+      "key": 2147483074,
+      "name": "Knowledge_Matthias",
+      "display": "Matthias"
+    },
+    {
+      "key": 2147483075,
+      "name": "Knowledge_Bilwise",
+      "display": "Bilwise"
+    },
+    {
+      "key": 2147483076,
+      "name": "Knowledge_Arlan",
+      "display": "Arlan"
+    },
+    {
+      "key": 2147483077,
+      "name": "Knowledge_Lauren",
+      "display": "Lauren"
+    },
+    {
+      "key": 2147483078,
+      "name": "Knowledge_CatManager",
+      "display": "Rulupee"
+    },
+    {
+      "key": 2147483081,
+      "name": "Knowledge_GreyFur_Ronald",
+      "display": "Ronald"
+    },
+    {
+      "key": 2147483085,
+      "name": "Knowledge_GreyFur_Luke",
+      "display": "Luke"
+    },
+    {
+      "key": 2147483098,
+      "name": "Knowledge_GreyFur_Andrew",
+      "display": "Andrew"
+    },
+    {
+      "key": 2147483118,
+      "name": "Knowledge_All_Terrain_Armored_Gear",
+      "display": "All-Terrain Armored Gear (A.T.A.G.)"
+    },
+    {
+      "key": 2147483150,
+      "name": "Knowledge_WantedPaper_0101",
+      "display": "Billy"
+    },
+    {
+      "key": 2147483177,
+      "name": "Knowledge_WantedPaper_0004",
+      "display": "Alessio"
+    },
+    {
+      "key": 2147483187,
+      "name": "Knowledge_WantedPaper_0005",
+      "display": "Blix"
+    },
+    {
+      "key": 2147483190,
+      "name": "Knowledge_WantedPaper_0006",
+      "display": "Bianca"
+    },
+    {
+      "key": 2147483191,
+      "name": "Knowledge_WantedPaper_0009",
+      "display": "Warren"
+    },
+    {
+      "key": 2147483192,
+      "name": "Knowledge_WantedPaper_0059",
+      "display": "Jeffrey"
+    },
+    {
+      "key": 2147483193,
+      "name": "Knowledge_WantedPaper_0001",
+      "display": "Simon de Montfort"
+    },
+    {
+      "key": 2147483194,
+      "name": "Knowledge_WantedPaper_0007",
+      "display": "Salvatore"
+    },
+    {
+      "key": 2147483204,
+      "name": "Knowledge_Silver_Armor_Boss",
+      "display": "Cassius Morten"
+    },
+    {
+      "key": 2147483210,
+      "name": "Knowledge_TheScarletExcecutioner",
+      "display": "The Crimson Warden"
+    },
+    {
+      "key": 2147483211,
+      "name": "Knowledge_FortaintheHexboundKnight",
+      "display": "Fortain, the Cursed Knight"
+    },
+    {
+      "key": 2147483223,
+      "name": "Knowledge_GregortheHalberdofCarnage",
+      "display": "Gregor, the Halberd of Carnage"
+    },
+    {
+      "key": 2147483225,
+      "name": "Knowledge_DarkKing",
+      "display": "Beloth, the Darksworn"
+    },
+    {
+      "key": 2147483227,
+      "name": "Knowledge_Unique_OrcuMer",
+      "display": "T'rukan the Ascended"
+    },
+    {
+      "key": 2147483243,
+      "name": "Knowledge_MarniExcavatron",
+      "display": "Marni's Excavatron"
+    },
+    {
+      "key": 2147483250,
+      "name": "Knowledge_Unique_Tank_Lase",
+      "display": "Storm Crusher"
+    },
+    {
+      "key": 2147483251,
+      "name": "Knowledge_Unique_Tank_Laser",
+      "display": "Thunder Tank"
+    },
+    {
+      "key": 2147483255,
+      "name": "Knowledge_Marni_MachineMantis",
+      "display": "Clockwork Mantis"
+    },
+    {
+      "key": 2147483258,
+      "name": "Knowledge_SkullKnight_Ghost",
+      "display": "Skull Knight Specter"
+    },
+    {
+      "key": 2147483268,
+      "name": "Knowledge_Dimension_Wyvern",
+      "display": "Dimensional Wyvern"
+    },
+    {
+      "key": 2147483274,
+      "name": "Knowledge_Skunky",
+      "display": "Skunky"
+    },
+    {
+      "key": 2147483276,
+      "name": "Knowledge_NatureCreature_SwampWorm",
+      "display": "Swamp Worm"
+    },
+    {
+      "key": 2147483334,
+      "name": "Knowledge_Mesite",
+      "display": "Mesite"
+    },
+    {
+      "key": 2147483351,
+      "name": "Knowledge_Armadillo",
+      "display": "Armadillo"
+    },
+    {
+      "key": 2147483352,
+      "name": "Knowledge_Arctic_Fox",
+      "display": "Snowfield Fox"
+    },
+    {
+      "key": 2147483363,
+      "name": "Knowledge_Desert_Rabbit",
+      "display": "Desert Rabbit"
+    },
+    {
+      "key": 2147483371,
+      "name": "Knowledge_WaterDeer",
+      "display": "Water Deer"
+    },
+    {
+      "key": 2147483396,
+      "name": "Knowledge_Wagon_Village_Chief",
+      "display": "Milford"
+    },
+    {
+      "key": 2147483415,
+      "name": "Knowledge_GreyFur_Carl",
+      "display": "Carl"
+    },
+    {
+      "key": 2147483433,
+      "name": "Knowledge_Alfred",
+      "display": "Alfred"
+    },
+    {
+      "key": 2147483442,
+      "name": "Knowledge_Blynhilde",
+      "display": "Elowen"
+    },
+    {
+      "key": 2147483447,
+      "name": "Knowledge_Bar_DyeColor",
+      "display": "Alton"
+    },
+    {
+      "key": 2147483454,
+      "name": "Knowledge_Her_DyeColor",
+      "display": "Theoric"
+    },
+    {
+      "key": 2147483458,
+      "name": "Knowledge_Edmund",
+      "display": "Edmond"
+    },
+    {
+      "key": 2147483467,
+      "name": "Knowledge_Grimrak",
+      "display": "Grimrak"
+    },
+    {
+      "key": 2147483471,
+      "name": "Knowledge_Darok",
+      "display": "Darroch"
+    },
+    {
+      "key": 2147483474,
+      "name": "Knowledge_Burk",
+      "display": "Burke"
+    },
+    {
+      "key": 2147483478,
+      "name": "Knowledge_Unique_Grainridge",
+      "display": "Grandige"
+    },
+    {
+      "key": 2147483493,
+      "name": "Knowledge_Maiden",
+      "display": "Maidon"
+    },
+    {
+      "key": 2147483494,
+      "name": "Knowledge_Khadija",
+      "display": "Hadiza"
+    },
+    {
+      "key": 2147483499,
+      "name": "Knowledge_Aldun",
+      "display": "Alden"
+    },
+    {
+      "key": 2147483503,
+      "name": "Knowledge_Noor",
+      "display": "Nora"
+    },
+    {
+      "key": 2147483506,
+      "name": "Knowledge_Tina",
+      "display": "Tina"
+    },
+    {
+      "key": 2147483507,
+      "name": "Knowledge_Martina",
+      "display": "Martina"
+    },
+    {
+      "key": 2147483512,
+      "name": "Knowledge_Fatima",
+      "display": "Fatima"
+    },
+    {
+      "key": 2147483513,
+      "name": "Knowledge_Grana",
+      "display": "Grania"
+    },
+    {
+      "key": 2147483516,
+      "name": "Knowledge_Dahlia",
+      "display": "Dahlia"
+    },
+    {
+      "key": 2147483517,
+      "name": "Knowledge_Inn",
+      "display": "Anne"
+    },
+    {
+      "key": 2147483521,
+      "name": "Knowledge_Faisal",
+      "display": "Faisal"
+    },
+    {
+      "key": 2147483529,
+      "name": "Knowledge_Zara",
+      "display": "Zara"
+    },
+    {
+      "key": 2147483541,
+      "name": "Knowledge_Marin",
+      "display": "Marin"
+    },
+    {
+      "key": 2147483545,
+      "name": "Knowledge_Bran",
+      "display": "Bran"
+    },
+    {
+      "key": 2147483546,
+      "name": "Knowledge_Doni",
+      "display": "Donny"
+    },
+    {
+      "key": 2147483553,
+      "name": "Knowledge_Delkin",
+      "display": "Delkin"
+    },
+    {
+      "key": 2147483562,
+      "name": "Knowledge_Rickmore",
+      "display": "Rickmore"
+    },
+    {
+      "key": 2147483567,
+      "name": "Knowledge_Valentis",
+      "display": "Valentine"
+    },
+    {
+      "key": 2147483570,
+      "name": "Knowledge_Holdwin",
+      "display": "Haldwin"
+    },
+    {
+      "key": 2147483573,
+      "name": "Knowledge_Lior",
+      "display": "Leore"
+    },
+    {
+      "key": 2147483574,
+      "name": "Knowledge_Omar",
+      "display": "Omar"
+    },
+    {
+      "key": 2147483583,
+      "name": "Knowledge_Samir",
+      "display": "Samir"
+    },
+    {
+      "key": 2147483584,
+      "name": "Knowledge_Rainier",
+      "display": "Renier"
+    },
+    {
+      "key": 2147483588,
+      "name": "Knowledge_Turnuli",
+      "display": "Turnali"
+    },
+    {
+      "key": 2147483599,
+      "name": "Knowledge_MarniAirLabCaptain",
+      "display": "Aeronautical Research Base Guard Captain"
+    },
+    {
+      "key": 2147483600,
+      "name": "Knowledge_MarniLabAssistant",
+      "display": "Marni's Laboratorium Assistant"
+    },
+    {
+      "key": 2147483617,
+      "name": "Knowledge_Erich",
+      "display": "Erich"
+    },
+    {
+      "key": 2147483624,
+      "name": "Knowledge_Unique_Ruknadin",
+      "display": "Lukadin"
+    },
+    {
+      "key": 2147483628,
+      "name": "Knowledge_Unique_Olvald",
+      "display": "Olvald"
+    },
+    {
+      "key": 2147483629,
+      "name": "Knowledge_Marni",
+      "display": "Marni"
+    },
+    {
+      "key": 2147483631,
+      "name": "Knowledge_Rahului_1",
+      "display": "Edward Thorel"
+    },
+    {
+      "key": 2147483633,
+      "name": "Knowledge_AlderynGrace",
+      "display": "Aldrin Grace"
+    },
+    {
+      "key": 2147483639,
+      "name": "Knowledge_Antoni",
+      "display": "Antoni"
+    },
+    {
+      "key": 2147483643,
+      "name": "Knowledge_Roberts",
+      "display": "Leon Roberts"
+    },
+    {
+      "key": 2147483644,
+      "name": "Knowledge_Azureian",
+      "display": "Beatrice Azerian"
+    },
+    {
+      "key": 2147483645,
+      "name": "Knowledge_Caliburn",
+      "display": "Gabriel Caliburn"
+    },
+    {
+      "key": 2147483646,
+      "name": "Knowledge_Ziane",
+      "display": "Jian"
+    }
+  ]
+}
