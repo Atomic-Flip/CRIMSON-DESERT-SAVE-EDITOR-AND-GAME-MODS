@@ -1,0 +1,1611 @@
+{
+  "name": "Waypoints + Regions (Test)",
+  "description": "393 teleport/waypoint nodes + 8 map regions from community knowledge. Test pack to check quest interference.",
+  "type": "knowledge",
+  "entries": [
+    {
+      "key": 1001803,
+      "name": "Knowledge_Node_Her_Serkis"
+    },
+    {
+      "key": 1000987,
+      "name": "Knowledge_Node_Her_village"
+    },
+    {
+      "key": 1000016,
+      "name": "Knowledge_Node_Her_HernandCastle"
+    },
+    {
+      "key": 1000017,
+      "name": "Knowledge_Node_Her_HernandEastGate"
+    },
+    {
+      "key": 1000089,
+      "name": "Knowledge_Node_Her_HernandNorthGate"
+    },
+    {
+      "key": 1000740,
+      "name": "Knowledge_Node_Her_BellanorHuntingGrounds"
+    },
+    {
+      "key": 1001682,
+      "name": "Knowledge_Node_Her_TorchlightBeacon"
+    },
+    {
+      "key": 1002119,
+      "name": "Knowledge_Node_Her_EmbernestBeacon"
+    },
+    {
+      "key": 1002420,
+      "name": "Knowledge_Node_Her_CarriageWorkshop_00"
+    },
+    {
+      "key": 1002298,
+      "name": "Knowledge_Node_Her_HillguardOutpost"
+    },
+    {
+      "key": 1002166,
+      "name": "Knowledge_Node_Her_FortHellwood"
+    },
+    {
+      "key": 1002167,
+      "name": "Knowledge_Node_Her_HellwoodInnerGate"
+    },
+    {
+      "key": 1001836,
+      "name": "Knowledge_Node_Her_Riverward_SpearsendStation"
+    },
+    {
+      "key": 1001837,
+      "name": "Knowledge_Node_Her_Riverward_ArroweyeStation"
+    },
+    {
+      "key": 1001838,
+      "name": "Knowledge_Node_Her_Riverward_IronhoofStation"
+    },
+    {
+      "key": 1001839,
+      "name": "Knowledge_Node_Her_Riverward_IronhammerStation"
+    },
+    {
+      "key": 1001676,
+      "name": "Knowledge_Node_Her_DragonKillCastle"
+    },
+    {
+      "key": 1002250,
+      "name": "Knowledge_Node_Her_DrakefallWatchtowerArea"
+    },
+    {
+      "key": 1002220,
+      "name": "Knowledge_Node_Cal_CalphadeCastle"
+    },
+    {
+      "key": 1002221,
+      "name": "Knowledge_Node_Cal_CalphadeSouthGate"
+    },
+    {
+      "key": 1001712,
+      "name": "Knowledge_Node_Cal_CalphadeSouthEastGate"
+    },
+    {
+      "key": 1002222,
+      "name": "Knowledge_Node_Cal_CalphadeNorthGate"
+    },
+    {
+      "key": 1001713,
+      "name": "Knowledge_Node_Cal_CalphadeOutpost"
+    },
+    {
+      "key": 1002223,
+      "name": "Knowledge_Node_Cal_CalphadeBeacon"
+    },
+    {
+      "key": 1002224,
+      "name": "Knowledge_Node_Cal_CalphadeSouthDepot"
+    },
+    {
+      "key": 1002225,
+      "name": "Knowledge_Node_Cal_CalphadeNorthDepot"
+    },
+    {
+      "key": 1002228,
+      "name": "Knowledge_Node_Cal_CalphadeRefinery"
+    },
+    {
+      "key": 1003315,
+      "name": "Knowledge_Node_Cal_CalphadeGunpowderFactory"
+    },
+    {
+      "key": 1002230,
+      "name": "Knowledge_Node_Cal_CalphadeLoggingCamp"
+    },
+    {
+      "key": 1002231,
+      "name": "Knowledge_Node_Cal_ThalwyndVillage"
+    },
+    {
+      "key": 1002232,
+      "name": "Knowledge_Node_Cal_CalphadeTrainingField"
+    },
+    {
+      "key": 1002234,
+      "name": "Knowledge_Node_Cal_CalphadeFarm"
+    },
+    {
+      "key": 1001715,
+      "name": "Knowledge_Node_Cal_SouthWatch_Post"
+    },
+    {
+      "key": 1001716,
+      "name": "Knowledge_Node_Cal_SouthBorder_Post"
+    },
+    {
+      "key": 1001717,
+      "name": "Knowledge_Node_Cal_CenterBorder_Post"
+    },
+    {
+      "key": 1001718,
+      "name": "Knowledge_Node_Cal_NorthBorder_Post"
+    },
+    {
+      "key": 1000340,
+      "name": "Knowledge_Node_Her_GlenbrightManor_Grace"
+    },
+    {
+      "key": 1000350,
+      "name": "Knowledge_Node_Her_GlenbrightFarm"
+    },
+    {
+      "key": 1003339,
+      "name": "Knowledge_Node_Her_CemeteryofReeds"
+    },
+    {
+      "key": 1002171,
+      "name": "Knowledge_Node_Her_SunsetVillage"
+    },
+    {
+      "key": 1002131,
+      "name": "Knowledge_Node_Her_VelluaVillage"
+    },
+    {
+      "key": 1002170,
+      "name": "Knowledge_Node_Her_TheFlyingCatfish"
+    },
+    {
+      "key": 1001678,
+      "name": "Knowledge_Node_Her_OakenshieldManor_Serkis"
+    },
+    {
+      "key": 1001809,
+      "name": "Knowledge_Node_Her_GreymaneCamp"
+    },
+    {
+      "key": 1001680,
+      "name": "Knowledge_Node_Her_CapraPasture"
+    },
+    {
+      "key": 1001681,
+      "name": "Knowledge_Node_Her_SpringtideWatermill"
+    },
+    {
+      "key": 1001684,
+      "name": "Knowledge_Node_Her_IvyVillage"
+    },
+    {
+      "key": 1001685,
+      "name": "Knowledge_Node_Her_HuntersHut"
+    },
+    {
+      "key": 1001671,
+      "name": "Knowledge_Node_Her_FortAnvil"
+    },
+    {
+      "key": 1001840,
+      "name": "Knowledge_Node_Her_WillkommPost"
+    },
+    {
+      "key": 1001687,
+      "name": "Knowledge_Node_Her_BluemontManor_Rupert"
+    },
+    {
+      "key": 1001688,
+      "name": "Knowledge_Node_Her_BluemontWineHouse"
+    },
+    {
+      "key": 1001691,
+      "name": "Knowledge_Node_Her_KarinQuarry"
+    },
+    {
+      "key": 1000029,
+      "name": "Knowledge_Node_Her_StoneTowerVillage"
+    },
+    {
+      "key": 1002142,
+      "name": "Knowledge_Node_Her_MuckrootRanch"
+    },
+    {
+      "key": 1002146,
+      "name": "Knowledge_Node_Her_StreamsidePier"
+    },
+    {
+      "key": 1002147,
+      "name": "Knowledge_Node_Her_BloomwoodRanch"
+    },
+    {
+      "key": 1001666,
+      "name": "Knowledge_Node_Her_PervinFort"
+    },
+    {
+      "key": 1001667,
+      "name": "Knowledge_Node_Her_PervinGate"
+    },
+    {
+      "key": 1001668,
+      "name": "Knowledge_Node_Her_PervinPrisonCamp"
+    },
+    {
+      "key": 1001669,
+      "name": "Knowledge_Node_Her_PervinQuarry"
+    },
+    {
+      "key": 1001670,
+      "name": "Knowledge_Node_Her_PervinTradePost"
+    },
+    {
+      "key": 1001689,
+      "name": "Knowledge_Node_Her_MeshleyTrapMaker"
+    },
+    {
+      "key": 1001810,
+      "name": "Knowledge_Node_Her_LioncrestManor_Alfonso"
+    },
+    {
+      "key": 1001811,
+      "name": "Knowledge_Node_Her_TimberhamSawmill"
+    },
+    {
+      "key": 1001812,
+      "name": "Knowledge_Node_Her_TimberhamLumbermill"
+    },
+    {
+      "key": 1002144,
+      "name": "Knowledge_Node_Her_EquinsherSaddlery"
+    },
+    {
+      "key": 1002150,
+      "name": "Knowledge_Node_Her_TimberWagonFactory"
+    },
+    {
+      "key": 1000840,
+      "name": "Knowledge_Node_Her_PhonielRanch"
+    },
+    {
+      "key": 1000643,
+      "name": "Knowledge_Node_Her_FortWarspike"
+    },
+    {
+      "key": 1000862,
+      "name": "Knowledge_Node_Her_WarspikeEastGate"
+    },
+    {
+      "key": 1000863,
+      "name": "Knowledge_Node_Her_WarspikeSouthGate"
+    },
+    {
+      "key": 1002116,
+      "name": "Knowledge_Node_Her_GreystoneManor_Felix"
+    },
+    {
+      "key": 1002117,
+      "name": "Knowledge_Node_Her_WycliffeMappery"
+    },
+    {
+      "key": 1002143,
+      "name": "Knowledge_Node_Her_CoalvaleWorkshop"
+    },
+    {
+      "key": 1002118,
+      "name": "Knowledge_Node_Her_RodbelFishingDock"
+    },
+    {
+      "key": 1002120,
+      "name": "Knowledge_Node_Her_SouthQuarry"
+    },
+    {
+      "key": 1001690,
+      "name": "Knowledge_Node_Her_InksworthPrinter"
+    },
+    {
+      "key": 1000104,
+      "name": "Knowledge_Node_Her_KharonsoVillage"
+    },
+    {
+      "key": 1000098,
+      "name": "Knowledge_Node_Her_KharonsoLake"
+    },
+    {
+      "key": 1002124,
+      "name": "Knowledge_Node_Her_PororinVillage"
+    },
+    {
+      "key": 1002127,
+      "name": "Knowledge_Node_Her_FlorindaleVillage"
+    },
+    {
+      "key": 1002141,
+      "name": "Knowledge_Node_Her_GoldleafGuildhouse"
+    },
+    {
+      "key": 1002145,
+      "name": "Knowledge_Node_Her_GoldleafTradepost"
+    },
+    {
+      "key": 1002149,
+      "name": "Knowledge_Node_Her_GoldenFistsArena"
+    },
+    {
+      "key": 1002148,
+      "name": "Knowledge_Node_GoldleafGuildhouse_Child_04"
+    },
+    {
+      "key": 1001883,
+      "name": "Knowledge_Node_Her_North_GoldleafBlackMarket"
+    },
+    {
+      "key": 1001884,
+      "name": "Knowledge_Node_Her_East_GoldleafBlackMarket"
+    },
+    {
+      "key": 1001886,
+      "name": "Knowledge_Node_Her_Cal_GoldleafBlackMarket"
+    },
+    {
+      "key": 1000258,
+      "name": "Knowledge_Node_Her_ScholastoneInstitute"
+    },
+    {
+      "key": 1000261,
+      "name": "Knowledge_Node_Her_ScholastoneArchive"
+    },
+    {
+      "key": 1000262,
+      "name": "Knowledge_Node_Her_KilndenKukuWorkshop"
+    },
+    {
+      "key": 1000522,
+      "name": "Knowledge_Node_Her_HalsiusHospital"
+    },
+    {
+      "key": 1000523,
+      "name": "Knowledge_Node_Her_HalsiusTradePost"
+    },
+    {
+      "key": 1000529,
+      "name": "Knowledge_Node_Her_HalsiusDrugstore"
+    },
+    {
+      "key": 1001780,
+      "name": "Knowledge_Node_Her_HernandChurch"
+    },
+    {
+      "key": 1000352,
+      "name": "Knowledge_Node_Her_SeniaVillage"
+    },
+    {
+      "key": 1002238,
+      "name": "Knowledge_Node_Cal_CalphadeChurch"
+    },
+    {
+      "key": 1002138,
+      "name": "Knowledge_Node_Her_RuinedChapel"
+    },
+    {
+      "key": 1002125,
+      "name": "Knowledge_Node_Her_CastlewoodRuins"
+    },
+    {
+      "key": 1002139,
+      "name": "Knowledge_Node_Her_EastGoblinCamp"
+    },
+    {
+      "key": 1000091,
+      "name": "Knowledge_Node_Her_DeepForest"
+    },
+    {
+      "key": 1002122,
+      "name": "Knowledge_Node_Her_BeggarsEnd"
+    },
+    {
+      "key": 1002123,
+      "name": "Knowledge_Node_Her_TheScrapfold"
+    },
+    {
+      "key": 1002121,
+      "name": "Knowledge_Node_Her_Slum"
+    },
+    {
+      "key": 1001672,
+      "name": "Knowledge_Node_Her_RaidersBase"
+    },
+    {
+      "key": 1002670,
+      "name": "Knowledge_Node_Her_AnvilRiversideBanditCamp"
+    },
+    {
+      "key": 1002683,
+      "name": "Knowledge_Node_Her_AnvilHillBanditCamp"
+    },
+    {
+      "key": 1002035,
+      "name": "Knowledge_Node_Her_HowlingHillCamp"
+    },
+    {
+      "key": 1003230,
+      "name": "Knowledge_Node_Her_ForestCabin"
+    },
+    {
+      "key": 1004142,
+      "name": "Knowledge_Node_Her_Temporary_Camp"
+    },
+    {
+      "key": 1002172,
+      "name": "Knowledge_Node_Kwe_Pailune"
+    },
+    {
+      "key": 1002173,
+      "name": "Knowledge_Node_Kwe_PailuneEastGate"
+    },
+    {
+      "key": 1002174,
+      "name": "Knowledge_Node_Kwe_PailuneSouthGate"
+    },
+    {
+      "key": 1002175,
+      "name": "Knowledge_Node_Kwe_Watergate"
+    },
+    {
+      "key": 1002176,
+      "name": "Knowledge_Node_Kwe_PailuneBeacon"
+    },
+    {
+      "key": 1000283,
+      "name": "Knowledge_Node_Kwe_PailuneCampsite"
+    },
+    {
+      "key": 1002218,
+      "name": "Knowledge_Node_Kwe_ValgrindTomb"
+    },
+    {
+      "key": 1002177,
+      "name": "Knowledge_Node_Kwe_SequoiaForest"
+    },
+    {
+      "key": 1002318,
+      "name": "Knowledge_Node_Kwe_StellenManor"
+    },
+    {
+      "key": 1002179,
+      "name": "Knowledge_Node_Kwe_SkoghornVillage"
+    },
+    {
+      "key": 1002183,
+      "name": "Knowledge_Node_Kwe_SkoghornFarm"
+    },
+    {
+      "key": 1002189,
+      "name": "Knowledge_Node_Kwe_BolsteinnRuins"
+    },
+    {
+      "key": 1002194,
+      "name": "Knowledge_Node_Kwe_LongrootsVillage"
+    },
+    {
+      "key": 1002195,
+      "name": "Knowledge_Node_Kwe_RidgehunterLeatherMaker"
+    },
+    {
+      "key": 1002197,
+      "name": "Knowledge_Node_Kwe_BeighenVillage"
+    },
+    {
+      "key": 1002198,
+      "name": "Knowledge_Node_Kwe_BeighenCandlery"
+    },
+    {
+      "key": 1002199,
+      "name": "Knowledge_Node_Kwe_BeighenBasketMaker"
+    },
+    {
+      "key": 1002211,
+      "name": "Knowledge_Node_Kwe_SvinholtRanch"
+    },
+    {
+      "key": 1002213,
+      "name": "Knowledge_Node_Kwe_WolfsnareTrapsmith"
+    },
+    {
+      "key": 1002217,
+      "name": "Knowledge_Node_Kwe_TotemfeltVillage"
+    },
+    {
+      "key": 1002219,
+      "name": "Knowledge_Node_Kwe_VannsteinLake"
+    },
+    {
+      "key": 1002200,
+      "name": "Knowledge_Node_Kwe_AshclawKeep"
+    },
+    {
+      "key": 1002207,
+      "name": "Knowledge_Node_Kwe_AshclawSlaveCamp"
+    },
+    {
+      "key": 1002206,
+      "name": "Knowledge_Node_Kwe_AshclawGate"
+    },
+    {
+      "key": 1002205,
+      "name": "Knowledge_Node_Kwe_AshclawOutpost"
+    },
+    {
+      "key": 1002202,
+      "name": "Knowledge_Node_Kwe_VatnhollFortress"
+    },
+    {
+      "key": 1002203,
+      "name": "Knowledge_Node_Kwe_SteinnfellFortress"
+    },
+    {
+      "key": 1001845,
+      "name": "Knowledge_Node_Kwe_SteinnfellFortress_Gate"
+    },
+    {
+      "key": 1003343,
+      "name": "Knowledge_Node_Kwe_DestructionTemple"
+    },
+    {
+      "key": 1002185,
+      "name": "Knowledge_Node_Kwe_RedLake"
+    },
+    {
+      "key": 1002247,
+      "name": "Knowledge_Node_Dem_DemenissCastle"
+    },
+    {
+      "key": 1002314,
+      "name": "Knowledge_Node_Dem_SouthDemenissGate"
+    },
+    {
+      "key": 1002315,
+      "name": "Knowledge_Node_Dem_WestDemenissGate"
+    },
+    {
+      "key": 1002249,
+      "name": "Knowledge_Node_Dem_DemenissZoo"
+    },
+    {
+      "key": 1003070,
+      "name": "Knowledge_Node_Dem_DemenissPolice"
+    },
+    {
+      "key": 1002312,
+      "name": "Knowledge_Node_Dem_PecusRanch"
+    },
+    {
+      "key": 1002313,
+      "name": "Knowledge_Node_Dem_GrassfieldRanch"
+    },
+    {
+      "key": 1002308,
+      "name": "Knowledge_Node_Dem_SouthWagonFactory"
+    },
+    {
+      "key": 1002333,
+      "name": "Knowledge_Node_Dem_TheLaughingMarionette"
+    },
+    {
+      "key": 1001828,
+      "name": "Knowledge_Node_Dem_ScorchrockCastle"
+    },
+    {
+      "key": 1002338,
+      "name": "Knowledge_Node_Dem_EastCourt"
+    },
+    {
+      "key": 1002266,
+      "name": "Knowledge_Node_Dem_WestCourt"
+    },
+    {
+      "key": 1002307,
+      "name": "Knowledge_Node_Dem_SouthCourt"
+    },
+    {
+      "key": 1002373,
+      "name": "Knowledge_Node_Dem_DemArmyCamp"
+    },
+    {
+      "key": 1002345,
+      "name": "Knowledge_Node_Crim_FortMusket"
+    },
+    {
+      "key": 1002346,
+      "name": "Knowledge_Node_Crim_Musket1Outpost"
+    },
+    {
+      "key": 1002347,
+      "name": "Knowledge_Node_Crim_Musket2Outpost"
+    },
+    {
+      "key": 1003816,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_I"
+    },
+    {
+      "key": 1003817,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_II"
+    },
+    {
+      "key": 1003818,
+      "name": "Knowledge_Node_Crim_Musket_UltimateWeapon_III"
+    },
+    {
+      "key": 1002302,
+      "name": "Knowledge_Node_Dem_AzerianManor"
+    },
+    {
+      "key": 1002309,
+      "name": "Knowledge_Node_Dem_LacusFarm"
+    },
+    {
+      "key": 1002310,
+      "name": "Knowledge_Node_Dem_CanalsideFarm"
+    },
+    {
+      "key": 1002311,
+      "name": "Knowledge_Node_Dem_RustleleafFarm"
+    },
+    {
+      "key": 1002303,
+      "name": "Knowledge_Node_Dem_PurringtonFarm"
+    },
+    {
+      "key": 1002304,
+      "name": "Knowledge_Node_Dem_HayscentFarm"
+    },
+    {
+      "key": 1000031,
+      "name": "Knowledge_Node_Dem_FrameVillage"
+    },
+    {
+      "key": 1000147,
+      "name": "Knowledge_Node_Dem_Flame_Knights"
+    },
+    {
+      "key": 1002152,
+      "name": "Knowledge_Node_Dem_ThornRoseFort"
+    },
+    {
+      "key": 1002156,
+      "name": "Knowledge_Node_Dem_ThornRoseOutpost"
+    },
+    {
+      "key": 1002153,
+      "name": "Knowledge_Node_Dem_ThornRoseGuardPost"
+    },
+    {
+      "key": 1002154,
+      "name": "Knowledge_Node_Dem_ThornRoseSouthGate"
+    },
+    {
+      "key": 1002155,
+      "name": "Knowledge_Node_Dem_ThornRoseFoodStorage"
+    },
+    {
+      "key": 1000336,
+      "name": "Knowledge_Node_Dem_ThornRoseSuppliesStorageCentral"
+    },
+    {
+      "key": 1002295,
+      "name": "Knowledge_Node_Dem_IronStronghold"
+    },
+    {
+      "key": 1002296,
+      "name": "Knowledge_Node_Dem_TombstoneWorkshop"
+    },
+    {
+      "key": 1002297,
+      "name": "Knowledge_Node_Dem_IronwoodPottery"
+    },
+    {
+      "key": 1002299,
+      "name": "Knowledge_Node_Dem_IronwoodFarmhouse"
+    },
+    {
+      "key": 1002300,
+      "name": "Knowledge_Node_Dem_IronwoodFarm"
+    },
+    {
+      "key": 1002329,
+      "name": "Knowledge_Node_Dem_SungroveManor_Marcella"
+    },
+    {
+      "key": 1002330,
+      "name": "Knowledge_Node_Dem_BlueGoldDyehouse"
+    },
+    {
+      "key": 1002305,
+      "name": "Knowledge_Node_Dem_GreenfieldFarm"
+    },
+    {
+      "key": 1002331,
+      "name": "Knowledge_Node_Dem_ClearBellFarm"
+    },
+    {
+      "key": 1002306,
+      "name": "Knowledge_Node_Dem_StonewellFarm"
+    },
+    {
+      "key": 1002267,
+      "name": "Knowledge_Node_Dem_CowbellRanch"
+    },
+    {
+      "key": 1002268,
+      "name": "Knowledge_Node_Dem_WindmereManor_Byron"
+    },
+    {
+      "key": 1002678,
+      "name": "Knowledge_Node_Dem_HiddenEstate"
+    },
+    {
+      "key": 1002269,
+      "name": "Knowledge_Node_Dem_HoneywoodBeeFarm"
+    },
+    {
+      "key": 1002272,
+      "name": "Knowledge_Node_Dem_BurnhandQuarry"
+    },
+    {
+      "key": 1002255,
+      "name": "Knowledge_Node_Dem_SwiftStables"
+    },
+    {
+      "key": 1000044,
+      "name": "Knowledge_Node_Dem_WheelsmithWagonFactory"
+    },
+    {
+      "key": 1002274,
+      "name": "Knowledge_Node_Dem_DemenissHorseMarket"
+    },
+    {
+      "key": 1001882,
+      "name": "Knowledge_Node_Dem_NorthOutpost"
+    },
+    {
+      "key": 1000042,
+      "name": "Knowledge_Node_Dem_ReventineDigSite"
+    },
+    {
+      "key": 1002276,
+      "name": "Knowledge_Node_Dem_SlopeseedFarm"
+    },
+    {
+      "key": 1002277,
+      "name": "Knowledge_Node_Dem_SundellFarm"
+    },
+    {
+      "key": 1002279,
+      "name": "Knowledge_Node_Dem_SeedrowFarm"
+    },
+    {
+      "key": 1002280,
+      "name": "Knowledge_Node_Dem_CattlefoldRanch"
+    },
+    {
+      "key": 1002281,
+      "name": "Knowledge_Node_Dem_GreenpondFarm"
+    },
+    {
+      "key": 1002342,
+      "name": "Knowledge_Node_Dem_HayroofFarm"
+    },
+    {
+      "key": 1002344,
+      "name": "Knowledge_Node_Dem_WhitemillFarm"
+    },
+    {
+      "key": 1002341,
+      "name": "Knowledge_Node_Dem_VinewoodWinery"
+    },
+    {
+      "key": 1002343,
+      "name": "Knowledge_Node_Dem_JoyfairMarketplace"
+    },
+    {
+      "key": 1002283,
+      "name": "Knowledge_Node_Dem_StronghoofHorseGearMaker"
+    },
+    {
+      "key": 1002284,
+      "name": "Knowledge_Node_Dem_StronghelmFactory"
+    },
+    {
+      "key": 1002339,
+      "name": "Knowledge_Node_Dem_IronbarrelWeaponFactory"
+    },
+    {
+      "key": 1002340,
+      "name": "Knowledge_Node_Dem_BulwarkWeaponFactory"
+    },
+    {
+      "key": 1002285,
+      "name": "Knowledge_Node_Dem_DemenissCathedral"
+    },
+    {
+      "key": 1002286,
+      "name": "Knowledge_Node_Dem_EastDemenissChurch"
+    },
+    {
+      "key": 1002287,
+      "name": "Knowledge_Node_Dem_WestDemenissChurch"
+    },
+    {
+      "key": 1002288,
+      "name": "Knowledge_Node_Dem_DemenissOrphanage"
+    },
+    {
+      "key": 1002289,
+      "name": "Knowledge_Node_Dem_JijeongTemple"
+    },
+    {
+      "key": 1002324,
+      "name": "Knowledge_Node_Dem_GoldenTradePost"
+    },
+    {
+      "key": 1002361,
+      "name": "Knowledge_Node_Dem_OakBarrelWineMaker"
+    },
+    {
+      "key": 1002325,
+      "name": "Knowledge_Node_Dem_TarivVillage"
+    },
+    {
+      "key": 1002362,
+      "name": "Knowledge_Node_Dem_HexeSanctuary"
+    },
+    {
+      "key": 1002363,
+      "name": "Knowledge_Node_Dem_UrnGrave"
+    },
+    {
+      "key": 1002364,
+      "name": "Knowledge_Node_Dem_ForgottenTomb"
+    },
+    {
+      "key": 1002365,
+      "name": "Knowledge_Node_Dem_SulfurSprings"
+    },
+    {
+      "key": 1002366,
+      "name": "Knowledge_Node_Dem_HollowHaven"
+    },
+    {
+      "key": 1002163,
+      "name": "Knowledge_Node_Dem_BloodsteelSouthGate"
+    },
+    {
+      "key": 1002088,
+      "name": "Knowledge_Node_Dem_BanditCamp_I"
+    },
+    {
+      "key": 1003119,
+      "name": "Knowledge_Node_Dem_Shipwreck_0005"
+    },
+    {
+      "key": 1002259,
+      "name": "Knowledge_Node_Dem_RoofRock"
+    },
+    {
+      "key": 1002260,
+      "name": "Knowledge_Node_Dem_TalkingRock"
+    },
+    {
+      "key": 1002695,
+      "name": "Knowledge_Node_Kwe_ForestRing"
+    },
+    {
+      "key": 1002699,
+      "name": "Knowledge_Node_Kwe_SnowleafHaven"
+    },
+    {
+      "key": 1002705,
+      "name": "Knowledge_Node_Kwe_FrostFortressSite"
+    },
+    {
+      "key": 1002706,
+      "name": "Knowledge_Node_Kwe_TreeshadeCabin"
+    },
+    {
+      "key": 1002512,
+      "name": "Knowledge_Node_Her_WetFogCabin"
+    },
+    {
+      "key": 1003155,
+      "name": "Knowledge_Node_Dem_SlantedFishingDock"
+    },
+    {
+      "key": 1003214,
+      "name": "Knowledge_Node_Del_VenusRiversideCabin"
+    },
+    {
+      "key": 1000076,
+      "name": "Knowledge_Node_Her_ReedField"
+    },
+    {
+      "key": 1003171,
+      "name": "Knowledge_Node_Del_AncientRuins_0016"
+    },
+    {
+      "key": 1003185,
+      "name": "Knowledge_Node_Dem_AncientRuins_0030"
+    },
+    {
+      "key": 1003186,
+      "name": "Knowledge_Node_Her_AncientRuins_0031"
+    },
+    {
+      "key": 1003187,
+      "name": "Knowledge_Node_Her_AncientRuins_0032"
+    },
+    {
+      "key": 1002908,
+      "name": "Knowledge_Node_Dem_SolarAndLunarMaze"
+    },
+    {
+      "key": 1002573,
+      "name": "Knowledge_Node_Her_Ruins_0005"
+    },
+    {
+      "key": 1002610,
+      "name": "Knowledge_Node_Crim_Ruins_0015"
+    },
+    {
+      "key": 1003046,
+      "name": "Knowledge_Node_Del_AbandonedCabin_III"
+    },
+    {
+      "key": 1003291,
+      "name": "Knowledge_Node_Her_AbandonedCabin_VI"
+    },
+    {
+      "key": 1003060,
+      "name": "Knowledge_Node_Crim_Watchtower_I"
+    },
+    {
+      "key": 1003068,
+      "name": "Knowledge_Node_Del_Watchtower_I"
+    },
+    {
+      "key": 1003072,
+      "name": "Knowledge_Node_Her_Pervin_WatchTower"
+    },
+    {
+      "key": 1003077,
+      "name": "Knowledge_Node_Dem_SulfurLake_WatchTower"
+    },
+    {
+      "key": 1003375,
+      "name": "Knowledge_Node_Her_RestArea_0004"
+    },
+    {
+      "key": 1003378,
+      "name": "Knowledge_Node_Kwe_RestArea_0007"
+    },
+    {
+      "key": 1003392,
+      "name": "Knowledge_Node_Kwe_RestArea_0023"
+    },
+    {
+      "key": 1003397,
+      "name": "Knowledge_Node_Kwe_RestArea_0028"
+    },
+    {
+      "key": 1003403,
+      "name": "Knowledge_Node_Her_RestArea_0035"
+    },
+    {
+      "key": 1003412,
+      "name": "Knowledge_Node_Her_RestArea_0044"
+    },
+    {
+      "key": 1003415,
+      "name": "Knowledge_Node_Her_RestArea_0048"
+    },
+    {
+      "key": 1003417,
+      "name": "Knowledge_Node_Her_RestArea_0050"
+    },
+    {
+      "key": 1003433,
+      "name": "Knowledge_Node_Del_RestArea_0067"
+    },
+    {
+      "key": 1003448,
+      "name": "Knowledge_Node_Crim_RestArea_0082"
+    },
+    {
+      "key": 1003460,
+      "name": "Knowledge_Node_Dem_IronStronghold_RestArea"
+    },
+    {
+      "key": 1000433,
+      "name": "Knowledge_Node_Her_Mountain_of_Frozen_Souls_RestArea_0001"
+    },
+    {
+      "key": 1003465,
+      "name": "Knowledge_Node_Dem_IronStronghold_RestArea_0002"
+    },
+    {
+      "key": 1003466,
+      "name": "Knowledge_Node_Dem_ThornRoseFort_RestArea_0001"
+    },
+    {
+      "key": 1003549,
+      "name": "Knowledge_Node_Cal_HohenmarkRuins_RestArea_0001"
+    },
+    {
+      "key": 1003554,
+      "name": "Knowledge_Node_Crim_HowlsandsCamp_RestArea_0001"
+    },
+    {
+      "key": 1002376,
+      "name": "Knowledge_Node_Del_DelesyiaCastle"
+    },
+    {
+      "key": 1002377,
+      "name": "Knowledge_Node_Del_PortDelesyia"
+    },
+    {
+      "key": 1002408,
+      "name": "Knowledge_Node_Del_DelesyianInstitute"
+    },
+    {
+      "key": 1003240,
+      "name": "Knowledge_Node_Del_MarniMuseum"
+    },
+    {
+      "key": 1002409,
+      "name": "Knowledge_Node_Del_MarniPark"
+    },
+    {
+      "key": 1002413,
+      "name": "Knowledge_Node_Del_DelesyiaDyehouse"
+    },
+    {
+      "key": 1002418,
+      "name": "Knowledge_Node_Del_SweetbloomPlantation"
+    },
+    {
+      "key": 1002458,
+      "name": "Knowledge_Node_Del_SilverbrookRuins"
+    },
+    {
+      "key": 1002395,
+      "name": "Knowledge_Node_Del_StonewardPort"
+    },
+    {
+      "key": 1002388,
+      "name": "Knowledge_Node_Del_WindCliffFort"
+    },
+    {
+      "key": 1002380,
+      "name": "Knowledge_Node_Neut_GorthakIronMaker"
+    },
+    {
+      "key": 1002382,
+      "name": "Knowledge_Node_Neut_GorthakStorage"
+    },
+    {
+      "key": 1002383,
+      "name": "Knowledge_Node_Neut_ZarganTankFactory"
+    },
+    {
+      "key": 1002384,
+      "name": "Knowledge_Node_Neut_GrunlOutpost"
+    },
+    {
+      "key": 1002385,
+      "name": "Knowledge_Node_Neut_KrallFoundry"
+    },
+    {
+      "key": 1002386,
+      "name": "Knowledge_Node_Neut_YulgarBeacon"
+    },
+    {
+      "key": 1002387,
+      "name": "Knowledge_Node_Neut_BragokShipFactory"
+    },
+    {
+      "key": 1002354,
+      "name": "Knowledge_Node_Neut_Delpheon"
+    },
+    {
+      "key": 1002356,
+      "name": "Knowledge_Node_Neut_DelpheonNorthCamp"
+    },
+    {
+      "key": 1000056,
+      "name": "Knowledge_Node_Neut_FreeswordHouse"
+    },
+    {
+      "key": 1002421,
+      "name": "Knowledge_Node_Del_DelesyiaChurch"
+    },
+    {
+      "key": 1002422,
+      "name": "Knowledge_Node_Del_MarniLab"
+    },
+    {
+      "key": 1002424,
+      "name": "Knowledge_Node_Del_MarniLabGate"
+    },
+    {
+      "key": 1002425,
+      "name": "Knowledge_Node_Del_ExperimentFacility"
+    },
+    {
+      "key": 1002426,
+      "name": "Knowledge_Node_Del_LabWatchtower"
+    },
+    {
+      "key": 1002427,
+      "name": "Knowledge_Node_Del_MarniAirLab"
+    },
+    {
+      "key": 1002435,
+      "name": "Knowledge_Node_Del_ValvegardWallFort"
+    },
+    {
+      "key": 1002403,
+      "name": "Knowledge_Node_Del_MarniWorkshop"
+    },
+    {
+      "key": 1002407,
+      "name": "Knowledge_Node_Del_MarniCliffSecretBase"
+    },
+    {
+      "key": 1002405,
+      "name": "Knowledge_Node_Del_MarniWorkshopEastGate"
+    },
+    {
+      "key": 1002406,
+      "name": "Knowledge_Node_Del_MarniWorkshopNorthEastGate"
+    },
+    {
+      "key": 1002404,
+      "name": "Knowledge_Node_Del_SaltMine"
+    },
+    {
+      "key": 1002450,
+      "name": "Knowledge_Node_Neut_MarnisOutpost"
+    },
+    {
+      "key": 1002445,
+      "name": "Knowledge_Node_Del_RivershackPier"
+    },
+    {
+      "key": 1002444,
+      "name": "Knowledge_Node_Del_StonebackCrabWetlands"
+    },
+    {
+      "key": 1002337,
+      "name": "Knowledge_Node_Neut_WineTradePost"
+    },
+    {
+      "key": 1002391,
+      "name": "Knowledge_Node_Del_DesolateWyvernNest"
+    },
+    {
+      "key": 1002392,
+      "name": "Knowledge_Node_Del_ForgottenWyvernNest"
+    },
+    {
+      "key": 1002436,
+      "name": "Knowledge_Node_Del_WallFortDrainagePipes"
+    },
+    {
+      "key": 1002461,
+      "name": "Knowledge_Node_Crim_Varnia"
+    },
+    {
+      "key": 1002465,
+      "name": "Knowledge_Node_Crim_VarniaSaltroadCamp"
+    },
+    {
+      "key": 1002502,
+      "name": "Knowledge_Node_Crim_WhitesandPrayHouse"
+    },
+    {
+      "key": 1002469,
+      "name": "Knowledge_Node_Crim_Tashkalp"
+    },
+    {
+      "key": 1001833,
+      "name": "Knowledge_Node_Crim_RedRockFarm"
+    },
+    {
+      "key": 1002471,
+      "name": "Knowledge_Node_Crim_TashkalpBeacon"
+    },
+    {
+      "key": 1002472,
+      "name": "Knowledge_Node_Crim_RightEyeWatchtower"
+    },
+    {
+      "key": 1002474,
+      "name": "Knowledge_Node_Crim_HyenaDen"
+    },
+    {
+      "key": 1003226,
+      "name": "Knowledge_Node_Crim_Urdavah_Title"
+    },
+    {
+      "key": 1002466,
+      "name": "Knowledge_Node_Crim_Urdavah"
+    },
+    {
+      "key": 1002533,
+      "name": "Knowledge_Node_Crim_KurmaniRedtree"
+    },
+    {
+      "key": 1002534,
+      "name": "Knowledge_Node_Crim_DryRiver"
+    },
+    {
+      "key": 1002490,
+      "name": "Knowledge_Node_Crim_RedsandHelmhole"
+    },
+    {
+      "key": 1002523,
+      "name": "Knowledge_Node_Crim_SuramahdBazaar"
+    },
+    {
+      "key": 1002499,
+      "name": "Knowledge_Node_Crim_EnlightenShrine"
+    },
+    {
+      "key": 1002500,
+      "name": "Knowledge_Node_Crim_BurhumVillage"
+    },
+    {
+      "key": 1001478,
+      "name": "Knowledge_Node_Crim_DesertOasis_Patience"
+    },
+    {
+      "key": 1002503,
+      "name": "Knowledge_Node_Crim_RedMountainFort"
+    },
+    {
+      "key": 1002507,
+      "name": "Knowledge_Node_Crim_TimewornRuins"
+    },
+    {
+      "key": 1002506,
+      "name": "Knowledge_Node_Crim_RuinsExcavation"
+    },
+    {
+      "key": 1002493,
+      "name": "Knowledge_Node_Crim_HowlsandsCamp"
+    },
+    {
+      "key": 1000004,
+      "name": "Knowledge_Node_Crim_ArimajahrCamp"
+    },
+    {
+      "key": 1000005,
+      "name": "Knowledge_Node_Crim_KhafijahrCamp"
+    },
+    {
+      "key": 1000008,
+      "name": "Knowledge_Node_Crim_GhadirjahrCamp"
+    },
+    {
+      "key": 1000009,
+      "name": "Knowledge_Node_Crim_QudimjahrCamp"
+    },
+    {
+      "key": 1000010,
+      "name": "Knowledge_Node_Crim_YalwijahrCamp"
+    },
+    {
+      "key": 1000011,
+      "name": "Knowledge_Node_Crim_ShiqarjahrCamp"
+    },
+    {
+      "key": 1000020,
+      "name": "Knowledge_Node_Crim_BaisunjahrCamp"
+    },
+    {
+      "key": 1000022,
+      "name": "Knowledge_Node_Crim_AsaharamCamp"
+    },
+    {
+      "key": 1000026,
+      "name": "Knowledge_Node_Crim_KuhteramCamp"
+    },
+    {
+      "key": 1000027,
+      "name": "Knowledge_Node_Crim_HariyahramCamp"
+    },
+    {
+      "key": 1002529,
+      "name": "Knowledge_Node_Crim_IguanaHatchery"
+    },
+    {
+      "key": 1002475,
+      "name": "Knowledge_Node_Crim_BoneArena"
+    },
+    {
+      "key": 1002235,
+      "name": "Knowledge_Node_Cal_HohenmarkRuins"
+    },
+    {
+      "key": 1002319,
+      "name": "Knowledge_Node_Dem_EyeOfIce"
+    },
+    {
+      "key": 1000047,
+      "name": "Knowledge_Node_Dem_SickForest"
+    },
+    {
+      "key": 1002301,
+      "name": "Knowledge_Node_Dem_ForestAltar"
+    },
+    {
+      "key": 1002258,
+      "name": "Knowledge_Node_Dem_TruthGate"
+    },
+    {
+      "key": 1003107,
+      "name": "Knowledge_Node_Crim_DesolateStoneAltar"
+    },
+    {
+      "key": 1002504,
+      "name": "Knowledge_Node_Crim_FallenAbyss"
+    },
+    {
+      "key": 1003103,
+      "name": "Knowledge_Node_Crim_Ashen_Crevasse"
+    },
+    {
+      "key": 1002687,
+      "name": "Knowledge_Node_Crim_ShadowdeepForest"
+    },
+    {
+      "key": 1003008,
+      "name": "Knowledge_Node_Crim_SouloftheWarriorCave"
+    },
+    {
+      "key": 1003370,
+      "name": "Knowledge_Node_Crim_OreVein_0004"
+    },
+    {
+      "key": 1002616,
+      "name": "Knowledge_Node_Her_SpireOfTheStars"
+    },
+    {
+      "key": 1002615,
+      "name": "Knowledge_Node_Kwe_SpireOfRingingTruth"
+    },
+    {
+      "key": 1002614,
+      "name": "Knowledge_Node_Crim_SunTower"
+    },
+    {
+      "key": 1002613,
+      "name": "Knowledge_Node_Dem_JumpTower"
+    },
+    {
+      "key": 1002617,
+      "name": "Knowledge_Node_Dem_WisdomTower"
+    },
+    {
+      "key": 1001023,
+      "name": "Knowledge_Node_Dem_JiJeongTower"
+    },
+    {
+      "key": 1001648,
+      "name": "Knowledge_Node_Dem_FrozenTower"
+    },
+    {
+      "key": 1002619,
+      "name": "Knowledge_Node_Del_ClockTower"
+    },
+    {
+      "key": 1002621,
+      "name": "Knowledge_Node_Her_SanctumOfAbsolution"
+    },
+    {
+      "key": 1002622,
+      "name": "Knowledge_Node_Her_SanctumOfTemperance"
+    },
+    {
+      "key": 1002623,
+      "name": "Knowledge_Node_Her_SanctumOfBenediction"
+    },
+    {
+      "key": 1002626,
+      "name": "Knowledge_Node_Her_SanctumOfPenitence"
+    },
+    {
+      "key": 1002627,
+      "name": "Knowledge_Node_Her_SanctumOfSolace"
+    },
+    {
+      "key": 1002632,
+      "name": "Knowledge_Node_Del_SanctumOfMortification"
+    },
+    {
+      "key": 1002633,
+      "name": "Knowledge_Node_Del_SanctumOfVeneration"
+    },
+    {
+      "key": 1002648,
+      "name": "Knowledge_Node_Her_WitchHouse"
+    },
+    {
+      "key": 1002001,
+      "name": "Knowledge_Node_Kingshield_NorthGreyManeTemple"
+    },
+    {
+      "key": 1002002,
+      "name": "Knowledge_Node_NasRiver_GreyManeTemple"
+    },
+    {
+      "key": 1002003,
+      "name": "Knowledge_Node_SunrisePlain_GreyManeTemple"
+    },
+    {
+      "key": 1002539,
+      "name": "Knowledge_Node_Crim_CrescentSkyway"
+    },
+    {
+      "key": 1002540,
+      "name": "Knowledge_Node_Dem_BigRockCrown"
+    },
+    {
+      "key": 1002543,
+      "name": "Knowledge_Node_Crim_TruthThrone"
+    },
+    {
+      "key": 1002551,
+      "name": "Knowledge_Node_Del_BraveNest"
+    },
+    {
+      "key": 1002560,
+      "name": "Knowledge_Node_Dem_GuruHaven"
+    },
+    {
+      "key": 1002561,
+      "name": "Knowledge_Node_Her_MindAltar"
+    },
+    {
+      "key": 1000061,
+      "name": "Knowledge_Node_Abyssone_0002"
+    },
+    {
+      "key": 1000062,
+      "name": "Knowledge_Node_Abyssone_0009"
+    },
+    {
+      "key": 1000065,
+      "name": "Knowledge_Node_Abyssone_0001"
+    },
+    {
+      "key": 1002612,
+      "name": "Knowledge_Node_Abyssone_End_0001"
+    },
+    {
+      "key": 1000087,
+      "name": "Knowledge_Node_Abyssone_End_0005"
+    },
+    {
+      "key": 1000088,
+      "name": "Knowledge_Node_Abyssone_End_0006"
+    },
+    {
+      "key": 1000006,
+      "name": "Knowledge_Node_Abyss_Corridor"
+    },
+    {
+      "key": 1000007,
+      "name": "Knowledge_Node_Pink_Rosemary_Grove"
+    },
+    {
+      "key": 1000066,
+      "name": "Knowledge_Node_Begonia_Grove"
+    },
+    {
+      "key": 1000427,
+      "name": "Knowledge_Node_Yellow_Rosemary_Grove"
+    },
+    {
+      "key": 1000429,
+      "name": "Knowledge_Node_White_Rosemary_Grove"
+    },
+    {
+      "key": 1001725,
+      "name": "Knowledge_Node_Villosa_Grove"
+    },
+    {
+      "key": 1000363,
+      "name": "Knowledge_Paper_AbyssTeleport"
+    },
+    {
+      "key": 1004335,
+      "name": "Knowledge_Node_Her_HerStore_Wanted"
+    },
+    {
+      "key": 1004336,
+      "name": "Knowledge_Node_Cal_CalStore_Wanted"
+    },
+    {
+      "key": 1004337,
+      "name": "Knowledge_Node_Kwe_PeiStore_Wanted"
+    },
+    {
+      "key": 1004338,
+      "name": "Knowledge_Node_Dem_DemStore_Wanted"
+    },
+    {
+      "key": 1004339,
+      "name": "Knowledge_Node_Del_DelStore_Wanted"
+    },
+    {
+      "key": 1004340,
+      "name": "Knowledge_Node_Crim_TomStore_Wanted"
+    },
+    {
+      "key": 1004341,
+      "name": "Knowledge_Node_Crim_VarStore_Wanted"
+    },
+    {
+      "key": 1003359,
+      "name": "Knowledge_BlackWolf_Teleport"
+    },
+    {
+      "key": 40048,
+      "name": "Knowledge_RotationBash_NoDelay"
+    },
+    {
+      "key": 1000290,
+      "name": "Knowledge_FoggyWind_HillsideStairs"
+    },
+    {
+      "key": 1000291,
+      "name": "Knowledge_Winding_HillyArea"
+    },
+    {
+      "key": 1000506,
+      "name": "Knowledge_GreenField_HillyArea"
+    },
+    {
+      "key": 35038,
+      "name": "Knowledge_Deepfog_Basin"
+    },
+    {
+      "key": 1000169,
+      "name": "Knowledge_Hernand_RegionName"
+    },
+    {
+      "key": 1000170,
+      "name": "Knowledge_Demeniss_RegionName"
+    },
+    {
+      "key": 1000176,
+      "name": "Knowledge_Calphade_RegionName"
+    },
+    {
+      "key": 1000172,
+      "name": "Knowledge_Pailunese_RegionName"
+    }
+  ]
+}
