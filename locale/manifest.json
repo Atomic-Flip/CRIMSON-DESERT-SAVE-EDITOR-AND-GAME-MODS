@@ -1,0 +1,114 @@
+{
+  "de": {
+    "english": "German",
+    "has_names": true,
+    "native": "Deutsch",
+    "sha256": "1ee80348be2db1e9f20aa29f8c97f9b2540830a5c14944a5cbe304d7bb69eac6",
+    "size": 188115,
+    "source_file": "de.json"
+  },
+  "en": {
+    "english": "English",
+    "has_names": true,
+    "native": "English",
+    "sha256": "",
+    "size": 0,
+    "source_file": "en.json"
+  },
+  "es": {
+    "english": "Spanish",
+    "has_names": true,
+    "native": "Español",
+    "sha256": "9c4dbc40cd5f69d768fe970538cb96e7d7d195218b47f5fd264f5220af73798e",
+    "size": 190037,
+    "source_file": "es.json"
+  },
+  "es-mx": {
+    "english": "Spanish (Mexico)",
+    "has_names": true,
+    "native": "Español (México)",
+    "sha256": "694c7b74a84cee3dd41dea9db3f3f85a874d3e7b4f299cdb62b5406916d15209",
+    "size": 190047,
+    "source_file": "es-mx.json"
+  },
+  "fr": {
+    "english": "French",
+    "has_names": true,
+    "native": "Français",
+    "sha256": "68f471b2d067326eaccaf51f25fc8bd30c9ec35c7f8a004a3c26f0791c9f6c8f",
+    "size": 198429,
+    "source_file": "fr.json"
+  },
+  "it": {
+    "english": "Italian",
+    "has_names": true,
+    "native": "Italiano",
+    "sha256": "251c0c823130e5ecae04629b2ed74c78258759a0a567f7c678264859e483b6ed",
+    "size": 189283,
+    "source_file": "it.json"
+  },
+  "ja": {
+    "english": "Japanese",
+    "has_names": true,
+    "native": "日本語",
+    "sha256": "1959569b56a5059af49825bc321ebd31412580e76a731936bef94ec1b3f584ce",
+    "size": 208732,
+    "source_file": "ja.json"
+  },
+  "ko": {
+    "english": "Korean",
+    "has_names": true,
+    "native": "한국어",
+    "sha256": "5657b784bd83b0fae4dd2ad1bcaa3cc92ee96f16d010a437b73a604244c2257e",
+    "size": 188368,
+    "source_file": "ko.json"
+  },
+  "pl": {
+    "english": "Polish",
+    "has_names": true,
+    "native": "Polski",
+    "sha256": "7edceb825d798fc10cd3f260a367bc923956119d2917f8dcc92eb317d058c85a",
+    "size": 186671,
+    "source_file": "pl.json"
+  },
+  "pt-br": {
+    "english": "Portuguese (Brazil)",
+    "has_names": true,
+    "native": "Português (Brasil)",
+    "sha256": "a608953bf5aa30eb2d6f0ee31c1720dabfc3a4ac73a1f4368b5a5f6d1814575f",
+    "size": 191346,
+    "source_file": "pt-br.json"
+  },
+  "ru": {
+    "english": "Russian",
+    "has_names": true,
+    "native": "Русский",
+    "sha256": "54f2a240755c2bea916834169ff850accd9b4e8b5491888d665cc391acd272a7",
+    "size": 266951,
+    "source_file": "ru.json"
+  },
+  "tr": {
+    "english": "Turkish",
+    "has_names": true,
+    "native": "Türkçe",
+    "sha256": "1be15974526d6a5495c6e7a7ebbeec42f93be69e71e7f637b66a1b2c825e8d67",
+    "size": 195360,
+    "source_file": "tr.json"
+  },
+  "zh": {
+    "english": "Chinese (Simplified)",
+    "has_names": true,
+    "native": "简体中文",
+    "sha256": "74d7261fbfc41c894a1f29ab50b9b7cd40c04e4b2e7221ed9f3fd5102c49e67d",
+    "size": 174905,
+    "source_file": "zh.json"
+  },
+  "zh-tw": {
+    "english": "Chinese (Traditional)",
+    "has_names": true,
+    "native": "繁體中文",
+    "sha256": "4c72a3d5aeb7b36cb96e897b9157c99d1e620f7f4a7536d82637b7c14437f97a",
+    "size": 164293,
+    "source_file": "zh-tw.json"
+  }
+}
