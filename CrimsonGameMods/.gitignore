@@ -1,0 +1,35 @@
+# PyInstaller build output
+build/
+dist/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Per-user runtime config / logs
+editor_config.json
+logs.txt
+harvest_missing.json
+
+# OS cruft
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Test / profiling
+.hypothesis/
+.pytest_cache/
+
+# Local virtualenvs
+.venv/
+venv/
+
+# Temp
+*.tmp
+*.bak
+*.orig
