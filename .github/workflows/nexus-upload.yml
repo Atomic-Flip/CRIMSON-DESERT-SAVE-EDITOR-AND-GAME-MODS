@@ -83,7 +83,7 @@ jobs:
           ls -la "$zip"
 
       - name: Upload to Nexus Mods
-        uses: Nexus-Mods/upload-action@v1
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.4
         with:
           api_key: ${{ secrets.NEXUSMODS_API_KEY }}
           file_group_id: ${{ steps.meta.outputs.group }}
