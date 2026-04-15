@@ -151,7 +151,6 @@ This exact cluster of features is what produces `Wacatac.H!ml`, `AIDetectMalware
 The concern raised — that individual GitHub release assets can be swapped to deliver malware in a narrow window — is **legitimate and has happened to other projects**. It is the right thing to worry about. To directly address it for v3.1.2:
 
 - The SHA-256 of the analyzed file is `077758da8063d1e58d5533beaf5366cb4c9d825d23dd835692f4cc64907ee1ce`. This hash will be published in the release notes so any user can verify the file they downloaded matches what was analyzed here.
-- The full buildable source for this exact version is available at https://github.com/NattKh/CrimsonSaveEditor-v3.1.2-backup — anyone can rebuild locally and compare behavior.
 - No unexpected network hosts, exfil endpoints, or credential-access paths exist in the binary (see IOC section above).
 
 If a hijack had occurred, the reverse-engineered binary would contain **non-project URLs**, **credential-theft strings**, or **staging/loader logic**. None of those are present.
