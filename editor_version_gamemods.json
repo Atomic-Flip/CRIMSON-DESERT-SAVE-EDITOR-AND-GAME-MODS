@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4",
-  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/gamemods-v1.0.4/CrimsonGameMods.exe",
-  "notes": "v1.0.4 — Stacker tool merges multiple iteminfo mods into one overlay with RPD mode (safely translates broken byte-patch mods like Ultimate Lantern Reborn, AccessorySocketsMod, Axiom Necklace). Universal Proficiency v2 cross-character equip now works when stacked with other features (muskets on Kliff). One-click Enable Everything force-enables 5 sockets on rings/cloaks/earrings/necklaces/nobility. Drop-in folder export ships pre-built meta/0.papgt. Hex-offset JSON mods no longer crash. iteminfo.pabgh regenerated on every apply so edits don't silently vanish. Plus Custom Item Creator and SkillTree Editor carried forward from the v1.0.4 pre-release. See GitHub release notes for the full list."
+  "version": "1.0.5",
+  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/gamemods-v1.0.5/CrimsonGameMods.exe",
+  "notes": "v1.0.5 — Add-to-Save flow (custom items live in your save without external tools), Export as Single-Item Mod (clean shareable folder mods), Create Custom Item now preserves mod stacks (read from 0058, sentinel writes, in-memory sync). UI refactor: Import/Export/More dropdowns, Reset button, 8-button hero presets grid with God Mode bundle. Per-tab overlay-folder spinners for FieldEdit/SkillTree/MercPets/DropSets. Hex-offset JSON parser. Accessory sockets now included in Enable All. Splash updated. See GitHub release notes for full list."
 }
