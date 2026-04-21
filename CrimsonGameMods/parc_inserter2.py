@@ -1,15 +1,3 @@
-"""
-PARC Blob Inserter v2 — Parse-tree-guided item insertion.
-
-Uses the desktopeditor's full parser (save_parser.py) to walk the entire parse
-tree and collect the EXACT blob position of every child_payload_offset value.
-After insertion, each offset pointing past the insertion point is incremented
-by the insertion size.  Trailing size fields in parent objects that span the
-insertion point are also updated.
-
-This replaces the old heuristic sentinel-scan approach which missed compact
-list elements and produced false-positives, causing game crashes.
-"""
 from __future__ import annotations
 
 import logging
@@ -26,7 +14,6 @@ if not os.path.isdir(_DESKTOP_DIR):
     _DESKTOP_DIR = os.path.join(_MY_DIR, 'Includes', 'desktopeditor')
 
 def _get_full_parser():
-    """Lazily import desktopeditor/save_parser.py."""
     if _DESKTOP_DIR not in sys.path:
         sys.path.insert(0, _DESKTOP_DIR)
     import save_parser as sp
@@ -54,16 +41,6 @@ _BLANK_ITEM_HEX = "03009f280d0d0000ffffffffffffffffe4cc0200000000000100000077010
 def build_blank_item(insert_at: int, item_key: int, item_no: int,
                      stack: int = 1, slot: int = 0,
                      item_type_index: int = -1, socket_type_index: int = -1) -> bytes:
-    """Build a blank item entry from the game-produced template.
-
-    Patches: payload_offset (locator), type_index (from current save's schema),
-    itemNo, itemKey, slotNo, stackCount, transferredItemKey, and all 5 socket
-    payload_offsets.
-
-    Args:
-        item_type_index: schema index for ItemSaveData in the current save (-1 = keep default)
-        socket_type_index: schema index for ItemSocketSaveData in the current save (-1 = keep default)
-    """
     entry = bytearray(bytes.fromhex(_BLANK_ITEM_HEX))
 
     if item_type_index >= 0:
@@ -92,10 +69,6 @@ def build_blank_item(insert_at: int, item_key: int, item_no: int,
 
 
 def _compute_payload_offset_pos(f, raw: bytes) -> int:
-    """Compute the blob position where child_payload_offset u32 is stored.
-
-    Returns the position, or -1 if it can't be determined.
-    """
     if f.child_payload_offset <= 0 or f.start_offset <= 0:
         return -1
     if f.child_mask_byte_count <= 0:
@@ -138,7 +111,6 @@ def _compute_payload_offset_pos(f, raw: bytes) -> int:
 
 
 def _collect_from_fields(fields, raw: bytes, offset_positions, trailing_sizes):
-    """Recursively walk parsed fields to collect offset and trailing-size positions."""
     for f in fields:
         if f.child_payload_offset > 0 and f.start_offset > 0:
             pos = _compute_payload_offset_pos(f, raw)
@@ -161,12 +133,6 @@ def _collect_from_fields(fields, raw: bytes, offset_positions, trailing_sizes):
 
 
 def collect_all_positions(result, raw: bytes):
-    """Collect every absolute offset position from the full parse result.
-
-    Returns:
-        offset_positions: list of (blob_pos, current_value) for child_payload_offset
-        trailing_sizes:   list of (size_field_pos, payload_start) for trailing size_u32
-    """
     offset_positions = []
     trailing_sizes = []
 
@@ -199,13 +165,6 @@ def collect_all_positions(result, raw: bytes):
 
 
 def parse_and_collect(raw: bytes):
-    """Parse the full blob and collect all offset positions.
-
-    Returns:
-        result: full parse result from save_parser
-        offset_positions: list of (blob_pos, value)
-        trailing_sizes: list of (size_pos, payload_start)
-    """
     sp = _get_full_parser()
     log.info("Parsing full save structure (%d bytes)...", len(raw))
     container_info = {"input_kind": "raw_blob"}
@@ -231,22 +190,6 @@ def insert_and_fix(
     target_toc_idx: int,
     list_count_pos: int = -1,
 ) -> bytes:
-    """Insert bytes into the blob and fix ALL absolute offsets + trailing sizes.
-
-    Args:
-        raw: the original PARC blob
-        insertion_point: absolute offset where new_bytes will be inserted
-        new_bytes: bytes to insert
-        offset_positions: from collect_all_positions()
-        trailing_sizes: from collect_all_positions()
-        toc_entries: list of TocEntry from the parse result
-        schema_end: position where schema ends (TOC header location)
-        target_toc_idx: TOC index of the block we're inserting into
-        list_count_pos: blob position of the u32 list count to increment (-1 to skip)
-
-    Returns:
-        modified blob
-    """
     delta = len(new_bytes)
     result = bytearray(raw[:insertion_point]) + bytearray(new_bytes) + bytearray(raw[insertion_point:])
     log.info("Inserted %d bytes at offset 0x%X (blob %d -> %d)", delta, insertion_point, len(raw), len(result))
@@ -314,21 +257,6 @@ def clone_and_patch_entry(
     new_slot: int = -1,
     new_enchant: int = -1,
 ) -> bytes:
-    """Clone a list element (locator + payload) and patch it for a new item.
-
-    Handles both standard locators and compact list elements.
-    Fixes internal payload_offset self-references to point to the new location.
-
-    ItemSaveData field layout from saveVersion:
-      +0:  saveVersion (u32=1)
-      +4:  itemNo (i64)
-      +12: itemKey (u32)
-      +16: slotNo (u16)
-      +18: stackCount (i64)
-      +26: enchantLevel (u16)
-      +28: endurance (u16)
-      +30: sharpness (u16)
-    """
     entry = bytearray(raw[template_start:template_start + entry_size])
 
     patched = False
@@ -401,7 +329,6 @@ def clone_and_patch_entry(
 
 
 def _find_items_in_block(raw: bytes, block_offset: int, block_size: int, max_slot: int = 200):
-    """Find item entries in a block by scanning for saveVersion=1 pattern."""
     block_raw = raw[block_offset:block_offset + block_size]
     items = []
     for off in range(20, len(block_raw) - 40):
@@ -426,7 +353,6 @@ def _find_items_in_block(raw: bytes, block_offset: int, block_size: int, max_slo
 
 
 def _find_locator_before_item(block_raw: bytes, item_off: int) -> int:
-    """Walk backwards from an item's saveVersion position to find its locator start."""
     for back in range(2, 30):
         check = item_off - back
         if check < 0:
@@ -443,7 +369,6 @@ def _find_locator_before_item(block_raw: bytes, item_off: int) -> int:
 
 
 def _find_list_count(raw: bytes, block_offset: int, first_item_abs: int, expected_count: int) -> int:
-    """Find the list count u32 before the first item."""
     for back in range(20, 50):
         check = first_item_abs - back
         if check < block_offset:
@@ -460,11 +385,6 @@ def _find_list_count(raw: bytes, block_offset: int, first_item_abs: int, expecte
 
 
 def _find_sold_item_list_from_tree(result):
-    """Walk the parse tree to find the best _storeSoldItemDataList to insert into.
-
-    Returns (list_field, vendor_index, store_key) or (None, -1, -1).
-    Picks the vendor with the most sold items for the best template.
-    """
     store_block = None
     for obj in result['objects']:
         if obj.class_name == 'StoreSaveData':
@@ -507,13 +427,6 @@ def _find_sold_item_list_from_tree(result):
 
 
 def _find_item_list_from_tree(result, block_name, list_field_name):
-    """Walk parse tree to find a specific ObjList field with elements.
-
-    For InventorySaveData, walks: block._inventorylist[bag]._itemList
-    For StoreSaveData, walks: block._storeDataList[vendor]._storeSoldItemDataList
-
-    Returns list_field with .list_elements, .start_offset, .end_offset.
-    """
     block = None
     for obj in result['objects']:
         if obj.class_name == block_name:
@@ -568,10 +481,6 @@ def _find_item_list_from_tree(result, block_name, list_field_name):
 
 
 def _find_vendor_with_sold_items(result):
-    """Find the vendor group (StoreDataSaveData) that has the most sold items.
-
-    Returns (vendor_element, sold_list_field, time_list_field) or (None, None, None).
-    """
     block = None
     for obj in result['objects']:
         if obj.class_name == 'StoreSaveData':
@@ -613,11 +522,6 @@ def _find_vendor_with_sold_items(result):
 
 
 def _find_list_count_from_tree(raw: bytes, list_field) -> int:
-    """Find the list count u32 position from the parse tree's list_count value.
-
-    The list header starts at list_field.start_offset. The count is stored
-    within the header. We scan the header bytes for the expected count.
-    """
     expected = list_field.list_count
     header_start = list_field.start_offset
     header_size = list_field.list_header_size
@@ -645,21 +549,6 @@ def add_item_to_store(
     new_item_no: int,
     new_stack: int = 1,
 ) -> Optional[bytes]:
-    """Add a new item to a vendor's sold items list.
-
-    Uses the full parser to walk the parse tree and find the exact
-    _storeSoldItemDataList, element boundaries, list count position,
-    AND the parallel _itemSoldFieldTimeRawList (timestamps must match).
-
-    Args:
-        raw: decrypted, decompressed PARC blob
-        new_item_key: item key for the new item
-        new_item_no: unique item number
-        new_stack: stack count for the new item
-
-    Returns:
-        modified blob, or None on failure
-    """
     log.info("=== Add Item to Store (parse-tree v2) ===")
     log.info("Item key: %d, no: %d, stack: %d", new_item_key, new_item_no, new_stack)
 
@@ -913,20 +802,6 @@ def add_item_to_inventory(
     new_item_no: int,
     new_stack: int = 1,
 ) -> Optional[bytes]:
-    """Add a new item to the player's inventory.
-
-    Uses the full parser to walk the parse tree and find the exact
-    _itemList, element boundaries, and list count position.
-
-    Args:
-        raw: decrypted, decompressed PARC blob
-        new_item_key: item key for the new item
-        new_item_no: unique item number
-        new_stack: stack count
-
-    Returns:
-        modified blob, or None on failure
-    """
     log.info("=== Add Item to Inventory (parse-tree v2) ===")
     log.info("Item key: %d, no: %d, stack: %d", new_item_key, new_item_no, new_stack)
 

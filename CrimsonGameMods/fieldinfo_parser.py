@@ -1,37 +1,3 @@
-"""
-FieldInfo parser — parses fieldinfo.pabgb entries.
-
-Schema from IDA decompile of sub_1410403F0.
-Target field: _alwaysCallVehicle_dev (u8 bool, last field of each entry).
-
-Stream field order:
-  1.  _key:                    4B (u32)
-  2.  _stringKey:              CString (4+len)
-  3.  _unknownBool:            1B (u8)
-  4.  _fieldType1:             4B (enum _1335)
-  5.  _fieldType2:             4B (enum _1335)
-  6.  _unknownKey:             4B (u32)
-  7.  _flag1:                  1B (u8)
-  8.  _flag2:                  1B (u8)
-  9.  _flag3:                  1B (u8)
-  10. _flag4:                  1B (u8)
-  11. _fieldType3:             4B (enum _1335)
-  12. _position:               12B (3*f32)
-  13. _value1:                 8B (u64)
-  14. _value2:                 8B (u64)
-  15. _bounds1:                4B (u32)
-  16. _bounds2:                4B (u32)
-  17. _bounds3:                4B (u32)
-  18. _bounds4:                4B (u32)
-  19. _zoneType:               2B (enum _1344 — the rare 2B reader!)
-  20. _canCallVehicle:         1B (u8) — normal vehicle call flag?
-  21. _unknownFlag:            1B (u8)
-  22. _complexData:            variable (sub_141A7CA00)
-  23. _regionKey1:             4B (enum4B lookup)
-  24. _regionKey2:             4B (enum4B lookup)
-  25. _regionKey3:             4B (enum4B lookup)
-  26. _alwaysCallVehicle_dev:  1B (u8 bool) ← TARGET
-"""
 import struct
 import sys
 import os
@@ -77,10 +43,6 @@ def parse_pabgh_index(G):
 
 
 def parse_entry(D, eoff, end):
-    """Parse a single FieldInfo entry.
-
-    Returns dict with key fields and the _alwaysCallVehicle_dev offset, or None.
-    """
     p = eoff
     entry = {}
 
@@ -138,10 +100,6 @@ def parse_entry(D, eoff, end):
 
 
 def parse_all_entries(pabgb_path, pabgh_path):
-    """Parse all FieldInfo entries.
-
-    Returns (entries_list, failure_count).
-    """
     with open(pabgb_path, 'rb') as f:
         D = f.read()
     with open(pabgh_path, 'rb') as f:

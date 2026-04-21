@@ -1,21 +1,3 @@
-"""
-Central SQLite connection manager for crimson_data.db / crimson_data.db.gz.
-
-Path resolution order:
-  1. exe dir   crimson_data.db   — written by GitHub sync; used directly (no decompression)
-  2. _MEIPASS  crimson_data.db.gz — bundled compressed file; decompressed into RAM on first access
-  3. _MEIPASS  crimson_data.db   — uncompressed bundle fallback
-  4. project root crimson_data.db — development fallback
-
-The compressed path loads the database bytes via gzip and hands them to
-sqlite3.Connection.deserialize() (Python 3.11+), giving an in-memory database
-with no temp file on disk.  Read performance is equal to or faster than disk
-because all data is already in RAM.
-
-Writes (open_writable) always target the exe-dir .db file.  After a write,
-reset_connection() causes the next get_connection() to open that file directly
-instead of re-decompressing the bundle.
-"""
 from __future__ import annotations
 
 import gzip
@@ -38,7 +20,6 @@ def _exe_dir() -> str:
 
 
 def _resolve() -> tuple[str, bool]:
-    """Return (path, is_compressed) for the best available database file."""
     exe    = _exe_dir()
     meipass = getattr(sys, "_MEIPASS", exe)
     dev    = os.path.dirname(os.path.abspath(__file__))
@@ -56,13 +37,11 @@ def _resolve() -> tuple[str, bool]:
 
 
 def get_db_path() -> str:
-    """Return the path of the active database file (compressed or not)."""
     path, _ = _resolve()
     return path
 
 
 def _open_compressed(path: str) -> sqlite3.Connection:
-    """Decompress a .db.gz file and return an in-memory SQLite connection."""
     with gzip.open(path, "rb") as f:
         data = f.read()
     conn = sqlite3.connect(":memory:", check_same_thread=False)
@@ -72,13 +51,6 @@ def _open_compressed(path: str) -> sqlite3.Connection:
 
 
 def get_connection() -> sqlite3.Connection:
-    """Return a cached connection to crimson_data.db (thread-safe).
-
-    - Uncompressed .db  → read-only file-URI connection (no RAM overhead)
-    - Compressed .db.gz → in-memory connection via deserialize() (~28 MB RAM,
-                          faster reads, no disk footprint in _MEIPASS)
-    - Missing DB        → empty in-memory connection (dev, returns empty rows)
-    """
     global _connection
     if _connection is None:
         path, compressed = _resolve()
@@ -96,13 +68,6 @@ def get_connection() -> sqlite3.Connection:
 
 
 def open_writable() -> sqlite3.Connection:
-    """Open a new writable on-disk connection for sync/bookmark writes.
-
-    Always targets the exe-dir crimson_data.db (never _MEIPASS).
-    If that file doesn't exist yet, the uncompressed DB (or decompressed
-    bundle) is materialised there first so it starts with full schema + data.
-    Caller is responsible for commit() and close().
-    """
     import shutil
 
     target = os.path.join(_exe_dir(), DB_FILENAME)
@@ -170,11 +135,6 @@ def _load_json_fallback(filename: str):
 def query_with_fallback(sql: str, params: tuple = (),
                         table: str | None = None,
                         json_to_rows=None) -> list:
-    """Execute a SELECT; if it returns 0 rows AND a JSON fallback is registered
-    for the table, load and convert the JSON. Returns a list of dict-like rows.
-
-    json_to_rows: callable(json_obj) -> list[dict]. If None, returns raw JSON wrapped.
-    """
     conn = get_connection()
     try:
         cur = conn.execute(sql, params)
@@ -213,7 +173,6 @@ def query_with_fallback(sql: str, params: tuple = (),
 
 
 def reset_connection() -> None:
-    """Invalidate the cached connection (call after a write to the exe-dir DB)."""
     global _connection
     if _connection is not None:
         try:

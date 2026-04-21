@@ -1,16 +1,3 @@
-"""
-Internationalization (i18n) — Localization string loader.
-
-Loads UI strings from locale JSON files (locale/en.json, locale/ja.json, etc.).
-Translators copy en.json, translate values, and name it with their language code.
-
-Usage:
-    from i18n import tr, set_locale, available_locales
-
-    set_locale("ja")           # switch to Japanese
-    label = tr("tab.inventory") # returns translated string
-    label = tr("app.version_format", version="2.5.5")  # with formatting
-"""
 
 import json
 import logging
@@ -26,7 +13,6 @@ _fallback: Dict[str, str] = {}
 
 
 def _load_locale_file(code: str) -> Dict[str, str]:
-    """Load a locale JSON file. Returns flat key->string dict."""
     path = os.path.join(_LOCALE_DIR, f"{code}.json")
     if not os.path.isfile(path):
         log.warning("Locale file not found: %s", path)
@@ -41,10 +27,6 @@ def _load_locale_file(code: str) -> Dict[str, str]:
 
 
 def set_locale(code: str) -> None:
-    """Set the active locale. Falls back to English for missing keys.
-
-    Delegates to gui_i18n.set_language so both modules stay in sync.
-    """
     global _current_locale, _strings, _fallback
     _current_locale = code
 
@@ -73,15 +55,6 @@ def set_language(code: str) -> None:
 
 
 def tr(key: str, **kwargs) -> str:
-    """Translate a string key.
-
-    Args:
-        key: Dot-separated key (e.g. "tab.inventory", "msg.admin_required")
-        **kwargs: Format arguments (e.g. tr("app.version_format", version="2.5.5"))
-
-    Returns:
-        Translated string, or the key itself if not found.
-    """
     if not _strings and not _fallback:
         set_locale("en")
 
@@ -102,10 +75,6 @@ def tr(key: str, **kwargs) -> str:
 
 
 def available_locales() -> List[dict]:
-    """List available locale files with metadata.
-
-    Returns list of {"code": "en", "language": "English", "author": "..."}.
-    """
     locales = []
     if not os.path.isdir(_LOCALE_DIR):
         return locales
@@ -131,10 +100,8 @@ def available_locales() -> List[dict]:
 
 
 def get_locale() -> str:
-    """Get the current locale code."""
     return _current_locale
 
 
 def locale_dir() -> str:
-    """Get the locale directory path."""
     return _LOCALE_DIR

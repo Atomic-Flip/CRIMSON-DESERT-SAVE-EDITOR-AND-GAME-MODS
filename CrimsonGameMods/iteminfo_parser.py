@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-"""
-Parser for Crimson Desert iteminfo_decompressed.pabgb binary format.
-Parses all 5988 items with full byte preservation for roundtrip writes.
-
-Usage:
-    python iteminfo_parser.py [binary_path] [--json output.json]
-
-See iteminfo_struct.h for the binary format specification.
-"""
 
 import struct
 import json
@@ -132,7 +122,6 @@ class ItemRecord:
 
 
 def serialize_item(item: ItemRecord) -> bytes:
-    """Serialize an ItemRecord back to binary. Exact byte-for-byte roundtrip."""
     w = BinaryWriter()
 
     w.u32(item.item_id)
@@ -194,7 +183,6 @@ def serialize_item(item: ItemRecord) -> bytes:
 
 
 def find_all_items(data: bytes) -> List[tuple]:
-    """Scan the file for item start positions."""
     items = []
     off = 0
     end = len(data) - 16
@@ -221,7 +209,6 @@ def find_all_items(data: bytes) -> List[tuple]:
 
 
 def _find_hash(data: bytes, start: int, end: int):
-    """Find hash anchor. Returns (position, marker_byte) or (None, 0)."""
     for off in range(start, min(start + 500, end - 5)):
         if data[off] in (0x00, 0x01):
             if struct.unpack_from('<I', data, off + 1)[0] == CONST_HASH:
@@ -230,7 +217,6 @@ def _find_hash(data: bytes, start: int, end: int):
 
 
 def _try_desc_at(data, dl_off, limit, hash_pos):
-    """Try parsing desc at dl_off. Returns (text, len, ref, field1, cat, gap) or None."""
     if dl_off + 4 >= limit:
         return None
     desc_len = struct.unpack_from('<I', data, dl_off)[0]
@@ -261,7 +247,6 @@ def _try_desc_at(data, dl_off, limit, hash_pos):
 
 
 def parse_item(data: bytes, item_off: int, next_off: int) -> Optional[ItemRecord]:
-    """Parse a single item, preserving every byte for roundtrip."""
     r = BinaryReader(data, item_off)
 
     try:

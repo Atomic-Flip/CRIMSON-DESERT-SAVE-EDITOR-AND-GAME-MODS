@@ -1,15 +1,3 @@
-"""
-Armor Catalog — parses iteminfo.pabgb to find armor items with their
-prefab-hash offsets, so we can swap visuals between armors (transmog).
-
-Ported from HexeMarie's CrimsonForge (core/item_catalog.py) — hash extraction
-logic and category classification. Produces ArmorItem records with:
-    item_id, internal_name, display_name, category, hashes[(offset, value)]
-
-The hashes list lets us write new 4-byte values at specific file offsets.
-Pair a source + target armor, copy source's hash values into target's offsets,
-and the game renders the target with the source's visual.
-"""
 from __future__ import annotations
 
 import re
@@ -62,7 +50,6 @@ class ArmorItem:
 
 
 def get_category(internal_name: str) -> Optional[str]:
-    """Return armor category name or None if not an armor item."""
     name = internal_name
     for cat, tokens in CATEGORY_KEYWORDS:
         for tok in tokens:
@@ -72,7 +59,6 @@ def get_category(internal_name: str) -> Optional[str]:
 
 
 def clean_display_name(internal_name: str) -> str:
-    """Convert CamelCase/underscore names to readable form."""
     s = re.sub(r'([a-z])([A-Z])', r'\1 \2', internal_name)
     s = s.replace('_', ' ')
     s = re.sub(r'\s+', ' ', s).strip()
@@ -81,15 +67,6 @@ def clean_display_name(internal_name: str) -> str:
 
 
 def parse_transmog_items_crimson_rs(data: bytes) -> list[ArmorItem]:
-    """Authoritative transmog catalog via crimson_rs.
-
-    Uses the Rust parser to enumerate every item with visual prefabs, then locates
-    each prefab_name u32 value's byte offset in the raw blob. Catches everything
-    crimson_rs can parse (~6k items, ~5.3k with visuals).
-
-    Returns list of ArmorItem with (offset, hash) pairs for every non-zero
-    prefab_name found per item.
-    """
     try:
         import crimson_rs
     except ImportError:
@@ -161,16 +138,6 @@ def parse_transmog_items_crimson_rs(data: bytes) -> list[ArmorItem]:
 
 
 def parse_transmog_items(data: bytes, loc_dict: Optional[dict] = None) -> list[ArmorItem]:
-    """Scan iteminfo.pabgb for items with visual prefab hashes.
-
-    Tries crimson_rs-based enumeration first (catches ~5.3k items with visuals);
-    falls back to byte-pattern scanning if crimson_rs isn't available or fails.
-
-    data:      raw iteminfo.pabgb bytes
-    loc_dict:  optional {loc_id(int): display_name} for pretty names
-
-    Returns list of ArmorItem.
-    """
     legacy = _parse_transmog_items_legacy(data, loc_dict)
     if legacy:
         return legacy
@@ -181,11 +148,6 @@ def parse_transmog_items(data: bytes, loc_dict: Optional[dict] = None) -> list[A
 
 
 def _parse_transmog_items_legacy(data: bytes, loc_dict: Optional[dict] = None) -> list[ArmorItem]:
-    """Legacy byte-pattern scanner (fallback when crimson_rs unavailable).
-
-    Scans iteminfo.pabgb bytes for items with prefab hashes using marker-based
-    parsing. Captures fewer items than the crimson_rs path (~4k vs ~5.3k).
-    """
     results: list[ArmorItem] = []
     seen_ids: set[int] = set()
 
@@ -295,13 +257,6 @@ def _parse_transmog_items_legacy(data: bytes, loc_dict: Optional[dict] = None) -
 
 
 def build_swap_changes(source: ArmorItem, target: ArmorItem) -> list[dict]:
-    """Build byte-patch changes that make target look like source.
-
-    We match hash-by-hash positionally. The target's OFFSETS are written with
-    the source's VALUES.
-
-    Returns list of {offset, label, original, patched} dicts.
-    """
     changes = []
     n = min(len(source.hashes), len(target.hashes))
     if n <= 2:
@@ -328,14 +283,6 @@ def build_swap_changes(source: ArmorItem, target: ArmorItem) -> list[dict]:
 
 
 def apply_swaps_to_blob(blob: bytearray, swaps: list[dict]) -> int:
-    """Apply a list of queued swaps (each with src/tgt ArmorItem) to blob.
-
-    Re-derives hash offsets from current blob state so we can safely run after
-    a Rust serialize that may have shifted offsets.
-
-    swaps:    list of {'src': ArmorItem, 'tgt': ArmorItem}
-    Returns: number of byte patches applied.
-    """
     fresh_items = parse_transmog_items(bytes(blob))
     by_key = {a.item_id: a for a in fresh_items}
 

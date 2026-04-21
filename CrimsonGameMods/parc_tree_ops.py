@@ -1,17 +1,3 @@
-"""
-PARC Tree Operations — Modify the parsed save tree in memory.
-
-All operations modify the GenericFieldValue tree. The serializer
-(parc_tree_serializer.py) handles producing correct bytes.
-
-Operations:
-    set_field_value()       — Change a scalar field's value
-    insert_list_element()   — Add a new element to an object list
-    remove_list_element()   — Remove an element from an object list
-    clone_element()         — Deep-copy a tree node (clearing stale offsets)
-    expand_bitmask()        — Add a field that wasn't present before
-    navigate()              — Find a field by dot-path in the tree
-"""
 
 from __future__ import annotations
 
@@ -27,15 +13,6 @@ from save_parser import GenericFieldValue, ObjectBlock, TypeDef
 
 
 def navigate(block: ObjectBlock, path: str) -> GenericFieldValue | None:
-    """Navigate to a field by dot-path.
-
-    Examples:
-        navigate(block, "_list")                → the _list field
-        navigate(block, "_list[2]")             → 3rd element of _list
-        navigate(block, "_list[2]._itemKey")    → _itemKey in 3rd element
-
-    Returns the GenericFieldValue, or None if not found.
-    """
     parts = _parse_path(path)
     current_fields = block.fields
 
@@ -62,7 +39,6 @@ def navigate(block: ObjectBlock, path: str) -> GenericFieldValue | None:
 
 
 def _parse_path(path: str) -> list[tuple[str, int | None]]:
-    """Parse a dot-path like '_list[2]._itemKey' into [(name, index), ...]."""
     import re
     parts = []
     for segment in path.split('.'):
@@ -80,16 +56,6 @@ def set_field_value(
     new_value,
     raw_blob: bytes | None = None,
 ) -> bool:
-    """Set a scalar field's value in the tree.
-
-    Args:
-        block: The ObjectBlock containing the field.
-        field_path: Dot-path to the field (e.g., "_list[2]._stackCount").
-        new_value: The new value (int, float, bool).
-        raw_blob: Original blob (needed to update raw bytes for round-trip).
-
-    Returns True if the field was found and updated.
-    """
     field = navigate(block, field_path)
     if field is None:
         log.warning("set_field_value: field %s not found", field_path)
@@ -114,7 +80,6 @@ def set_field_value(
 
 
 def _write_scalar_to_blob(blob: bytes | bytearray, field: GenericFieldValue, value) -> None:
-    """Write a scalar value into the blob at the field's position."""
     if not isinstance(blob, bytearray):
         return
 
@@ -132,14 +97,6 @@ def clone_element(
     element: GenericFieldValue,
     raw_blob: bytes | None = None,
 ) -> GenericFieldValue:
-    """Deep-copy a GenericFieldValue tree node.
-
-    If raw_blob is provided, also captures the raw bytes so the clone
-    can be serialized independently. Clears all offset fields since
-    the clone won't be at the same position.
-
-    Returns a new GenericFieldValue that can be inserted into a list.
-    """
     cloned = copy.deepcopy(element)
 
     if raw_blob is not None and element.start_offset > 0 and element.end_offset > element.start_offset:
@@ -153,7 +110,6 @@ def clone_element(
 
 
 def _clear_offsets(field: GenericFieldValue) -> None:
-    """Recursively clear all offset fields in a cloned tree."""
     field.start_offset = 0
     field.end_offset = 0
     field.child_payload_offset = 0
@@ -176,17 +132,6 @@ def insert_list_element(
     template: GenericFieldValue,
     field_values: dict | None = None,
 ) -> GenericFieldValue | None:
-    """Insert a new element at the end of an object list.
-
-    Args:
-        block: The ObjectBlock containing the list.
-        list_path: Dot-path to the list field (e.g., "_list").
-        template: A GenericFieldValue to clone as the new element.
-                  Should come from clone_element() of an existing element.
-        field_values: Optional dict of {field_name: value} to patch in the new element.
-
-    Returns the inserted element, or None on failure.
-    """
     list_field = navigate(block, list_path)
     if list_field is None:
         log.warning("insert_list_element: list %s not found", list_path)
@@ -228,10 +173,6 @@ def remove_list_element(
     list_path: str,
     index: int,
 ) -> GenericFieldValue | None:
-    """Remove an element from an object list by index.
-
-    Returns the removed element (for undo support), or None on failure.
-    """
     list_field = navigate(block, list_path)
     if list_field is None:
         log.warning("remove_list_element: list %s not found", list_path)
@@ -291,19 +232,6 @@ def build_item_element(
     type_index: int = 17,
     timestamp: int = 0,
 ) -> GenericFieldValue:
-    """Build an ItemSaveData element from scratch — no cloning needed.
-
-    Args:
-        item_key: The item key from iteminfo.pabgb.
-        item_no: Unique item number (must be unique across all inventory items).
-        stack_count: How many of this item.
-        slot_no: Inventory slot number.
-        is_equipment: True for weapons/armor (enables enchant/sharpness/sockets).
-        type_index: The PARC type index for ItemSaveData in this save's schema.
-        timestamp: Acquisition timestamp (_timeWhenPushItem). 0 = use current.
-
-    Returns a GenericFieldValue tree ready to insert into an _itemList.
-    """
     if timestamp == 0:
         import time
         timestamp = int(time.time() * 10_000_000)
@@ -402,16 +330,6 @@ def expand_bitmask(
     default_value = 0,
     schema_types: dict[int, TypeDef] | None = None,
 ) -> bool:
-    """Enable a field that was previously absent (bit not set in bitmask).
-
-    Args:
-        block: The ObjectBlock to modify.
-        field_index: Index of the field in the type's field list.
-        default_value: Default value for the new field.
-        schema_types: Type definitions for looking up field metadata.
-
-    Returns True if the field was successfully enabled.
-    """
     if field_index >= len(block.fields):
         return False
 

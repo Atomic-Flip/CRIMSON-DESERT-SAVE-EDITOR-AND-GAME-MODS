@@ -1,29 +1,3 @@
-"""
-PARC Serializer — Crimson Desert save file serialization (round-trip safe).
-
-Supports:
-  1. Byte-identical round-trip: parse -> serialize -> identical bytes
-  2. Field-level modifications with automatic offset recalculation
-  3. Item insertion into inventory lists
-  4. New ItemSaveData creation from scratch
-
-The PARC format layout:
-  [14-byte inner header]
-  [Schema registry: u32(num_root_entries) + u16(num_types) + TypeDef[]]
-  [TOC: u32(reserved=0) + u32(entry_count) + u32(stream_size) + TOCEntry[20 bytes each]]
-  [Data blocks: contiguous, one per TOC entry]
-
-Each data block:
-  u16(mask_byte_count) + byte[N](bitmask) + u32(context) + field values (bitmask-driven)
-
-Inline objects (mk=4,5):
-  Locator: u16(mask_byte_count) + byte[N](bitmask) + u16(type_index) + u8(reserved) +
-           u32(sentinel1=0xFFFFFFFF) + u32(sentinel2=0xFFFFFFFF) + u32(payload_offset)
-  Payload: u32(reserved=0) + fields + u32(trailing_size = current_pos - payload_start)
-
-Object lists (mk=6,7):
-  Variable header format + N inline element locators with payloads
-"""
 
 import struct
 from dataclasses import dataclass, field as dataclass_field
@@ -32,7 +6,6 @@ from typing import List, Dict, Optional, Tuple, Any
 
 @dataclass
 class FieldDef:
-    """Schema field definition."""
     name: str
     type_name: str
     meta_kind: int
@@ -42,7 +15,6 @@ class FieldDef:
 
 @dataclass
 class TypeDef:
-    """Schema type definition."""
     index: int
     name: str
     fields: List[FieldDef]
@@ -58,7 +30,6 @@ class TypeDef:
 
 @dataclass
 class TOCEntry:
-    """An entry in the object table of contents."""
     index: int
     class_index: int
     sentinel1: int
@@ -69,13 +40,6 @@ class TOCEntry:
 
 @dataclass
 class ParcBlob:
-    """
-    Complete parsed PARC blob with raw data preservation for round-trip.
-
-    For round-trip serialization, we keep the original raw data and track
-    which data blocks have been modified. Unmodified blocks are copied
-    verbatim; modified blocks are re-serialized from parsed values.
-    """
     raw: bytes
     header: bytes
     schema_bytes: bytes
@@ -121,7 +85,6 @@ def _bitmask_width(num_fields: int) -> int:
 
 
 def parse_parc_blob(data: bytes) -> ParcBlob:
-    """Parse a raw PARC blob, preserving all data needed for round-trip serialization."""
 
     if len(data) < 14:
         raise ValueError("Blob too small")
@@ -206,13 +169,6 @@ def parse_parc_blob(data: bytes) -> ParcBlob:
 
 
 def serialize_parc(parc: ParcBlob) -> bytes:
-    """
-    Serialize a ParcBlob back to binary.
-
-    For unmodified blocks, copies raw bytes verbatim.
-    For modified blocks, uses the new bytes from parc.modified_blocks.
-    Recalculates all TOC offsets and the stream_size.
-    """
     out = bytearray()
 
     out.extend(parc.header)
@@ -270,25 +226,6 @@ def _fixup_global_self_references(
     old_parc: ParcBlob,
     new_toc_entries: list,
 ) -> None:
-    """
-    Fix absolute payload_offset pointers in blocks that shifted.
-
-    When a block's size changes, all subsequent blocks shift by the same delta.
-    Each shifted block is a verbatim copy of the original, so its internal
-    payload_offset values (u32 fields in inline object locator headers) still
-    hold the old absolute positions and must be adjusted by +delta.
-
-    We ONLY scan blocks that actually moved (data_offset changed). Blocks that
-    didn't move (including the modified/resized block whose offsets were already
-    fixed by _fixup_payload_offsets) are left untouched.
-
-    To avoid false positives (random data that happens to look like a sentinel),
-    we validate each candidate locator by checking:
-      - mbc (u16) is 1..8 and appears before the sentinel at the right position
-      - type_index (u16) is a valid type in the schema
-      - reserved byte is 0
-      - the old payload_offset is a self-reference (points right after the locator)
-    """
     shifted_blocks = []
     for i, new_entry in enumerate(new_toc_entries):
         old_entry = old_parc.toc_entries[i]
@@ -356,20 +293,12 @@ def _fixup_global_self_references(
 
 
 class BlockParser:
-    """
-    Parses a single TOC data block into a structured form that can be
-    modified and re-serialized to identical bytes.
-
-    The parsed form preserves ALL raw data — including exact bitmask bytes,
-    context values, list headers, locator bytes, trailing sizes, etc.
-    """
 
     def __init__(self, parc: ParcBlob):
         self.parc = parc
         self.data = parc.raw
 
     def parse_root_block(self, toc_index: int) -> dict:
-        """Parse a root TOC block. Returns a dict suitable for re-serialization."""
         entry = self.parc.toc_entries[toc_index]
         typedef = self.parc.type_by_index[entry.class_index]
         pos = entry.data_offset
@@ -393,7 +322,6 @@ class BlockParser:
         }
 
     def _parse_fields(self, typedef: TypeDef, mask_bytes: bytes, pos: int, tail: int) -> Tuple[list, int]:
-        """Parse fields according to bitmask. Returns (field_list, end_pos)."""
         fields = []
         for i, fdef in enumerate(typedef.fields):
             present = _field_present(mask_bytes, i)
@@ -443,7 +371,6 @@ class BlockParser:
         raise ValueError(f"Unknown meta_kind={mk} for field {fdef.name}")
 
     def _parse_dynamic_array(self, fdef: FieldDef, pos: int, tail: int):
-        """Parse mk=3 dynamic array with multiple header formats (matches C++ DecodeDynamicArray)."""
         ms = fdef.meta_size
         start = pos
 
@@ -501,7 +428,6 @@ class BlockParser:
         return int.from_bytes(self.data[pos:pos + ms], "little")
 
     def _parse_object_locator(self, fdef, pos, tail, locator_kind):
-        """Parse inline object locator (mk=4 or mk=5). Returns (raw_bytes, end_pos)."""
         start = pos
         body_cursor = pos
 
@@ -543,7 +469,6 @@ class BlockParser:
         return {"kind": "object_locator", "raw": raw, "locator_kind": locator_kind}, end
 
     def _parse_inline_payload(self, typedef, mask_bytes, payload_start, tail):
-        """Parse inline object payload. Returns (fields, end_pos)."""
         if payload_start + 8 > tail:
             raise ValueError(f"Inline payload overruns at 0x{payload_start:X}")
 
@@ -570,7 +495,6 @@ class BlockParser:
         return None, end
 
     def _parse_object_list(self, fdef, pos, tail):
-        """Parse object list (mk=6 or mk=7). Returns (raw_bytes, end_pos)."""
         start = pos
         best_end = None
         last_error = None
@@ -630,7 +554,6 @@ class BlockParser:
         return {"kind": "object_list", "raw": raw}, best_end
 
     def _parse_list_element(self, cursor, tail):
-        """Parse one list element, return end pos."""
         try:
             return self._parse_full_locator_element(cursor, tail)
         except Exception:
@@ -638,7 +561,6 @@ class BlockParser:
         return self._parse_compact_element(cursor, tail)
 
     def _parse_full_locator_element(self, cursor, tail):
-        """Parse a full-locator list element. Returns end_pos."""
         if cursor + 18 > tail:
             raise ValueError("Overruns")
 
@@ -667,7 +589,6 @@ class BlockParser:
         return end
 
     def _parse_compact_element(self, cursor, tail):
-        """Parse a compact list element. Returns end_pos."""
         if cursor + 18 > tail:
             raise ValueError("Overruns")
 
@@ -689,7 +610,6 @@ class BlockParser:
 
 
 def serialize_root_block(parsed_block: dict) -> bytes:
-    """Serialize a parsed root block back to bytes."""
     out = bytearray()
 
     mask_bytes = parsed_block["mask_bytes"]
@@ -709,7 +629,6 @@ def serialize_root_block(parsed_block: dict) -> bytes:
 
 
 def _write_scalar(value, meta_size: int, type_name: str) -> bytes:
-    """Write a scalar value to bytes."""
     tname = type_name.lower()
     if meta_size == 1:
         return struct.pack("<B", value & 0xFF)
@@ -734,19 +653,6 @@ def _write_scalar(value, meta_size: int, type_name: str) -> bytes:
 
 def serialize_inline_object(type_def: TypeDef, field_values: Dict[str, Any],
                             mask_bytes: bytes, parc: ParcBlob) -> bytes:
-    """
-    Serialize an inline object with locator header and payload.
-    Used for creating new list elements.
-
-    Args:
-        type_def: The type definition for this object
-        field_values: Dict mapping field name -> value
-        mask_bytes: Bitmask bytes indicating which fields are present
-        parc: ParcBlob for type lookups
-
-    Returns:
-        Full inline object bytes: locator + payload
-    """
     payload = bytearray()
     payload.extend(struct.pack("<I", 0))
 
@@ -812,19 +718,6 @@ def serialize_inline_object(type_def: TypeDef, field_values: Dict[str, Any],
 
 
 def fixup_inline_object_offset(obj_bytes: bytes, absolute_offset: int) -> bytes:
-    """
-    Fix up the payload_offset field in an inline object's locator header.
-
-    The payload_offset must be the absolute position in the PARC blob
-    where the payload starts (right after the locator).
-
-    Args:
-        obj_bytes: The full inline object bytes (locator + payload)
-        absolute_offset: The absolute position of this object in the blob
-
-    Returns:
-        Fixed-up bytes
-    """
     result = bytearray(obj_bytes)
 
     mask_byte_count = _u16(result, 0)
@@ -838,7 +731,6 @@ def fixup_inline_object_offset(obj_bytes: bytes, absolute_offset: int) -> bytes:
 
 
 def _default_scalar(fdef: FieldDef):
-    """Return default zero value for a scalar field."""
     return 0
 
 
@@ -863,24 +755,6 @@ def create_item_save_data(
     current_gimmick_state: int = 0,
     bitmask: bytes = ITEM_BITMASK_BASIC,
 ) -> bytes:
-    """
-    Create a new ItemSaveData inline object from scratch.
-
-    Args:
-        parc: ParcBlob for type lookup
-        item_key: The item key identifier
-        item_no: The item number
-        slot_no: Inventory slot number
-        stack_count: Number of items in stack
-        enchant_level: Enchant level
-        endurance: Item endurance
-        sharpness: Item sharpness
-        transferred_item_key: Visual identity key
-        bitmask: Field presence bitmask (default: basic item pattern)
-
-    Returns:
-        Full inline object bytes (locator + payload)
-    """
     item_type = None
     for td in parc.types:
         if td.name == "ItemSaveData":
@@ -914,7 +788,6 @@ def create_item_save_data(
 
 
 def find_inventory_toc_index(parc: ParcBlob) -> Optional[int]:
-    """Find the TOC index for InventorySaveData."""
     for entry in parc.toc_entries:
         if entry.class_index < len(parc.types):
             if parc.types[entry.class_index].name == "InventorySaveData":
@@ -923,14 +796,6 @@ def find_inventory_toc_index(parc: ParcBlob) -> Optional[int]:
 
 
 def _find_inventory_categories(parc: ParcBlob, inv_toc: int) -> List[dict]:
-    """
-    Walk the InventorySaveData block and locate each InventoryElementSaveData
-    category, including its _itemList position, count, and element boundaries.
-
-    Returns a list of dicts (one per category) with keys:
-        locator_abs, payload_abs, inventory_key, item_list_abs, item_count,
-        items_end_abs, elem_end_abs, mask_bytes
-    """
     entry = parc.toc_entries[inv_toc]
     data = parc.raw
     abs_start = entry.data_offset
@@ -1011,7 +876,6 @@ def _find_inventory_categories(parc: ParcBlob, inv_toc: int) -> List[dict]:
 
 
 def _find_max_item_no(parc: ParcBlob) -> int:
-    """Scan the blob for the highest _itemNo to generate unique new ones."""
     from item_scanner import scan_items
     items = scan_items(parc.raw)
     if items:
@@ -1031,27 +895,6 @@ def clone_item_from_template(
     endurance: int = 100,
     sharpness: int = 100,
 ) -> bytes:
-    """
-    Clone an existing item's raw bytes and patch the identity/stat fields.
-
-    This preserves the exact binary structure (including socket lists, dye
-    data, etc.) while changing the item identity and stats.
-
-    Args:
-        parc: ParcBlob for data access
-        template_abs: Absolute offset of the template item in the blob
-        template_size: Size of the template item in bytes
-        item_key: New item key
-        item_no: New unique item number
-        slot_no: Inventory slot
-        stack_count: Stack count
-        enchant_level: Enchant level (0 = none)
-        endurance: Endurance value
-        sharpness: Sharpness value
-
-    Returns:
-        New item bytes (locator + payload) with a placeholder payload_offset
-    """
     data = parc.raw
     item = bytearray(data[template_abs:template_abs + template_size])
 
@@ -1139,26 +982,6 @@ def insert_item_into_inventory(
     sharpness: int = 100,
     category_key: int = 2,
 ) -> bytes:
-    """
-    Insert a new item into the InventorySaveData block.
-
-    Clones an existing item from the target category as a template, patches
-    identity/stat fields, inserts it at the end of the category's _itemList,
-    updates the list count and all trailing sizes, then fixes up every
-    payload_offset in the block that was shifted by the insertion.
-
-    Args:
-        parc: Parsed PARC blob
-        item_key: Item definition key for the new item
-        stack_count: Stack count
-        enchant_level: Enchant level (0 for non-equipment)
-        endurance: Endurance (100 = max for non-equipment, use 65535 for equipment)
-        sharpness: Sharpness (100 = max for non-equipment, use 65535 for equipment)
-        category_key: Inventory category key (1=equipment, 2=general, 5=materials, etc.)
-
-    Returns:
-        New complete PARC blob bytes
-    """
     inv_toc = find_inventory_toc_index(parc)
     if inv_toc is None:
         raise ValueError("InventorySaveData not found in TOC")
@@ -1238,7 +1061,6 @@ def insert_item_into_inventory(
 
 
 def find_store_toc_index(parc: ParcBlob) -> Optional[int]:
-    """Find the TOC index for StoreSaveData."""
     for entry in parc.toc_entries:
         if entry.class_index < len(parc.types):
             if parc.types[entry.class_index].name == "StoreSaveData":
@@ -1254,14 +1076,6 @@ def insert_item_into_store(
     endurance: int = 5,
     sharpness: int = 0,
 ) -> bytes:
-    """
-    Insert a new item into the StoreSaveData block's _storeSoldItemDataList.
-    This places the item in a vendor's repurchase list. When the player buys
-    it back in-game, the game fully initializes it (correct icon, model, stats).
-
-    Finds the first store that already has sold items and appends to its list.
-    Uses the same clone-from-template approach as inventory insertion.
-    """
     store_toc = find_store_toc_index(parc)
     if store_toc is None:
         raise ValueError("StoreSaveData not found in TOC")
@@ -1380,16 +1194,6 @@ def insert_item_into_store(
 
 def _fixup_payload_offsets(block: bytearray, block_abs_start: int,
                             insert_abs: int, delta: int) -> None:
-    """
-    Scan the block for inline object locators and shift any payload_offset
-    that points to a position >= insert_abs by +delta.
-
-    Inline object locators have the pattern:
-        mbc(u16) + mask(mbc bytes) + type_index(u16) + reserved(u8) +
-        sentinel(FFFFFFFFFFFFFFFF) + payload_offset(u32)
-
-    We detect them by looking for the sentinel pattern.
-    """
     pos = 0
     while pos < len(block) - 20:
 
@@ -1408,11 +1212,6 @@ def _fixup_payload_offsets(block: bytearray, block_abs_start: int,
 
 def _fixup_nested_payload_offsets(block: bytearray, item_start: int,
                                     item_size: int, block_abs_start: int) -> None:
-    """
-    Fix payload_offset values within a newly inserted item (cloned from template).
-    These offsets pointed to the template's absolute positions and need to be
-    recalculated to point within the item's new location.
-    """
     pos = item_start
     end = item_start + item_size
     first = True
@@ -1433,18 +1232,6 @@ def _fixup_nested_payload_offsets(block: bytearray, item_start: int,
 
 def modify_field_in_block(parc: ParcBlob, toc_index: int,
                           field_name: str, new_value) -> None:
-    """
-    Modify a scalar field value in a root TOC block.
-
-    This modifies the field in-place within the raw block data
-    (no offset shifts needed for same-size scalar edits).
-
-    Args:
-        parc: Parsed PARC blob
-        toc_index: TOC entry index
-        field_name: Name of the field to modify
-        new_value: New value (must be same scalar type)
-    """
     entry = parc.toc_entries[toc_index]
     typedef = parc.type_by_index[entry.class_index]
     block = bytearray(parc.block_raw[toc_index])
@@ -1487,25 +1274,10 @@ def modify_field_in_block(parc: ParcBlob, toc_index: int,
 
 
 def replace_block_raw(parc: ParcBlob, toc_index: int, new_raw: bytes) -> None:
-    """
-    Replace the raw data of a TOC block entirely.
-
-    Args:
-        parc: Parsed PARC blob
-        toc_index: TOC entry index
-        new_raw: New raw bytes for this block
-    """
     parc.modified_blocks[toc_index] = new_raw
 
 
 def verify_round_trip(original_blob: bytes) -> Tuple[bool, str]:
-    """
-    Verify byte-identical round-trip:
-    parse -> serialize -> compare.
-
-    Returns:
-        (success, message)
-    """
     parc = parse_parc_blob(original_blob)
     serialized = serialize_parc(parc)
 

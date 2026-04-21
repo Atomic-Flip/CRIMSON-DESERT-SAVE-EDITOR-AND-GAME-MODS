@@ -1,10 +1,3 @@
-"""
-Store Editor — Parse and modify storeinfo.pabgb vendor inventories.
-
-Extracts all 254 stores from storeinfo.pabgb, identifies items for sale
-using the 0x0101 marker pattern, and allows item key swaps and additions.
-Uses PAZ packing pipeline (crimson-rs PackGroupBuilder) for safe writes.
-"""
 
 import json
 import logging
@@ -22,7 +15,6 @@ ITEM_MARKER = b'\x01\x01'
 
 @dataclass
 class StoreItem:
-    """An item entry within a store."""
     offset: int
     item_key: int
     item_name: str
@@ -33,7 +25,6 @@ class StoreItem:
 
 @dataclass
 class Store:
-    """A vendor store parsed from storeinfo.pabgb."""
     key: int
     name: str
     offset: int
@@ -43,7 +34,6 @@ class Store:
 
 
 class StoreInfoParser:
-    """Parse storeinfo.pabgb from the game PAZ archive."""
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -55,16 +45,11 @@ class StoreInfoParser:
         self._loaded = False
 
     def load_names(self) -> None:
-        """Load item name database."""
         _db = get_connection()
         for row in _db.execute("SELECT item_key, name FROM items"):
             self._name_lookup[row['item_key']] = row['name']
 
     def extract(self) -> bool:
-        """Extract and decompress storeinfo from PAZ archive.
-
-        Returns True on success.
-        """
         import sys
         for d in (os.path.join(os.path.dirname(__file__), 'Communitydump', 'BestCrypto'),
                   os.path.join(os.path.dirname(__file__), 'tools')):
@@ -129,7 +114,6 @@ class StoreInfoParser:
         return True
 
     def _parse_stores(self) -> None:
-        """Parse all store records from the body data."""
         self.stores.clear()
         data = self._body_data
 
@@ -182,19 +166,13 @@ class StoreInfoParser:
             self.stores.append(store)
 
     def get_store_by_key(self, key: int) -> Optional[Store]:
-        """Find a store by its key."""
         return next((s for s in self.stores if s.key == key), None)
 
     def get_store_by_name(self, name: str) -> Optional[Store]:
-        """Find a store by partial name match."""
         name_lower = name.lower()
         return next((s for s in self.stores if name_lower in s.name.lower()), None)
 
     def swap_item(self, store_key: int, old_item_key: int, new_item_key: int) -> bool:
-        """Swap an item key in a store (replace one item with another).
-
-        Modifies the body data in-place. Returns True on success.
-        """
         store = self.get_store_by_key(store_key)
         if not store:
             return False
@@ -217,14 +195,6 @@ class StoreInfoParser:
 
     def add_item_to_store(self, store_key: int, donor_item_key: int,
                           new_item_key: int) -> bool:
-        """Add an item to a store by cloning an existing entry and changing the key.
-
-        Finds the donor item's entry in the store, clones it, changes the item key
-        to new_item_key, and inserts the clone after the donor.
-
-        Since we use PAZ packing (new directory), size changes are fine.
-        Returns True on success.
-        """
         store = self.get_store_by_key(store_key)
         if not store:
             return False
@@ -266,11 +236,6 @@ class StoreInfoParser:
         return True
 
     def _rebuild_header_offsets(self) -> None:
-        """Rebuild header offsets after body modifications.
-
-        Since adding items changes sizes, we need to recalculate offsets.
-        We find each store by scanning for its key+name pattern.
-        """
         data = self._body_data
         new_entries = []
         for skey, _ in self._header_entries:
@@ -305,13 +270,6 @@ class StoreInfoParser:
         self._header_data = bytes(new_hdr)
 
     def write_to_paz(self, paz_dir_name: str = "0036") -> Tuple[bool, str]:
-        """Pack modified storeinfo into a new PAZ directory using crimson-rs.
-
-        Args:
-            paz_dir_name: Directory name (e.g. "0036")
-
-        Returns (success, message).
-        """
         try:
             import crimson_rs
             import shutil
@@ -352,19 +310,6 @@ class StoreInfoParser:
             return False, str(e)
 
     def write_inplace(self) -> Tuple[bool, str]:
-        """Apply changes by patching the original PAZ file in-place.
-
-        This is the method community tools use (proven working):
-        1. Read compressed storeinfo.pabgb from original PAZ
-        2. Decompress with LZ4
-        3. The caller has already modified self._body_data
-        4. Recompress with LZ4 HC (always smaller than original)
-        5. Pad to original compressed size
-        6. Write back at exact same offset in PAZ
-        7. Recompute checksums (PAMT chunk hash, PAMT header, PAPGT)
-
-        No new PAZ groups, no PAPGT entries — just direct byte replacement.
-        """
         try:
             import sys
             import lz4.block
@@ -500,7 +445,6 @@ class StoreInfoParser:
             return False, str(e)
 
     def get_summary(self) -> str:
-        """Get a human-readable summary."""
         if not self._loaded:
             return "Not loaded. Call extract() first."
         total_items = sum(len(s.items) for s in self.stores)

@@ -1,25 +1,3 @@
-"""
-PARC Inserter v3 — Production insertion engine for Crimson Desert save files.
-
-This module provides reliable PARC blob insertion using the Element Rebuild
-approach with sentinel-scan external fixup. First implementation to produce
-saves that load in-game without crashing (confirmed 2026-03-27).
-
-Algorithm:
-    1. Parse full tree (desktopeditor/save_parser.py) to find exact boundaries
-    2. Extract target element, rebuild with new data spliced in
-    3. Fix all internal payload_offsets (item + socket POs)
-    4. Fix list counts, trailing_sizes, element metadata
-    5. Replace element in blob (splice)
-    6. Sentinel-scan ALL external blocks for PO fixup
-    7. Fix TOC entries (data_offset, data_size, stream_size)
-    8. Full tree verification before returning
-
-Supports:
-    - Store insertion (add to vendor buyback list)
-    - Inventory insertion (add directly to player inventory)
-    - Section cloning (transplant entire block sections between saves)
-"""
 
 import struct
 import json
@@ -62,20 +40,17 @@ _LIST_PREFIX_BIG_ENDIAN = 1
 
 
 def _parse_tree(blob: bytes) -> dict:
-    """Parse PARC blob using Python parser (handles all list formats)."""
     from save_parser import build_result_from_raw
     return build_result_from_raw(blob, {'source': 'inserter', 'path': 'inserter'})
 
 
 def _parse_schema(blob: bytes) -> dict:
-    """Parse schema to get type_by_index mapping."""
     from save_parser import parse_schema
     schema = parse_schema(blob)
     return {td.index: td for td in schema['types']}
 
 
 def _find_block(result: dict, class_name: str):
-    """Find a block object by class name."""
     for obj in result['objects']:
         if obj.class_name == class_name:
             return obj
@@ -83,7 +58,6 @@ def _find_block(result: dict, class_name: str):
 
 
 def _find_field(obj, field_name: str):
-    """Find a field in an object's child_fields or fields."""
     fields = getattr(obj, 'child_fields', None) or getattr(obj, 'fields', None) or []
     for f in fields:
         if f.name == field_name and f.present:
@@ -92,12 +66,6 @@ def _find_field(obj, field_name: str):
 
 
 def _get_max_item_no(result: dict) -> int:
-    """Find the maximum itemNo across inventory/equipment/store items.
-
-    Only scans InventorySaveData, EquipmentSaveData, StoreSaveData,
-    and MercenaryClanSaveData — NOT FieldSaveData (world drops have
-    inflated itemNos that would create gaps in the sequence).
-    """
     _SAFE_BLOCKS = {
         'InventorySaveData', 'EquipmentSaveData',
         'StoreSaveData', 'MercenaryClanSaveData',
@@ -130,10 +98,6 @@ _category_map_cache = None
 
 
 def _get_item_bag_key(item_key: int) -> int:
-    """Get the correct inventory bag key for an item using runtime mapping.
-
-    Returns 1 (equipment) or 2 (general/consumable).
-    """
     global _category_map_cache
     if _category_map_cache is None:
         try:
@@ -148,11 +112,6 @@ def _get_item_bag_key(item_key: int) -> int:
 
 
 def _get_templates() -> dict:
-    """Load and cache item templates from crimson_data.db.
-
-    The DB was built with item_templates.json overriding master_templates.json
-    (INSERT OR REPLACE ordering in build_db.py), so curated entries win.
-    """
     global _templates_cache
     if _templates_cache is not None:
         return _templates_cache
@@ -181,26 +140,12 @@ def _get_templates() -> dict:
 
 
 def clear_caches() -> None:
-    """Invalidate all module-level caches.
-
-    Call after updating bundled JSON files (item_templates.json,
-    master_templates.json, item_category_map.json) without restarting.
-    """
     global _templates_cache, _category_map_cache
     _templates_cache = None
     _category_map_cache = None
 
 
 def load_item_template(item_key: int) -> Optional[Tuple[bytearray, dict]]:
-    """Load a real item template binary.
-
-    Tries in order:
-    1. Exact match for item_key
-    2. Any template with the same mask (same binary field layout)
-    3. None
-
-    Returns (binary, field_positions) or None.
-    """
     templates = _get_templates()
     key_str = str(item_key)
 
@@ -251,18 +196,6 @@ def build_item_from_template(
     save_type_index: int = -1,
     socket_type_index: int = -1,
 ) -> bytearray:
-    """Patch a template binary with new item identity and fix payload offsets.
-
-    Args:
-        template_binary: Raw 227B template from item_templates.json
-        field_positions: Dict with rel_offset for each field
-        item_key: Target item definition key
-        item_no: Unique item number (must be max+1)
-        stack_count: How many in the stack
-        slot_no: Inventory slot (use 200+ to avoid conflicts)
-        target_abs: Absolute blob position where this item will be placed
-        save_type_index: ItemSaveData type_index in the target save's schema
-    """
     item = bytearray(template_binary)
     fp = field_positions
 
@@ -329,10 +262,6 @@ def build_item_from_template(
 
 
 def _infer_field_positions(template: bytearray) -> dict:
-    """Infer field positions from a raw item template by scanning for saveVersion=1.
-
-    Returns dict compatible with item_templates.json field_positions format.
-    """
     fp = {}
     for i in range(len(template) - 30):
         if struct.unpack_from('<I', template, i)[0] == 1:
@@ -363,17 +292,6 @@ def clone_item_from_save(
     slot_no: int = 200,
     target_abs: int = 0,
 ) -> bytearray:
-    """Clone an existing item from the save blob and patch it.
-
-    Args:
-        blob: Original decompressed blob
-        item_element: GenericFieldValue of the source item (from tree parser)
-        item_key: Target item key
-        item_no: New unique itemNo
-        stack_count: Stack count
-        slot_no: Slot number
-        target_abs: Where this item will be placed in the blob
-    """
     item = bytearray(blob[item_element.start_offset:item_element.end_offset])
     item_size = len(item)
     po_shift = target_abs - item_element.start_offset
@@ -414,18 +332,6 @@ def _rebuild_element_with_item(
     new_item: bytearray,
     ts_array_field=None,
 ) -> Tuple[bytearray, int]:
-    """Rebuild an element with a new item inserted into its item list.
-
-    Args:
-        blob: Original blob bytes
-        element: GenericFieldValue of the container element (store or inventory bag)
-        item_list_field: The _itemList or _storeSoldItemDataList field
-        new_item: Patched item binary to insert
-        ts_array_field: Optional _itemSoldFieldTimeRawList (for store insertion)
-
-    Returns:
-        (new_element_bytes, growth)
-    """
     e_start = element.start_offset
     e_end = element.end_offset
     e_raw = bytearray(blob[e_start:e_end])
@@ -471,12 +377,6 @@ def _rebuild_element_with_item(
 
 
 def _is_real_po(sentinel_abs: int, po_value: int) -> bool:
-    """Check if a sentinel+PO pair is a real payload_offset.
-
-    A real PO always points to the byte immediately after itself:
-    [sentinel(8)][PO(4)][payload...] — PO value == sentinel_abs + 12.
-    Allow small slack for nested structures.
-    """
     expected = sentinel_abs + 12
     return po_value == expected
 
@@ -489,15 +389,6 @@ def _fixup_external(
     element_end: int,
     growth: int,
 ) -> int:
-    """Fix all payload_offsets in blocks outside the modified element.
-
-    Uses sentinel scanning with strict validation: only fixes POs where
-    the value points to sentinel_position + 12 (the real PO pattern).
-    This prevents false matches on UUIDs, timestamps, and other data
-    that happens to contain 0xFFFFFFFF patterns.
-
-    Returns number of POs fixed.
-    """
     import parc_serializer as ps
 
     target_block_end = parc.toc_entries[target_block_toc_idx].data_offset + \
@@ -569,17 +460,6 @@ def _fixup_trailing_sizes(
     growth: int,
     block_class_name: str,
 ) -> int:
-    """Fix trailing_size u32 values in all parent objects that contain the insertion point.
-
-    When inserting N bytes inside a nested object, every enclosing object's
-    trailing_size must increase by N. The trailing_size is the u32 at the
-    END of each inline object: value = (end_position - payload_start).
-
-    Uses the full tree parser to find all objects whose range contains
-    the insertion point, then increments their trailing_size by `growth`.
-
-    Returns number of trailing_sizes fixed.
-    """
     import save_parser as sp
 
     result = sp.build_result_from_raw(orig_blob, {'input_kind': 'raw_blob'})
@@ -635,16 +515,6 @@ def verify_runtime(
     target_toc_idx: int,
     expected_block_size: int,
 ) -> Tuple[bool, str]:
-    """Fast runtime verification — checks the specific bytes we wrote.
-
-    No tree parsing needed. Instant. Verifies:
-    1. The inserted item bytes are at the right position
-    2. The list count was incremented
-    3. The TOC block size was updated
-    4. The blob is parseable (basic header check)
-
-    Returns (success, message).
-    """
     issues = []
 
     actual_item = blob[insert_abs:insert_abs + item_size]
@@ -674,10 +544,6 @@ def verify_runtime(
 
 def verify_tree(orig_blob: bytes, mod_blob: bytes,
                 expected_list_field: str = '_itemList') -> Tuple[bool, str]:
-    """Full tree verification — SLOW but thorough. Use verify_runtime for fast checks.
-
-    Returns (success, message).
-    """
     try:
         orig_result = _parse_tree(orig_blob)
         mod_result = _parse_tree(mod_blob)
@@ -720,16 +586,6 @@ def insert_items_batch(
     items: List[Tuple[int, int, int]],
     bag_key: int = 2,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert multiple items in one pass — much faster than calling insert_item_to_inventory repeatedly.
-
-    Args:
-        blob: Decompressed save blob
-        items: List of (item_key, stack_count, slot_no) tuples
-        bag_key: Inventory category
-
-    Returns:
-        (success, modified_blob, message)
-    """
     if not items:
         return False, blob, "No items to insert"
 
@@ -765,19 +621,6 @@ def insert_item_to_inventory(
     template_key: int = -1,
     skip_verify: bool = False,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert an item into the player's inventory using CLEAN SPLICE approach.
-
-    Uses the same proven PO fixup pattern as complete_mission_entry:
-    1. Find exact insertion point (after last item in bag)
-    2. Clean splice: blob[insert_pos:insert_pos] = new_item
-    3. Increment item list count
-    4. Full-blob validated sentinel scan for PO fixup (proven working)
-    5. Fix trailing sizes and TOC
-    6. Byte-level + tree verification
-
-    Returns:
-        (success, modified_blob, message)
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
     import parc_serializer as _ps
@@ -1023,18 +866,6 @@ def insert_item_to_store(
     store_index: int = -1,
     template_key: int = -1,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert an item into a vendor's buyback list.
-
-    Args:
-        blob: Decompressed save blob
-        item_key: Item key to insert
-        stack_count: Stack count
-        store_index: Index of store in _storeDataList (-1 = first store with sold items)
-        template_key: Template source (-1 = clone from existing sold item)
-
-    Returns:
-        (success, modified_blob, message)
-    """
     orig_blob = bytes(blob)
     result = _parse_tree(orig_blob)
 
@@ -1142,19 +973,6 @@ def clone_block_section(
     source_blob: bytes,
     block_class_name: str,
 ) -> Tuple[bool, bytearray, str]:
-    """Clone an entire block from a source save into the target save.
-
-    Replaces the target's block with the source's block, adjusting all
-    internal payload_offsets and external references.
-
-    Args:
-        target_blob: Target save decompressed blob (modified in place)
-        source_blob: Source save decompressed blob
-        block_class_name: Class name of the block to transplant (e.g. 'MercenaryClanSaveData')
-
-    Returns:
-        (success, modified_blob, message)
-    """
     import parc_serializer as ps
 
     orig_target = bytes(target_blob)
@@ -1277,10 +1095,6 @@ def clone_block_section(
 
 
 def load_waypoint_templates() -> List[Dict[str, Any]]:
-    """Load the community waypoint template database.
-
-    Returns list of dicts with keys: key, uuid, pos, discovered, binary, mask, size.
-    """
     try:
         db = get_connection()
         return [
@@ -1292,7 +1106,6 @@ def load_waypoint_templates() -> List[Dict[str, Any]]:
 
 
 def _get_user_waypoint_uuids(result: dict) -> set:
-    """Extract all existing waypoint UUIDs from a parsed save."""
     uuids = set()
     obj = _find_block(result, 'DiscoveredLevelGimmickSceneObjectSaveData')
     if not obj:
@@ -1312,20 +1125,6 @@ def insert_waypoints(
     waypoint_entries: List[Dict[str, Any]],
     skip_verify: bool = False,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert missing waypoint entries into DiscoveredLevelGimmickSceneObjectSaveData.
-
-    Each waypoint_entry must have a 'binary' key (hex string) of the raw element bytes,
-    plus 'uuid' (hex string) for deduplication.
-
-    The approach:
-        1. Parse tree, find the gimmick discovery block and its list
-        2. Collect existing UUIDs to skip duplicates
-        3. For each new entry: fix its payload_offset to match insertion point
-        4. Splice all new entries into the list at once
-        5. Fix list count, block trailing_size, external POs, TOC
-
-    Returns (success, modified_blob, message)
-    """
     if not waypoint_entries:
         return False, blob, "No waypoint entries to insert"
 
@@ -1440,7 +1239,6 @@ def insert_waypoints(
 
 
 def _load_community_knowledge_keys() -> List[Dict[str, Any]]:
-    """Load community knowledge keys from crimson_data.db."""
     try:
         db = get_connection()
         return [
@@ -1455,13 +1253,6 @@ def insert_quest_completed(
     blob: bytearray,
     quest_key: int,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert a quest into _questStateList as fully completed (0x1905).
-
-    Clones an existing completed quest entry from the save, patches the key.
-    If no completed entry exists, clones any entry and sets the state.
-
-    Returns (success, modified_blob, message)
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
 
@@ -1582,15 +1373,6 @@ def complete_mission_simple(
     blob: bytearray,
     mission_key: int,
 ) -> Tuple[bool, bytearray, str]:
-    """Complete an existing mission by flipping its state byte to 5.
-
-    NO PARC insertion needed. Just writes one byte.
-    The game computes challenge counters dynamically from state=5 entries.
-    Timestamps are NOT required — 18 quests in game saves have state=5
-    without _completedTime.
-
-    Returns (success, modified_blob, message).
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
 
@@ -1628,23 +1410,6 @@ def complete_mission_entry(
     mission_key: int,
     game_time: int = 0,
 ) -> Tuple[bool, bytearray, str]:
-    """Complete an existing mission by expanding its PARC record.
-
-    LEGACY: This does full PARC insertion to add timestamps.
-    For most missions, use complete_mission_simple() instead — it just
-    flips the state byte without any PARC insertion, which is safer and faster.
-
-    For missions with compact records (1-byte _state, no timestamps),
-    this function:
-      1. Sets _state to 0x05 (completed)
-      2. Sets bits 3+4 in the element bitmask
-      3. Inserts _branchedTime (8B) and _completedTime (8B) into the record
-      4. Fixes all downstream offsets (POs, trailing sizes, TOC)
-
-    If game_time=0, auto-detects from the highest _completedTime in the save.
-
-    Returns (success, modified_blob, message).
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
     import parc_serializer as _ps
@@ -1841,16 +1606,6 @@ def complete_mission_entry(
 
 
 def _compute_dye_mask(entry: dict, is_base: bool) -> int:
-    """Compute the correct mask byte for a dye entry following the golden rule.
-
-    The game ONLY saves channels with non-zero values. Mask bit is SET iff value > 0.
-    Violating this rule crashes the game on load.
-
-    Args:
-        entry: dict with keys r, g, b, a, slot, grime, group, material,
-               and has_grime (bool, whether grime was ever touched)
-        is_base: True for entry 0 (no slotNo field)
-    """
     mask = 0
     if not is_base:
         mask |= 0x01
@@ -1871,10 +1626,6 @@ def _compute_dye_mask(entry: dict, is_base: bool) -> int:
 
 
 def _build_dye_element(entry: dict, is_base: bool, dye_type_index: int) -> bytearray:
-    """Build a single dye compact list element with correct mask.
-
-    Returns the full element bytes (header + reserved + fields + trailing_size).
-    """
     mask = _compute_dye_mask(entry, is_base)
 
     fields = bytearray()
@@ -1914,16 +1665,6 @@ def rebuild_dye_list(
     item_key: int,
     updated_entries: Optional[List[Dict]] = None,
 ) -> Tuple[bool, bytearray, str]:
-    """Rebuild the entire _itemDyeDataList with correct masks for all entries.
-
-    The golden rule: mask bit SET iff value > 0 for R/G/B channels.
-    The game crashes if a mask bit is set but the channel value is 0.
-
-    If updated_entries is provided, uses those values. Otherwise reads from blob.
-    Each entry dict: {slot, r, g, b, a, grime, group, material, has_grime}
-
-    Returns (changed, modified_blob, message).
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
     from parc_inserter2 import parse_and_collect, collect_all_positions
@@ -2128,18 +1869,6 @@ def _splice_socket_elements(
     verb: str,
     save_data: 'SaveData' = None,
 ) -> Tuple[bool, bytearray, str]:
-    """Shared structural-splice engine for fill_socket_slots and clear_socket_slots.
-
-    target_slots:      {slot_idx → caller-specific payload} for slots to transform
-    expected_mask:     mask each target slot must have before transformation
-    build_target_elem: (elem_info, cursor) → bytes for the replacement element
-    valid_count_fn:    (old_val, slot_count) → new _validSocketCount value
-    fn_name:           used in log messages
-    verb:              used in the returned status string ("Filled" / "Cleared")
-    save_data:         optional SaveData carrying a ParseCache; if provided,
-                       the cache is used in place of a full parse_and_collect
-                       call and is updated in-place after the splice succeeds
-    """
     from parc_inserter2 import parse_and_collect
 
     orig_blob = bytes(blob)
@@ -2319,15 +2048,6 @@ def fill_socket_slots(
     endurance_map: Optional[Dict[int, int]] = None,
     save_data: 'SaveData' = None,
 ) -> Tuple[bool, bytearray, str]:
-    """
-    Fill empty socket slots (mask=0x00) with gems via structural PARC splice.
-
-    slot_gem_map:  {0-based slot index → ItemKey hash}
-    endurance:     fallback gem durability for all slots (0xFFFF = permanent/no limit)
-    endurance_map: per-slot override {slot_index → endurance}; takes priority over endurance
-
-    Returns (success, modified_blob, message).
-    """
     _ensure_desktop_path()
 
     def _build_filled(e: dict, cursor: int) -> bytes:
@@ -2362,14 +2082,6 @@ def clear_socket_slots(
     slot_indices: List[int],
     save_data: 'SaveData' = None,
 ) -> Tuple[bool, bytearray, str]:
-    """
-    Remove gems from filled socket slots (mask=0x03) via structural PARC splice.
-
-    Replaces each 32-byte filled element with a 26-byte empty element (mask=0x00).
-    Decrements _validSocketCount by the number of slots cleared.
-
-    Returns (success, modified_blob, message).
-    """
     _ensure_desktop_path()
 
     def _build_empty(e: dict, cursor: int) -> bytes:
@@ -2395,7 +2107,6 @@ def clear_socket_slots(
 
 
 def ensure_dye_full_channels(blob: bytearray, item_key: int) -> Tuple[bool, bytearray, str]:
-    """Alias for rebuild_dye_list — rebuilds dye entries with correct masks."""
     return rebuild_dye_list(blob, item_key)
 
 
@@ -2408,17 +2119,6 @@ def insert_dye_to_item(
     material: int = 1,
     grime: int = 0,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert _itemDyeDataList into an equipped item that has no dye data.
-
-    Follows the same PARC insertion pattern as complete_mission_entry:
-      1. Find the item in EquipmentSaveData._list by item_key
-      2. Set bit 14 in the item's mask (enables _itemDyeDataList)
-      3. Build and splice a dye object list (header + N elements)
-      4. Fix POs, trailing sizes, TOC entries
-      5. Verify with tree re-parse
-
-    Returns (success, modified_blob, message).
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
     import parc_serializer as _ps
@@ -2639,13 +2339,6 @@ def insert_dye_to_item(
 def inject_community_knowledge(
     blob: bytearray,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert community knowledge entries to reveal nexus locations on the map.
-
-    PROVEN WORKING — shows nexus gates as ??? markers.
-    Uses community_knowledge_keys.json (1,350 keys extracted from community save).
-
-    Returns (success, modified_blob, message)
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
 
@@ -2693,13 +2386,6 @@ def inject_community_knowledge(
 def inject_knowledge_locations_only(
     blob: bytearray,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert community knowledge at level=0 — shows ??? markers without unlocking.
-
-    Same as inject_community_knowledge but sets _level=0 so gates appear
-    as undiscovered ??? markers instead of being fully unlocked.
-
-    Returns (success, modified_blob, message)
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
 
@@ -2753,13 +2439,6 @@ def _insert_knowledge_keys(
     existing_count: int,
     override_level: int = -1,
 ) -> Tuple[bool, bytearray, str]:
-    """Shared logic: clone knowledge template and insert entries for given keys.
-
-    Args:
-        override_level: If >= 0, set _level to this value instead of cloning from template.
-                        level=0 or 1 = show as ??? (not fully discovered)
-                        level=2+ = fully discovered/unlocked
-    """
     template_elem = know_field.list_elements[-1]
     tmpl_raw = orig_blob[template_elem.start_offset:template_elem.end_offset]
     tmpl_start = template_elem.start_offset
@@ -2858,11 +2537,6 @@ def inject_knowledge_fast(
     blob: bytearray,
     keys_filter: Optional[List[int]] = None,
 ) -> Tuple[bool, bytearray, str]:
-    """Fast knowledge injection — validated sentinel scan instead of _fixup_external.
-
-    Same logic as inject_all_knowledge but uses O(n) validated sentinel scan
-    on the ORIGINAL blob instead of the slow _fixup_external sentinel scanner.
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
     import parc_serializer as _ps
@@ -3070,7 +2744,6 @@ def inject_knowledge_fast(
 
 
 def _load_all_knowledge_keys() -> List[int]:
-    """Load all knowledge keys from crimson_data.db."""
     try:
         db = get_connection()
         return [row['key'] for row in db.execute("SELECT key FROM knowledge")]
@@ -3082,15 +2755,6 @@ def inject_all_knowledge(
     blob: bytearray,
     keys_filter: Optional[List[int]] = None,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert knowledge entries from game data.
-
-    Args:
-        blob: Save blob to modify
-        keys_filter: If provided, only inject these specific keys.
-                     If None, inject ALL 5,500+ knowledge entries.
-
-    Returns (success, modified_blob, message)
-    """
     _ensure_desktop_path()
     from save_parser import build_result_from_raw as _brfr
 
@@ -3137,7 +2801,6 @@ ABYSS_STATE_HASH = 0x150b14d0
 
 
 def load_abyss_templates() -> List[Dict[str, Any]]:
-    """Load community abyss gate template data from crimson_data.db."""
     try:
         db = get_connection()
         return [
@@ -3149,14 +2812,12 @@ def load_abyss_templates() -> List[Dict[str, Any]]:
 
 
 def _parse_tree_full(blob: bytes) -> dict:
-    """Parse using desktopeditor parser (returns objects with child_fields)."""
     _ensure_desktop_path()
     from save_parser import build_result_from_raw
     return build_result_from_raw(blob, {'input_kind': 'raw_blob'})
 
 
 def _ensure_desktop_path():
-    """Ensure desktopeditor is on sys.path."""
     for sub in ['Includes/desktopeditor', 'desktopeditor']:
         for base in [_MY_DIR, getattr(sys, '_MEIPASS', _MY_DIR)]:
             p = os.path.join(base, sub)
@@ -3168,13 +2829,6 @@ def insert_abyss_gates(
     blob: bytearray,
     community_entries: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[bool, bytearray, str]:
-    """Insert missing abyss gate gimmick entries using clone-from-same-save.
-
-    Requires the save to already have at least one abyss gate with mask db33b0000802.
-    Clones that entry as a template, patches identity fields from community data.
-
-    Returns (success, modified_blob, message)
-    """
     if community_entries is None:
         community_entries = load_abyss_templates()
     if not community_entries:

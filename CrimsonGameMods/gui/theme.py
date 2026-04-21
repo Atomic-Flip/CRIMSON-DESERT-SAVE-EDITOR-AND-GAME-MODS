@@ -1,8 +1,7 @@
-"""Theme constants and application stylesheet for the dark UI."""
 from __future__ import annotations
 import base64 as _b64
 
-COLORS = {
+DARK_COLORS = {
     "bg": "#1a1510",
     "panel": "#272018",
     "header": "#3d2e1a",
@@ -19,6 +18,29 @@ COLORS = {
     "scope_game": "#FFB74D",
 }
 
+LIGHT_COLORS = {
+    "bg": "#f5f5f5",
+    "panel": "#ffffff",
+    "header": "#d8d8d8",
+    "accent": "#8B3A00",        # darker orange so it's readable on white
+    "text": "#111111",
+    "text_dim": "#3d3d3d",       # much darker than before (was #555555)
+    "selected": "#b8d9ff",
+    "border": "#a0a0a0",
+    "input_bg": "#ffffff",
+    "success": "#1b5e20",
+    "warning": "#bf5500",
+    "error": "#b71c1c",
+    "scope_save": "#01579B",
+    "scope_game": "#BF360C",
+}
+
+# Active palette — mutated by apply_theme() so existing `COLORS[...]` reads
+# during runtime pick up the new values after a switch. Widgets that inline-
+# style via COLORS['x'] update on next repaint; widgets baked into the
+# compiled stylesheet update immediately via setStyleSheet().
+COLORS = dict(DARK_COLORS)
+
 CATEGORY_COLORS = {
     "Equipment": "#d4a24e",
     "Material": "#c9b458",
@@ -33,66 +55,78 @@ _TAB_SELECTED_BG = "#2a3040"
 _TAB_SELECTED_COLOR = "#e0eaff"
 _TAB_SELECTED_BORDER = "#70a8ff"
 
-_COMBO_ARROW_URI = "data:image/svg+xml;base64," + _b64.b64encode(
-    b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6">'
-    b'<polygon points="0,0 10,0 5,6" fill="#f0e6d4"/>'
-    b'</svg>'
-).decode()
+_TAB_SELECTED_BG_LIGHT = "#cfe3ff"
+_TAB_SELECTED_COLOR_LIGHT = "#103060"
+_TAB_SELECTED_BORDER_LIGHT = "#2277dd"
 
-DARK_STYLESHEET = f"""
+
+def _combo_arrow_uri(fill: str) -> str:
+    return "data:image/svg+xml;base64," + _b64.b64encode(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6">'
+        f'<polygon points="0,0 10,0 5,6" fill="{fill}"/>'
+        f'</svg>'.encode()
+    ).decode()
+
+
+_COMBO_ARROW_URI = _combo_arrow_uri("#f0e6d4")
+
+
+def build_stylesheet(c: dict, tab_bg: str, tab_color: str, tab_border: str, arrow_fill: str) -> str:
+    arrow = _combo_arrow_uri(arrow_fill)
+    return f"""
 QMainWindow, QWidget {{
-    background-color: {COLORS['bg']};
-    color: {COLORS['text']};
+    background-color: {c['bg']};
+    color: {c['text']};
     font-family: Consolas, 'Courier New', monospace;
     font-size: 13px;
 }}
 QMenuBar {{
-    background-color: {COLORS['header']};
-    color: {COLORS['text']};
-    border-bottom: 1px solid {COLORS['border']};
+    background-color: {c['header']};
+    color: {c['text']};
+    border-bottom: 1px solid {c['border']};
     padding: 2px;
 }}
 QMenuBar::item:selected {{
-    background-color: {COLORS['selected']};
+    background-color: {c['selected']};
 }}
 QMenu {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
+    background-color: {c['panel']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
 }}
 QMenu::item:selected {{
-    background-color: {COLORS['selected']};
+    background-color: {c['selected']};
 }}
 QTabWidget::pane {{
-    border: 1px solid {COLORS['border']};
-    background-color: {COLORS['bg']};
+    border: 1px solid {c['border']};
+    background-color: {c['bg']};
 }}
 QTabBar::tab {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
+    background-color: {c['panel']};
+    color: {c['text']};
     padding: 8px 18px;
     margin-right: 2px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    border: 1px solid {COLORS['border']};
+    border: 1px solid {c['border']};
     border-bottom: none;
 }}
 QTabBar::tab:selected {{
-    background-color: {_TAB_SELECTED_BG};
-    color: {_TAB_SELECTED_COLOR};
-    border-bottom: 3px solid {_TAB_SELECTED_BORDER};
+    background-color: {tab_bg};
+    color: {tab_color};
+    border-bottom: 3px solid {tab_border};
     font-weight: bold;
 }}
 QTabBar::tab:hover {{
-    background-color: {COLORS['selected']};
+    background-color: {c['selected']};
 }}
 QTableWidget {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
-    gridline-color: {COLORS['border']};
-    selection-background-color: {COLORS['selected']};
+    background-color: {c['panel']};
+    color: {c['text']};
+    gridline-color: {c['border']};
+    selection-background-color: {c['selected']};
     selection-color: white;
-    border: 1px solid {COLORS['border']};
+    border: 1px solid {c['border']};
     font-family: Consolas, monospace;
     font-size: 12px;
 }}
@@ -100,64 +134,64 @@ QTableWidget::item {{
     padding: 3px 6px;
 }}
 QHeaderView::section {{
-    background-color: {COLORS['header']};
-    color: {COLORS['text']};
+    background-color: {c['header']};
+    color: {c['text']};
     padding: 5px 8px;
-    border: 1px solid {COLORS['border']};
+    border: 1px solid {c['border']};
     font-weight: bold;
 }}
 QPushButton {{
-    background-color: {COLORS['header']};
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
+    background-color: {c['header']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
     padding: 6px 16px;
     border-radius: 3px;
     font-weight: bold;
 }}
 QPushButton:hover {{
-    background-color: {COLORS['selected']};
-    border-color: {COLORS['accent']};
+    background-color: {c['selected']};
+    border-color: {c['accent']};
 }}
 QPushButton:pressed {{
-    background-color: {COLORS['accent']};
+    background-color: {c['accent']};
 }}
 QPushButton#accentBtn {{
-    background-color: {COLORS['accent']};
+    background-color: {c['accent']};
     color: white;
 }}
 QPushButton#accentBtn:hover {{
     background-color: #e8b85e;
 }}
 QLineEdit, QSpinBox, QComboBox {{
-    background-color: {COLORS['input_bg']};
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
+    background-color: {c['input_bg']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
     padding: 5px 8px;
     border-radius: 3px;
 }}
 QLineEdit:focus, QSpinBox:focus, QComboBox:focus {{
-    border-color: {COLORS['accent']};
+    border-color: {c['accent']};
 }}
 QComboBox::drop-down {{
     border: none;
-    border-left: 1px solid {COLORS['border']};
-    background-color: {COLORS['header']};
+    border-left: 1px solid {c['border']};
+    background-color: {c['header']};
     width: 24px;
 }}
 QComboBox::down-arrow {{
-    image: url("{_COMBO_ARROW_URI}");
+    image: url("{arrow}");
     width: 10px;
     height: 6px;
 }}
 QComboBox QAbstractItemView {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
-    selection-background-color: {COLORS['selected']};
-    border: 1px solid {COLORS['border']};
+    background-color: {c['panel']};
+    color: {c['text']};
+    selection-background-color: {c['selected']};
+    border: 1px solid {c['border']};
 }}
 QGroupBox {{
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
     border-radius: 4px;
     margin-top: 10px;
     padding-top: 14px;
@@ -169,28 +203,28 @@ QGroupBox::title {{
     padding: 0 5px;
 }}
 QStatusBar {{
-    background-color: {COLORS['header']};
-    color: {COLORS['text']};
-    border-top: 1px solid {COLORS['border']};
+    background-color: {c['header']};
+    color: {c['text']};
+    border-top: 1px solid {c['border']};
 }}
 QListWidget {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
-    selection-background-color: {COLORS['selected']};
+    background-color: {c['panel']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
+    selection-background-color: {c['selected']};
 }}
 QTextEdit {{
-    background-color: {COLORS['panel']};
-    color: {COLORS['text']};
-    border: 1px solid {COLORS['border']};
+    background-color: {c['panel']};
+    color: {c['text']};
+    border: 1px solid {c['border']};
 }}
 QScrollBar:vertical {{
-    background-color: {COLORS['bg']};
+    background-color: {c['bg']};
     width: 12px;
     border: none;
 }}
 QScrollBar::handle:vertical {{
-    background-color: {COLORS['border']};
+    background-color: {c['border']};
     border-radius: 4px;
     min-height: 30px;
 }}
@@ -198,12 +232,12 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
     height: 0px;
 }}
 QScrollBar:horizontal {{
-    background-color: {COLORS['bg']};
+    background-color: {c['bg']};
     height: 12px;
     border: none;
 }}
 QScrollBar::handle:horizontal {{
-    background-color: {COLORS['border']};
+    background-color: {c['border']};
     border-radius: 4px;
     min-width: 30px;
 }}
@@ -211,7 +245,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
     width: 0px;
 }}
 QCheckBox {{
-    color: {COLORS['text']};
+    color: {c['text']};
     spacing: 6px;
 }}
 QCheckBox::indicator {{
@@ -221,8 +255,8 @@ QCheckBox::indicator {{
 
 /* ── Resize handles: visible bars so users know what's draggable ── */
 QSplitter::handle {{
-    background-color: {COLORS['border']};
-    border: 1px solid {COLORS['accent']};
+    background-color: {c['border']};
+    border: 1px solid {c['accent']};
 }}
 QSplitter::handle:horizontal {{
     width: 6px;
@@ -235,30 +269,52 @@ QSplitter::handle:vertical {{
     border-radius: 2px;
 }}
 QSplitter::handle:hover {{
-    background-color: {COLORS['accent']};
-    border-color: {COLORS['text']};
+    background-color: {c['accent']};
+    border-color: {c['text']};
 }}
 QSplitter::handle:pressed {{
-    background-color: {COLORS['scope_save']};
+    background-color: {c['scope_save']};
 }}
 
 /* Dock separators (between dock widgets and the central widget) */
 QMainWindow::separator {{
-    background-color: {COLORS['border']};
+    background-color: {c['border']};
     width: 5px;
     height: 5px;
 }}
 QMainWindow::separator:hover {{
-    background-color: {COLORS['accent']};
+    background-color: {c['accent']};
 }}
 
 QDockWidget {{
-    border: 1px solid {COLORS['border']};
+    border: 1px solid {c['border']};
 }}
 QDockWidget::title {{
-    background: {COLORS['header']};
-    color: {COLORS['text']};
+    background: {c['header']};
+    color: {c['text']};
     padding: 4px 8px;
-    border-bottom: 2px solid {COLORS['accent']};
+    border-bottom: 2px solid {c['accent']};
 }}
 """
+
+DARK_STYLESHEET = build_stylesheet(
+    DARK_COLORS, _TAB_SELECTED_BG, _TAB_SELECTED_COLOR,
+    _TAB_SELECTED_BORDER, '#f0e6d4')
+
+LIGHT_STYLESHEET = build_stylesheet(
+    LIGHT_COLORS, _TAB_SELECTED_BG_LIGHT, _TAB_SELECTED_COLOR_LIGHT,
+    _TAB_SELECTED_BORDER_LIGHT, '#333333')
+
+
+def apply_theme(app, mode: str) -> str:
+    """Apply dark or light theme to the QApplication. Also mutates the
+    module-level COLORS dict so widgets that read it during rebuild pick up
+    the new palette on next repaint. Returns the stylesheet applied."""
+    global COLORS
+    if mode == 'light':
+        COLORS.update(LIGHT_COLORS)
+        app.setStyleSheet(LIGHT_STYLESHEET)
+        return LIGHT_STYLESHEET
+    COLORS.update(DARK_COLORS)
+    app.setStyleSheet(DARK_STYLESHEET)
+    return DARK_STYLESHEET

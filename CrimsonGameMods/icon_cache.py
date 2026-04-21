@@ -1,10 +1,3 @@
-"""
-Icon cache for Crimson Desert Save Editor.
-
-Loads item icons from local icons_local/ folder (WebP, 256x256).
-On first use, downloads icons from GitHub on demand.
-Skips files already on disk — never re-downloads.
-"""
 from __future__ import annotations
 
 import logging
@@ -33,7 +26,6 @@ def _get_local_icons_dir():
 
 
 class IconCache:
-    """Downloads and caches item icons as QPixmaps."""
 
     def __init__(self, icon_urls_path: Optional[str] = None):
         self._pixmaps: Dict[int, QPixmap] = {}
@@ -43,13 +35,11 @@ class IconCache:
         os.makedirs(self._local_dir, exist_ok=True)
 
     def has_icon(self, item_key: int) -> bool:
-        """Check if an icon is available (local or GitHub)."""
         if os.path.isfile(os.path.join(self._local_dir, f"{item_key}.webp")):
             return True
         return True
 
     def get_pixmap(self, item_key: int) -> Optional[QPixmap]:
-        """Get a cached QPixmap for the item key, or None if not yet available."""
         if item_key in self._pixmaps:
             return self._pixmaps[item_key]
 
@@ -63,7 +53,6 @@ class IconCache:
         return None
 
     def request_icon(self, item_key: int, callback: Callable[[int, QPixmap], None]) -> None:
-        """Request an icon download in background. Skips if already on disk."""
         if item_key in self._pixmaps:
             callback(item_key, self._pixmaps[item_key])
             return
@@ -90,7 +79,6 @@ class IconCache:
         thread.start()
 
     def download_icon_sync(self, item_key: int) -> Optional[QPixmap]:
-        """Load icon from local or download synchronously."""
         if item_key in self._pixmaps:
             return self._pixmaps[item_key]
 
@@ -120,7 +108,6 @@ class IconCache:
         return None
 
     def _download_icon(self, item_key: int, url: str, callback) -> None:
-        """Download an icon from GitHub and save to icons_local/ (background thread)."""
         local_path = os.path.join(self._local_dir, f"{item_key}.webp")
 
         if os.path.isfile(local_path):
@@ -163,17 +150,11 @@ class IconCache:
                 self._pending.discard(item_key)
 
     def preload_keys(self, keys: list, callback: Callable[[int, QPixmap], None]) -> None:
-        """Preload icons for a list of item keys in background."""
         for key in keys:
             if key not in self._pixmaps:
                 self.request_icon(key, callback)
 
     def bulk_download_all(self, progress_callback=None) -> dict:
-        """Download ALL icon folders from GitHub in background.
-
-        Downloads icons_local/ (items) and icons_mercenary/ (mount portraits).
-        Skips files already on disk. Returns {downloaded, skipped, errors}.
-        """
         from urllib.request import urlopen, Request
         import json as _json
 
@@ -229,7 +210,6 @@ class IconCache:
         return stats
 
     def get_merc_pixmap(self, char_key: int) -> Optional[QPixmap]:
-        """Get a mercenary portrait QPixmap by charKey."""
         cache_key = f"merc_{char_key}"
         if cache_key in self._pixmaps:
             return self._pixmaps[cache_key]
@@ -245,7 +225,6 @@ class IconCache:
 
     @property
     def coverage(self) -> int:
-        """Number of locally cached icons."""
         try:
             return len([f for f in os.listdir(self._local_dir) if f.endswith('.webp')])
         except Exception:

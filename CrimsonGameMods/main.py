@@ -1,26 +1,12 @@
-#!/usr/bin/env python3
-"""
-Crimson Desert - Offline Save Editor
-=====================================
-PySide6 GUI for decrypting, viewing, editing, and re-encrypting
-Crimson Desert save files.
-
-Crypto pipeline:
-  ChaCha20 (RFC 7539) + HMAC-SHA256 + LZ4 block compression
-
-Usage:
-  python main.py
-  python main.py <path_to_save.save>
-"""
 import sys
 import os
 
 
 def _splash(text: str) -> None:
-    """Update the PyInstaller splash status line. No-op outside frozen builds."""
     try:
         import pyi_splash
-        pyi_splash.update_text(text)
+        ver = globals().get('_APP_VER', '?')
+        pyi_splash.update_text(f"v{ver} — {text}" if ver != '?' else text)
     except Exception:
         pass
 
@@ -44,6 +30,10 @@ def _splash_close() -> None:
         pass
 
 
+try:
+    from updater import APP_VERSION as _APP_VER
+except Exception:
+    _APP_VER = "?"
 _splash("Starting up...")
 
 def _setup_file_logging() -> None:
@@ -116,7 +106,6 @@ _CJK_FONT_STACK = [
 
 
 def _editor_config_path() -> str:
-    """Resolve editor_config.json relative to the exe/script."""
     base = (
         os.path.dirname(os.path.abspath(sys.executable))
         if getattr(sys, "frozen", False)
@@ -130,16 +119,6 @@ def _editor_config_path() -> str:
 
 
 def _compute_startup_language() -> str:
-    """Determine startup language from editor_config.json.
-
-    Returns the stored ``default_lang`` (or the legacy ``language`` key).
-    If neither is present, returns ``"en"`` and sets the i18n
-    ``_needs_language_picker`` flag so MainWindow pops the picker after show().
-
-    Note: OS-locale auto-detection is intentionally NOT done here. The user
-    now gets a first-run picker on fresh installs, making guessing unnecessary
-    (and making translations that never appear impossible).
-    """
     try:
         from gui_i18n import compute_startup_language as _compute
         return _compute(_editor_config_path())
@@ -149,12 +128,6 @@ def _compute_startup_language() -> str:
 
 
 def _autodetect_locale_if_unset() -> None:
-    """If editor_config.json has no explicit 'language' key, set one from OS locale.
-
-    We only write the detected language into the live localization module — we do
-    NOT persist it to config. That way if the user later changes OS locale, we
-    auto-follow. An explicit user choice in Settings overrides this.
-    """
     try:
         try:
             from gui_i18n import current_language

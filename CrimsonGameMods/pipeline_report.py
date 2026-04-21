@@ -1,18 +1,3 @@
-"""Step-by-step pipeline recorder + post-apply verifier for ItemBuffs exports.
-
-Usage from gui.py:
-
-    from pipeline_report import PipelineReport
-    rpt = PipelineReport()
-    rpt.stage("extract", f"raw iteminfo {len(raw)} bytes")
-    ...
-    rpt.stage("rust serialize", f"{len(final_data)} bytes")
-    rpt.expect("max_stacks", target=9999, items=[1001198, 1003225])
-    rpt.expect("cooldown", {item_key: new_val_sec for ...})
-    rpt.expect("transmog", [{'tgt_key': ..., 'src_hash': ...}, ...])
-    rpt.verify(final_data)
-    rpt.write()
-"""
 from __future__ import annotations
 
 import datetime
@@ -46,7 +31,6 @@ class PipelineReport:
         self._lines.append(f"{tag}: {detail}" if detail else tag)
 
     def expect(self, kind: str, data: Any) -> None:
-        """Record what we *intended* to apply — verified later against the blob."""
         self._expected[kind] = data
         self._lines.append(f"[EXPECT] {kind}: {self._summarize(data)}")
 
@@ -59,11 +43,6 @@ class PipelineReport:
         return repr(data)
 
     def verify(self, final_data: bytes, rust_items_final: list | None = None) -> None:
-        """Re-parse final blob and assert each expected change is actually present.
-
-        rust_items_final: optional pre-parsed rust dicts for the final blob.
-                          If None, we parse via crimson_rs lazily.
-        """
         import crimson_rs
 
         final_bytes = bytes(final_data)
@@ -90,7 +69,6 @@ class PipelineReport:
 
     def _verify_rust_dict(self, kind: str, field: str, by_key: dict,
                            expected_override: int | None = None) -> None:
-        """Check a scalar field across a set of items. kind: 'max_stacks', etc."""
         spec = self._expected.get(kind)
         if spec is None:
             return
@@ -124,7 +102,6 @@ class PipelineReport:
                  + (f" samples={bad_samples}" if bad_samples else ""))
 
     def _verify_buffs(self, by_key: dict) -> None:
-        """Spot-check that edited items actually have the equip_buffs we set."""
         spec = self._expected.get('buffs')
         if not spec:
             return
@@ -199,7 +176,6 @@ class PipelineReport:
                  + (f" samples(tgt_key,expected,actual)={bad_samples}" if bad_samples else ""))
 
     def write(self) -> str:
-        """Append report to logs.txt. Returns the path written to."""
         try:
             with open(self._log_path, "a", encoding="utf-8") as f:
                 f.write("\n".join(self._lines) + "\n")

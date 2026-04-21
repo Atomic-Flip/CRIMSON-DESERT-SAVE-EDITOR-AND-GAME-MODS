@@ -1,8 +1,3 @@
-"""
-Equipment Set system for Crimson Desert Save Editor.
-Sets are sharable collections of stat modifications (ItemBuffs presets) that can be
-applied to items in iteminfo.pabgb. Hosted on GitHub for community sharing.
-"""
 from __future__ import annotations
 
 import json
@@ -22,7 +17,6 @@ SETS_BASE_URL = f"https://raw.githubusercontent.com/{SETS_REPO}/{SETS_BRANCH}/{S
 
 @dataclass
 class StatOperation:
-    """A single stat modification to apply to an item."""
     stat_name: str
     stat_hash: int
     size_class: str
@@ -56,7 +50,6 @@ class StatOperation:
 
 @dataclass
 class SetItem:
-    """An item in the set with its intended stat operations."""
     item_key: int
     item_name: str = ""
     operations: List[StatOperation] = field(default_factory=list)
@@ -79,7 +72,6 @@ class SetItem:
 
 @dataclass
 class EquipmentSet:
-    """A sharable collection of stat modifications for multiple items."""
     name: str = ""
     author: str = ""
     description: str = ""
@@ -113,7 +105,6 @@ class EquipmentSet:
 
 @dataclass
 class SetIndexEntry:
-    """Entry in the community set index."""
     filename: str
     name: str
     author: str
@@ -123,7 +114,6 @@ class SetIndexEntry:
 
 
 class SetManager:
-    """Manages local and remote equipment sets."""
 
     def __init__(self, local_dir: str = ""):
         import sys
@@ -140,7 +130,6 @@ class SetManager:
 
 
     def scan_local(self) -> List[EquipmentSet]:
-        """Scan local sets directory for .json files."""
         self._local_sets = []
         if not os.path.isdir(self.local_dir):
             return []
@@ -159,7 +148,6 @@ class SetManager:
         return self._local_sets
 
     def save_set(self, es: EquipmentSet, filename: str = "") -> str:
-        """Save a set to local directory. Returns the file path."""
         if not filename:
             safe_name = "".join(c if c.isalnum() or c in "._- " else "_" for c in es.name)
             safe_name = safe_name.strip().replace(" ", "_").lower()
@@ -176,7 +164,6 @@ class SetManager:
         return path
 
     def delete_set(self, filename: str) -> bool:
-        """Delete a local set file."""
         path = os.path.join(self.local_dir, filename)
         if os.path.isfile(path):
             os.remove(path)
@@ -184,7 +171,6 @@ class SetManager:
         return False
 
     def load_set_file(self, path: str) -> Optional[EquipmentSet]:
-        """Load a set from any path."""
         try:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -194,7 +180,6 @@ class SetManager:
 
 
     def fetch_remote_index(self) -> tuple[bool, str]:
-        """Fetch the set index from GitHub. Returns (success, message)."""
         try:
             req = Request(SETS_INDEX_URL, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
             with urlopen(req, timeout=15) as resp:
@@ -219,7 +204,6 @@ class SetManager:
         return self._remote_index
 
     def download_set(self, filename: str) -> tuple[Optional[EquipmentSet], str]:
-        """Download a specific set from GitHub. Returns (set, message)."""
         url = SETS_BASE_URL + filename
         try:
             req = Request(url, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
@@ -234,11 +218,9 @@ class SetManager:
 
 
     def export_set_json(self, es: EquipmentSet) -> str:
-        """Export set as formatted JSON string."""
         return json.dumps(es.to_dict(), indent=2, ensure_ascii=False)
 
     def generate_index_entry(self, es: EquipmentSet) -> dict:
-        """Generate an index.json entry for this set."""
         return {
             "filename": es.filename,
             "name": es.name,

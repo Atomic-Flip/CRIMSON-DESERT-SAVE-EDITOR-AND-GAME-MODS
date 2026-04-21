@@ -1,8 +1,3 @@
-"""
-Item name database for Crimson Desert save editor.
-Loads from crimson_data.db (SQLite). Falls back to a GitHub download when the
-database has no items (e.g., first run before build_db.py).
-"""
 from __future__ import annotations
 
 import json
@@ -23,7 +18,6 @@ GITHUB_URL = (
 
 
 class ItemNameDB:
-    """Item name and category database backed by crimson_data.db."""
 
     def __init__(self) -> None:
         self.items: Dict[int, ItemInfo] = {}
@@ -32,7 +26,6 @@ class ItemNameDB:
         self.load_auto()
 
     def load_auto(self) -> str:
-        """Load from SQLite. If empty, attempt a GitHub download."""
         self.load()
         if self.items:
             return self.loaded_path
@@ -47,7 +40,6 @@ class ItemNameDB:
         return ""
 
     def load(self) -> None:
-        """Load item names from crimson_data.db."""
         self.items.clear()
         self.version = 0
         try:
@@ -70,7 +62,6 @@ class ItemNameDB:
             log.warning("SQLite item load failed: %s", exc)
 
     def save(self) -> None:
-        """Persist current items dict to crimson_data.db via INSERT OR REPLACE."""
         if not self.items:
             return
         rows = [
@@ -96,8 +87,6 @@ class ItemNameDB:
             log.warning("SQLite item save failed: %s", exc)
 
     def apply_localization(self) -> int:
-        """Override item names with localized versions from the active language pack.
-        Returns the number of items translated."""
         try:
             from localization import get_language, _names_data
             if get_language() == "en" or not _names_data:
@@ -116,19 +105,16 @@ class ItemNameDB:
             return 0
 
     def get_name(self, key: int) -> str:
-        """Get display name for an item key."""
         info = self.items.get(key)
         if info and info.name:
             return info.name
         return f"Unknown ({key})"
 
     def get_category(self, key: int) -> str:
-        """Get category for an item key."""
         info = self.items.get(key)
         return info.category if info else "Misc"
 
     def rename_item(self, key: int, new_name: str) -> None:
-        """Rename an item in the database."""
         if key in self.items:
             self.items[key].name = new_name
         else:
@@ -139,16 +125,13 @@ class ItemNameDB:
             )
 
     def get_all_sorted(self) -> List[ItemInfo]:
-        """Get all items sorted by key."""
         return [self.items[k] for k in sorted(self.items.keys())]
 
     def get_internal_name(self, key: int) -> str:
-        """Get internal name for an item key."""
         info = self.items.get(key)
         return info.internal_name if info else ""
 
     def search(self, query: str) -> List[ItemInfo]:
-        """Search items by name, internal name, or key (partial match)."""
         query_lower = query.lower().strip()
         if not query_lower:
             return self.get_all_sorted()
@@ -165,10 +148,6 @@ class ItemNameDB:
         return results
 
     def sync_from_github(self) -> tuple[bool, str]:
-        """Download latest item_names.json from GitHub and merge into items + SQLite.
-
-        Returns (success, message).
-        """
         try:
             req = Request(GITHUB_URL, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
             with urlopen(req, timeout=10) as resp:

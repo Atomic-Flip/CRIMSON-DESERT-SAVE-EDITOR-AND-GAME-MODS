@@ -1,45 +1,3 @@
-"""
-factionnode.pabgb parser — finds _needOperatorMaxCount for ALL schedules.
-
-Field layout determined by:
-1. IDA decompile of sub_14103DFA0 (FactionScheduleInfo reader) for field ORDER
-2. Runtime hook confirmation that maxOp=4 for HernandCastle at struct offset +84
-3. Empirical binary scan showing maxOp at TypeArray_end + 12 (3 empty u32 counts)
-
-NOTE: IDA decompile (possibly from older build) shows PlayList has trailing fields
-(enum2B + enum2B + u8), but current game binary does NOT include these when count=0.
-The empirical approach uses data-driven field sizes confirmed across 700+ entries.
-
-Schedule field sequence (32 fields from IDA, regrouped empirically):
-  Group 1 - Parsed fields:
-    1.  u8          _scheduleType
-    2.  TypeArray   u32 count + per elem: 22B + u32 inner_count + inner_count*6B
-    3.  u32         count_A (PlayList byte count, usually 0)
-    4.  u32         count_B (CArray count, usually 0)
-    5.  u32         _periodTimeInSecond
-    6.  u32         _needOperatorMaxCount       <-- TARGET
-    7.  u32         _maxCombatPower
-    8.  u8          field
-    9.  u8          field
-
-  Group 2 - Variable-length tail (parse to find next schedule):
-    10. u32         key (lookup)
-    11. CString     u32 len + bytes
-    12. LocStr      u8 + u64 + CString(u32 len + bytes)
-    13. Array       u32 count + count*24B
-    14-17. 4x enum2B (8B total)
-    18. u32         key (lookup)
-    19. CString     u32 len + bytes
-    20. u32         _needOperatorMinCount
-    21-23. 3x u32   (12B)
-    24. Blob        u32 len + bytes
-    25-26. 2x enum2B (4B)
-    27. u64         (8B)
-    28. 12B         position (XYZ)
-    29. Array5B     u32 count + count*5B
-    30. Array10B    u32 count + count*10B
-    31. u8          field
-"""
 import struct
 import sys
 import json
@@ -49,12 +7,10 @@ def _read_u32(D, p):
     return struct.unpack_from('<I', D, p)[0], p + 4
 
 def _read_cstring_skip(D, p):
-    """Skip CString: u32 len + bytes. Returns new position."""
     slen = struct.unpack_from('<I', D, p)[0]
     return p + 4 + slen
 
 def _read_locstr_skip(D, p):
-    """Skip LocalizableString: u8 + u64 + CString."""
     p += 1
     p += 8
     return _read_cstring_skip(D, p)
@@ -110,7 +66,6 @@ def parse_operator_counts(pabgb_path, pabgh_path):
 
 
 def _parse_entry_header(D, eoff, end):
-    """Parse FactionNodeInfo header. Returns (sched_start, sched_count) or (-1, 0)."""
     p = eoff
     p += 4
     slen = struct.unpack_from('<I', D, p)[0]
@@ -141,8 +96,6 @@ def _parse_entry_header(D, eoff, end):
 
 
 def _parse_type_array(D, p):
-    """Parse TypeArray: u32 count + elements(22B + u32 inner_count + inner*6B).
-    Returns new position or -1."""
     tc, p = _read_u32(D, p)
     if tc > 100:
         return -1
@@ -156,8 +109,6 @@ def _parse_type_array(D, p):
 
 
 def _parse_schedule_head(D, p, end):
-    """Parse the CONFIRMED head fields of a FactionScheduleInfo.
-    Returns dict with target fields + head_end position, or None."""
     if p + 20 > end:
         return None
 
@@ -207,33 +158,6 @@ def _parse_schedule_head(D, p, end):
 
 
 def _parse_schedule_tail(D, p, end):
-    """Parse the tail of a FactionScheduleInfo to find the next schedule start.
-
-    Tail field layout (determined empirically 2026-04-07):
-      F10. u32 key (4B)
-      F11. CString (u32 len + bytes, always empty len=0)
-      F12. LocStr: u8(1) + u64(8) + CString(u32 len + bytes)
-      F13. u32 enum/hash (4B, constant 0xA0021021)
-      F14. u8 flag (1B, constant 0x0F)
-      F15. u32 key (4B, variable hash)
-      F16. CString numeric ID (u32 len + bytes)
-      F17. u32 sub_count (4B, usually 3)
-      F18. u32 param (4B, usually 11)
-      F19. sub_count × 22B elements (4×u32 + u16 + u32 each)
-      F20. 5×u32 (20B, usually zeros)
-      F21-23. 3×u32 (12B: field, field, _needOperatorMinCount)
-      F24. u32 key (4B, key for combat CString)
-      F25. CString (u32 len + bytes, usually "Combat")
-      F26. 4×u32 (16B, usually zeros)
-      F27. 12B position (3 floats)
-      F28. Array9B: u32 count + count×9B (enum4B + u8 + enum4B)
-      F29. Array12B: u32 count + count×12B (enum4B + u32 + u32)
-      F30. u8 final (1B)
-
-    Note: enum readers consume 4 bytes from stream (stored as 2B in struct).
-
-    Returns (next_position, min_op_offset, min_op_value) or (-1, -1, -1) on failure.
-    """
     try:
         _, p = _read_u32(D, p)
 
@@ -306,15 +230,6 @@ def _parse_schedule_tail(D, p, end):
 
 
 def _parse_post_schedule_fields(D, p, end):
-    """Parse post-schedule fields to extract workerCount.
-
-    Post-schedule layout (from IDA sub_14103E930):
-      _factionType:          1B (u8)
-      _subInnerTypeString:   Blob (4+len)
-      _workerCount:          1B (u8)
-
-    Returns (worker_count, worker_count_offset) or (-1, -1).
-    """
     try:
         if p + 6 > end:
             return -1, -1
@@ -333,9 +248,6 @@ def _parse_post_schedule_fields(D, p, end):
 
 
 def _parse_all_schedules(D, eoff, end):
-    """Parse all schedules from a factionnode entry.
-    Parses head (target fields) + tail (to advance to next schedule).
-    Also reads post-schedule workerCount."""
     sched_start, sched_count = _parse_entry_header(D, eoff, end)
     if sched_start < 0:
         return [], -1, -1

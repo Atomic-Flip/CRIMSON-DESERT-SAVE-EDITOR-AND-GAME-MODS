@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-"""RegionInfo PABGB Parser — complete field map from IDA decompilation of sub_141053790."""
 
 import struct
 import json
@@ -18,13 +16,9 @@ def parse_pabgh_index(pabgh_data):
     return entries
 
 def parse_entry_header(data, off):
-    """There is NO per-entry name header in RegionInfo PABGB.
-    The _key and _stringKey are regular fields read by the table reader.
-    Data starts directly at the PABGH offset."""
     return None, None, off
 
 def parse_region_entry(data, off, end):
-    """Parse one RegionInfo entry following the IDA-decoded reader order (sub_141053790)."""
     _, _, p = parse_entry_header(data, off)
     result = {}
 

@@ -1,21 +1,3 @@
-"""Localization module for Crimson Desert Save Editor.
-
-Usage:
-    from localization import tr, set_language, get_available_languages
-
-    # In GUI code, replace hardcoded strings:
-    #   QPushButton("Save")       ->  QPushButton(tr("btn.save"))
-    #   QLabel("Inventory")       ->  QLabel(tr("tab.inventory"))
-
-    # Switch language:
-    set_language("ja")
-
-Translation files live in locale/<lang>.json (e.g. locale/en.json, locale/ja.json).
-English is the fallback — any missing key returns the English string.
-
-Community contributors: copy locale/en.json, rename to your language code,
-translate the values (NOT the keys), and drop it in the locale/ folder.
-"""
 
 import json
 import os
@@ -29,7 +11,6 @@ _names_data: dict = {}
 
 
 def _get_locale_dir() -> str:
-    """Return the locale directory path (works in dev and bundled exe)."""
     for base in [
         os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else _MY_DIR,
         getattr(sys, '_MEIPASS', _MY_DIR),
@@ -44,7 +25,6 @@ def _get_locale_dir() -> str:
 
 
 def _load_lang_file(lang: str) -> dict[str, str]:
-    """Load a language JSON file. Checks multiple name variants and locations."""
     variants = [f"{lang}.json"]
     if '_' not in lang and '-' not in lang and len(lang) == 2:
         LOCALE_MAP = {
@@ -76,7 +56,6 @@ def _load_lang_file(lang: str) -> dict[str, str]:
 
 
 def set_language(lang: str) -> None:
-    """Set the active language. Falls back to English for missing keys."""
     global _translations, _fallback, _current_lang, _names_data
     _current_lang = lang
     _fallback = _load_lang_file("en")
@@ -98,19 +77,10 @@ def set_language(lang: str) -> None:
 
 
 def get_language() -> str:
-    """Return the current language code."""
     return _current_lang
 
 
 def tr(key: str, **kwargs) -> str:
-    """Translate a key. Returns English fallback if not found.
-
-    Supports {placeholder} substitution:
-        tr("msg.found_items", count=5)  ->  "Found 5 items"
-
-    If key is not in any translation file, returns the key itself
-    (so untranslated strings show the key name as a hint).
-    """
     text = _translations.get(key) or _fallback.get(key)
     if text is None:
         try:
@@ -127,7 +97,6 @@ def tr(key: str, **kwargs) -> str:
 
 
 def get_available_languages() -> list[tuple[str, str]]:
-    """Return list of (lang_code, display_name) for all available languages."""
     locale_dir = _get_locale_dir()
     languages = []
     LANG_NAMES = {
@@ -186,10 +155,6 @@ def get_available_languages() -> list[tuple[str, str]]:
 
 
 def export_template(output_path: str = None) -> str:
-    """Export the current English strings as a template for translation.
-
-    Returns the output path.
-    """
     if not _fallback:
         set_language("en")
     if output_path is None:
@@ -200,15 +165,6 @@ def export_template(output_path: str = None) -> str:
 
 
 def get_localized_name(db_type: str, key, fallback: str = "") -> str:
-    """Get a localized name for an item/quest/knowledge entry.
-
-    Args:
-        db_type: 'items', 'quests', 'missions', or 'knowledge'
-        key: The entry key (int or str)
-        fallback: English name to return if no translation exists
-
-    Returns translated name, or fallback if not available.
-    """
     if _current_lang == "en" or not _names_data:
         return fallback
 
@@ -218,7 +174,6 @@ def get_localized_name(db_type: str, key, fallback: str = "") -> str:
 
 
 def _load_names_data(lang: str) -> dict:
-    """Load names_<lang>.json if it exists. Checks locale/ and language/ folders."""
     if lang == "en":
         return {}
     filename = f"names_{lang}.json"

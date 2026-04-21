@@ -1,24 +1,3 @@
-#!/usr/bin/env python3
-"""
-strip_comments.py — audit + remove Python line comments from source tree.
-
-Two modes:
-  python tools/strip_comments.py --scan           # list every comment, no edits
-  python tools/strip_comments.py --scan > out.txt
-  python tools/strip_comments.py --strip          # remove comments in place
-  python tools/strip_comments.py --strip --dry-run  # show what would change
-
-Preserved on --strip:
-  * Shebang lines (#!)                  — required by OS
-  * Encoding declarations (# -*- ... *-)— required by Python 2/3 parser on some setups
-  * Type-check hints that affect tooling:
-      # type: ignore, # type: ...        — mypy/pyright semantic
-      # noqa, # pylint:, # pragma:       — linter directives
-  * Docstrings are NOT comments and are NEVER touched.
-
-Run from the project root. Skips: build/, dist/, __pycache__/, .git/, .venv/,
-.hypothesis/, tools/ (this script lives there).
-"""
 from __future__ import annotations
 
 import argparse
@@ -31,7 +10,6 @@ import tokenize
 from pathlib import Path
 from typing import Iterable, Tuple
 
-# Patterns that must be kept even in --strip mode.
 _KEEP_RE = re.compile(
     r"^(\s*)#\s*(!|-\*-|type:\s*(ignore|[\w\[\],\s\.]+)|"
     r"noqa\b|pylint:|pragma:|fmt:\s*(on|off)|mypy:|pyright:|flake8:)",
@@ -41,7 +19,7 @@ _KEEP_RE = re.compile(
 _SKIP_DIRS = {
     "build", "dist", "__pycache__", ".git", ".venv", ".venv_linux",
     ".hypothesis", ".ida-mcp", ".idea", ".vscode", ".claude", "tools",
-    "Includes",   # third-party code, don't touch
+    "Includes",
     "node_modules",
 }
 
@@ -55,17 +33,10 @@ def _iter_py_files(root: Path) -> Iterable[Path]:
 
 
 def _is_protected(line: str) -> bool:
-    """Shebang / encoding / tool directives are protected."""
     return bool(_KEEP_RE.match(line))
 
 
 def _scan_file(path: Path) -> list[Tuple[int, str, str]]:
-    """Return list of (line_no, full_line, comment_text) for every comment.
-
-    A comment is any `#` that appears as a COMMENT token per tokenize — so
-    `#` inside strings is not counted. Shebang / coding / tool-hint lines are
-    flagged separately via `protected=True` in the returned tuple.
-    """
     try:
         src = path.read_bytes()
     except OSError as e:
@@ -87,21 +58,11 @@ def _scan_file(path: Path) -> list[Tuple[int, str, str]]:
 
 
 def _strip_comments_from_source(src: str) -> str:
-    """Return `src` with all non-protected line comments removed.
-
-    Uses tokenize to safely identify COMMENT tokens (respects strings / f-strings).
-    Preserves:
-      * blank lines that remain after comment removal (for structural readability,
-        but collapsing 3+ blank lines in a row into 2)
-      * indentation of any line that still has code on it
-    """
     new_lines = []
-    # Parse once to find comment token positions per line.
     comment_spans: dict[int, list[Tuple[int, int, str]]] = {}
     try:
         tokens = list(tokenize.tokenize(io.BytesIO(src.encode("utf-8")).readline))
     except tokenize.TokenizeError:
-        # Give up — return as-is rather than risk corrupting a file
         return src
 
     for tok in tokens:
@@ -118,22 +79,18 @@ def _strip_comments_from_source(src: str) -> str:
             new_lines.append(line)
             continue
 
-        # If the line's entire non-whitespace is a protected comment, keep as-is.
         stripped = line.lstrip()
         if stripped.startswith("#") and _is_protected(line):
             new_lines.append(line)
             continue
 
-        # Full-line comment (only whitespace before `#`) -> drop the line entirely.
         if stripped.startswith("#"):
-            continue  # skip line
+            continue
 
-        # Inline comment: cut from the first non-protected `#` onward and rstrip trailing ws.
         col = spans[0][0]
         code_part = line[:col].rstrip()
         new_lines.append(code_part)
 
-    # Collapse any run of 3+ blank lines into 2.
     collapsed: list[str] = []
     blank_run = 0
     for ln in new_lines:
@@ -146,7 +103,6 @@ def _strip_comments_from_source(src: str) -> str:
             collapsed.append(ln)
 
     out = "\n".join(collapsed)
-    # Preserve final newline if the original had one.
     if src.endswith("\n") and not out.endswith("\n"):
         out += "\n"
     return out

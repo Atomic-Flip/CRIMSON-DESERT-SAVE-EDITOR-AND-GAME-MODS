@@ -1,16 +1,3 @@
-"""
-World-data tabs: GameDataTab, StoreEditorTab, SpawnTab, DropsetTab,
-PabgbBrowserTab, BackupTab.
-
-  GameDataTab      — PABGB game-data file browser and byte editor
-  StoreEditorTab   — store item list editor (storeinfo.pabgb via StoreInfoParser)
-  SpawnTab         — spawn-pool data editor (factionspawn / terrain data)
-  DropsetTab       — drop-rate editor (dropset data via paz_patcher)
-  PabgbBrowserTab  — raw PABGB binary record browser (experimental)
-  BackupTab        — local save-file backup and restore
-
-Extracted from gui/main_window.py — step 10 of the gui-split refactor.
-"""
 from __future__ import annotations
 
 import datetime
@@ -46,7 +33,6 @@ log = logging.getLogger(__name__)
 
 
 def _is_admin() -> bool:
-    """Check if running with administrator privileges."""
     try:
         import ctypes
         return ctypes.windll.shell32.IsUserAnAdmin() != 0
@@ -55,7 +41,6 @@ def _is_admin() -> bool:
 
 
 class GameDataTab(QWidget):
-    """PABGB game-data file browser and byte editor."""
 
     status_message = Signal(str)
 
@@ -67,11 +52,13 @@ class GameDataTab(QWidget):
         self._build_ui()
 
     def set_game_path(self, path: str) -> None:
-        """Called by MainWindow when the global game path changes."""
         self._game_path = path
 
+    def set_experimental_mode(self, enabled: bool) -> None:
+        if hasattr(self, '_dev_export_btn_gd'):
+            self._dev_export_btn_gd.setVisible(bool(enabled))
+
     def _build_ui(self) -> None:
-        """Build the Game Data Editor tab — browse/edit any PABGB file."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(6)
@@ -184,9 +171,11 @@ class GameDataTab(QWidget):
         apply_row.addWidget(gd_restore_btn)
 
         gd_export_btn = QPushButton(tr("Export Record"))
-        gd_export_btn.setToolTip(tr("Export selected record as hex/binary for analysis"))
+        gd_export_btn.setToolTip(tr("ADVANCED — Export selected record as hex/binary"))
         gd_export_btn.clicked.connect(self._gd_export_record)
+        gd_export_btn.setVisible(False)
         apply_row.addWidget(gd_export_btn)
+        self._dev_export_btn_gd = gd_export_btn
 
         apply_row.addStretch()
         right_layout.addLayout(apply_row)
@@ -221,7 +210,6 @@ class GameDataTab(QWidget):
 
 
     def _gd_load(self) -> None:
-        """Load a PABGB file from the game."""
         game_path = self._game_path.strip() if hasattr(self, '_paz_game_path') else ""
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path using the Browse button at the top."))
@@ -433,7 +421,6 @@ class GameDataTab(QWidget):
             self._gd_status.setText(f"Exported {len(raw)} bytes to {os.path.basename(path)}")
 
     def _gd_batch_multiply_rates(self, multiplier: int) -> None:
-        """Multiply all drop rates in loaded dropsetinfo. multiplier=0 means set to max (100%)."""
         if not self._gd_editor or self._gd_current_file != 'dropsetinfo':
             QMessageBox.information(self, tr("Drop Rates"), tr("Load dropsetinfo first."))
             return
@@ -471,7 +458,6 @@ class GameDataTab(QWidget):
         self._gd_record_selected()
 
     def _gd_batch_zero_cooldowns(self) -> None:
-        """Set all cooldown-like timer values to minimum in loaded skill data."""
         if not self._gd_editor or self._gd_current_file != 'skill':
             QMessageBox.information(self, tr("Cooldowns"), tr("Load skill data first."))
             return
@@ -504,7 +490,6 @@ class GameDataTab(QWidget):
 
 
 class StoreEditorTab(QWidget):
-    """Store item list editor backed by StoreInfoParser / storeinfo.pabgb."""
 
     status_message = Signal(str)
     config_save_requested = Signal()
@@ -530,15 +515,16 @@ class StoreEditorTab(QWidget):
         self._build_ui()
 
     def set_game_path(self, path: str) -> None:
-        """Called by MainWindow when the global game path changes."""
         self._game_path = path
 
+    def set_experimental_mode(self, enabled: bool) -> None:
+        if hasattr(self, '_dev_export_btn_store'):
+            self._dev_export_btn_store.setVisible(bool(enabled))
+
     def set_icons_enabled(self, enabled: bool) -> None:
-        """Called by MainWindow._global_toggle_icons."""
         self._icons_enabled = enabled
 
     def _build_ui(self) -> None:
-        """Build the Store Editor tab — browse and modify vendor inventories."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(8)
@@ -570,9 +556,11 @@ class StoreEditorTab(QWidget):
         top_row.addWidget(import_json_btn)
 
         export_json_btn = QPushButton(tr("Export JSON Patch"))
-        export_json_btn.setToolTip(tr("Export your changes as a shareable JSON patch file"))
+        export_json_btn.setToolTip(tr("ADVANCED — UNSUPPORTED. Export changes as JSON patch."))
         export_json_btn.clicked.connect(self._store_export_json)
+        export_json_btn.setVisible(False)
         top_row.addWidget(export_json_btn)
+        self._dev_export_btn_store = export_json_btn
 
         top_row.addWidget(QLabel(tr("Overlay:")))
         self._store_overlay_spin = QSpinBox()
@@ -710,7 +698,6 @@ class StoreEditorTab(QWidget):
 
 
     def _store_extract(self) -> None:
-        """Load storeinfo from the game using storeinfo_parser."""
         game_path = self._game_path.strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path using the Browse button at the top."))
@@ -753,7 +740,6 @@ class StoreEditorTab(QWidget):
             self._store_changes_label.setText("")
 
     def _store_populate_list(self, filter_text: str = "") -> None:
-        """Populate the store list table."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             return
 
@@ -809,7 +795,6 @@ class StoreEditorTab(QWidget):
         self._store_populate_list(text)
 
     def _store_get_selected_store(self):
-        """Get the currently selected store record."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             return None
         rows = self._store_list.selectionModel().selectedRows()
@@ -821,7 +806,6 @@ class StoreEditorTab(QWidget):
         return self._store_parser_v2.get_store_by_key(key_item.data(Qt.UserRole))
 
     def _store_selected(self, *_args) -> None:
-        """Show items for the selected store with icons, limits, prices."""
         store = self._store_get_selected_store()
         if not store:
             return
@@ -886,7 +870,6 @@ class StoreEditorTab(QWidget):
         self._store_suppress_cell_edit = False
 
     def _store_cell_changed(self, cell) -> None:
-        """Write inline edits on Limit/Buy/Sell columns back into the PABGB body."""
         if getattr(self, '_store_suppress_cell_edit', False):
             return
         col = cell.column()
@@ -945,12 +928,10 @@ class StoreEditorTab(QWidget):
         )
 
     def _store_get_selected_items(self):
-        """Get selected item indices in the current store."""
         rows = set(idx.row() for idx in self._store_items_table.selectedIndexes())
         return sorted(rows)
 
     def _store_swap_item(self) -> None:
-        """Swap selected item(s) via search dialog."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             QMessageBox.warning(self, tr("Stores"), tr("Load store data first."))
             return
@@ -1013,7 +994,6 @@ class StoreEditorTab(QWidget):
             QMessageBox.warning(self, tr("Swap Failed"), tr("Could not swap any items."))
 
     def _store_add_item(self) -> None:
-        """Add a new item to the store by cloning the selected entry."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             QMessageBox.warning(self, tr("Stores"), tr("Load store data first."))
             return
@@ -1057,7 +1037,6 @@ class StoreEditorTab(QWidget):
             QMessageBox.warning(self, tr("Add Failed"), tr("Could not add item."))
 
     def _store_set_limit(self) -> None:
-        """Set purchase limit for selected item(s)."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             return
         store = self._store_get_selected_store()
@@ -1086,7 +1065,6 @@ class StoreEditorTab(QWidget):
             self._store_selected()
 
     def _store_set_all_limits(self) -> None:
-        """Set purchase limit for ALL items in the current store."""
         store = self._store_get_selected_store()
         if not store or not store.is_standard or not store.items:
             QMessageBox.information(self, tr("Set All Limits"), tr("Select a standard store with items first."))
@@ -1112,7 +1090,6 @@ class StoreEditorTab(QWidget):
         self._store_selected()
 
     def _store_import_json(self) -> None:
-        """Import a Pldada-format JSON vendor patch."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             QMessageBox.warning(self, tr("Import"), tr("Load store data first."))
             return
@@ -1172,10 +1149,6 @@ class StoreEditorTab(QWidget):
 
 
     def _store_label_for_offset(self, offset: int) -> str:
-        """Map a body byte offset to a rich community-style label.
-
-        Returns e.g. 'Store_Her_General - Invincible Ring (Limit)'
-        """
         parser = self._store_parser_v2
         for store in parser.stores:
             if not store.is_standard or not store.items:
@@ -1201,7 +1174,6 @@ class StoreEditorTab(QWidget):
         return f"Offset 0x{offset:X}"
 
     def _store_build_changes(self, original: bytes, current: bytes) -> list:
-        """Diff original vs current body and return community-format change list."""
         changes = []
         i = 0
         while i < len(current):
@@ -1221,7 +1193,6 @@ class StoreEditorTab(QWidget):
 
 
     def _store_export_json(self) -> None:
-        """Export changes as a community-compatible JSON patch file."""
         if not hasattr(self, '_store_parser_v2') or not self._store_parser_v2:
             QMessageBox.warning(self, tr("Export"), tr("Load store data first."))
             return
@@ -1276,11 +1247,6 @@ class StoreEditorTab(QWidget):
             f"Share this file — others drop it into NoSEModLoad/Json/.")
 
     def _store_apply(self) -> None:
-        """Apply store changes using crimson_rs.pack_mod (same as ItemBuffs).
-
-        Creates an overlay directory with correct PAZ + PAMT + PAPGT.
-        Original game files are never modified.
-        """
         if not self._store_parser:
             QMessageBox.warning(self, tr("Stores"), tr("Load store data first."))
             return
@@ -1410,7 +1376,6 @@ class StoreEditorTab(QWidget):
                 f"and crimson_rs is available.")
 
     def _store_restore(self) -> None:
-        """Remove store overlay and its PAPGT entry, preserving other overlays."""
         game_path = self._game_path.strip()
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Restore"), tr("Set a valid game path first."))
@@ -1478,7 +1443,6 @@ class StoreEditorTab(QWidget):
 
 
 class SpawnTab(QWidget):
-    """Spawn-pool data editor (factionspawndata / terrain spawn)."""
 
     status_message = Signal(str)
 
@@ -1488,8 +1452,11 @@ class SpawnTab(QWidget):
         self._show_guide_fn = show_guide_fn
         self._build_ui()
 
+    def set_experimental_mode(self, enabled: bool) -> None:
+        if hasattr(self, '_dev_export_btn_spawn'):
+            self._dev_export_btn_spawn.setVisible(bool(enabled))
+
     def _build_ui(self) -> None:
-        """Build the Spawn Editor tab — modify world spawn density."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
         layout.setSpacing(4)
@@ -1510,10 +1477,12 @@ class SpawnTab(QWidget):
         apply_btn.clicked.connect(self._spawn_apply)
         header.addWidget(apply_btn)
 
-        export_btn = QPushButton(tr("Export Mod"))
-        export_btn.setToolTip(tr("Export as CDUMM-compatible mod package"))
-        export_btn.clicked.connect(self._spawn_export_cdumm)
-        header.addWidget(export_btn)
+        spawn_export_btn = QPushButton(tr("Export Mod"))
+        spawn_export_btn.setToolTip(tr("ADVANCED — UNSUPPORTED. Export as CDUMM-compatible mod."))
+        spawn_export_btn.clicked.connect(self._spawn_export_cdumm)
+        spawn_export_btn.setVisible(False)
+        header.addWidget(spawn_export_btn)
+        self._dev_export_btn_spawn = spawn_export_btn
 
         restore_btn = QPushButton(tr("Restore Vanilla"))
         restore_btn.setToolTip(tr("Remove spawn mod and restore original game data"))
@@ -1675,7 +1644,6 @@ class SpawnTab(QWidget):
 
 
     def _spawn_show_help(self):
-        """Show help dialog for the Spawn Editor tab."""
         QMessageBox.information(self, tr("Spawn Editor Help"),
             "SPAWN EDITOR\n\n"
             "Controls enemy, animal, fish, bird, and NPC spawn density.\n\n"
@@ -1700,7 +1668,6 @@ class SpawnTab(QWidget):
             "  - 'Restore Vanilla' removes all spawn mods")
 
     def _spawn_extract(self):
-        """Load terrainregionautospawninfo from game PAZ."""
         game_path = self._config.get("game_install_path", "")
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Game Path"),
@@ -1929,7 +1896,6 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Extract Failed"), str(e))
 
     def _spawn_filter(self):
-        """Populate table based on region filter and search text."""
         if not self._spawn_elements:
             return
 
@@ -2079,7 +2045,6 @@ class SpawnTab(QWidget):
         self._spawn_editing = False
 
     def _spawn_cell_changed(self, row, col):
-        """Handle user edits to spawn count, minOp, or timer cells."""
         if self._spawn_editing or not self._spawn_elements:
             return
         if col not in (5, 6, 8, 9):
@@ -2204,7 +2169,6 @@ class SpawnTab(QWidget):
         self._spawn_update_changes()
 
     def _spawn_context_menu(self, pos):
-        """Right-click context menu for spawn table."""
         from PySide6.QtWidgets import QMenu, QInputDialog
         rows = self._spawn_table.selectionModel().selectedRows()
         if not rows:
@@ -2327,7 +2291,6 @@ class SpawnTab(QWidget):
                 self._spawn_status.setText(f"Multiplied {changed} entries by {val}x")
 
     def _spawn_update_changes(self):
-        """Update the change count label."""
         if not self._spawn_original or not self._spawn_data:
             return
         changes = 0
@@ -2358,7 +2321,6 @@ class SpawnTab(QWidget):
         self._spawn_changes_label.setText(f"{changes} change(s)" if changes else "")
 
     def _spawn_multiply_all(self):
-        """Multiply all spawn counts by the multiplier."""
         if not self._spawn_data or not self._spawn_elements:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2406,7 +2368,6 @@ class SpawnTab(QWidget):
         self._spawn_status.setText(f"Multiplied {count} spawn values by {mult}x ({filter_label})")
 
     def _spawn_multiply_sub_slots(self):
-        """Multiply per-slot operator counts inside each camp schedule."""
         if not hasattr(self, '_spawn_fnode_ops_data') or not self._spawn_fnode_ops_data:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2452,7 +2413,6 @@ class SpawnTab(QWidget):
             f"({dormant_filled} dormant slots filled)")
 
     def _spawn_halve_sub_times(self):
-        """Halve the time values on each sub-slot."""
         if not hasattr(self, '_spawn_fnode_ops_data') or not self._spawn_fnode_ops_data:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2478,7 +2438,6 @@ class SpawnTab(QWidget):
         self._spawn_status.setText(f"Halved {count} sub-slot time values")
 
     def _spawn_multiply_all_minop(self):
-        """Multiply all CampMaxOp MinOp values by the multiplier."""
         if not hasattr(self, '_spawn_fnode_ops_data') or not self._spawn_fnode_ops_data:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2504,7 +2463,6 @@ class SpawnTab(QWidget):
         self._spawn_status.setText(f"Multiplied {count} MinOp values by {mult}x")
 
     def _spawn_increase_all_smart(self):
-        """One-click: apply ALL spawn density increases with smart limits."""
         if not self._spawn_data:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2617,7 +2575,6 @@ class SpawnTab(QWidget):
             self._spawn_status.setText(tr("No changes made (data not loaded?)"))
 
     def _spawn_increase_life(self):
-        """Increase ambient wildlife spawns (spawningpoolautospawninfo)."""
         game_path = self._config.get("game_install_path", "")
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Game Path"), tr("Set the game install path first."))
@@ -2716,7 +2673,6 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Error"), f"Failed to load ambient life data:\n{e}")
 
     def _spawn_multiply_rates(self):
-        """Multiply verified open-world spawn rates using terrain_spawn_parser."""
         if not self._spawn_data or not self._spawn_schema:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2733,7 +2689,6 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("SpawnEdit"), f"Failed to multiply rates: {e}")
 
     def _spawn_halve_timers(self):
-        """Halve all respawn timers."""
         if not self._spawn_data or not self._spawn_elements:
             QMessageBox.information(self, tr("SpawnEdit"), tr("Load spawn data first."))
             return
@@ -2755,7 +2710,6 @@ class SpawnTab(QWidget):
         self._spawn_status.setText(f"Halved {count} respawn timers")
 
     def _spawn_reset(self):
-        """Reset to original extracted data."""
         if not self._spawn_original:
             return
         self._spawn_data = bytearray(self._spawn_original)
@@ -2791,7 +2745,6 @@ class SpawnTab(QWidget):
         self._spawn_status.setText(tr("Reset to vanilla values"))
 
     def _spawn_export_cdumm(self):
-        """Export modified spawn data as a CDUMM-compatible PAZ mod."""
         if not self._spawn_data or not self._spawn_modified:
             QMessageBox.information(self, tr("SpawnEdit"), tr("No modifications to export."))
             return
@@ -2894,7 +2847,6 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Export Failed"), str(e))
 
     def _spawn_apply(self):
-        """Apply spawn mod directly to game."""
         if not self._spawn_data or not self._spawn_modified:
             QMessageBox.information(self, tr("SpawnEdit"), tr("No modifications to apply."))
             return
@@ -2975,7 +2927,6 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Apply Failed"), str(e))
 
     def _spawn_restore(self):
-        """Remove spawn mod overlay."""
         game_path = self._config.get("game_install_path", "")
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Game Path"), tr("Game path not set."))
@@ -3007,7 +2958,6 @@ class SpawnTab(QWidget):
 
 
 class DropsetTab(QWidget):
-    """Drop-rate editor backed by the dropset paz-patcher module."""
 
     status_message = Signal(str)
 
@@ -3026,8 +2976,11 @@ class DropsetTab(QWidget):
         self._rebuild_papgt_fn = rebuild_papgt_fn
         self._build_ui()
 
+    def set_experimental_mode(self, enabled: bool) -> None:
+        if hasattr(self, '_dev_export_btn_drop'):
+            self._dev_export_btn_drop.setVisible(bool(enabled))
+
     def _build_ui(self) -> None:
-        """Build the DropSet Editor tab — browse and modify drop tables."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(8)
@@ -3052,13 +3005,14 @@ class DropsetTab(QWidget):
         load_btn.clicked.connect(self._dropset_extract)
         top_row.addWidget(load_btn)
 
-        export_mod_btn = QPushButton(tr("Export as Mod"))
-        export_mod_btn.setObjectName("accentBtn")
-        export_mod_btn.setToolTip(
-            "Export as a standalone PAZ overlay mod.\n"
-            "Compatible with DMM, CDUMM, and manual install.")
-        export_mod_btn.clicked.connect(self._dropset_export_mod)
-        top_row.addWidget(export_mod_btn)
+        drop_export_btn = QPushButton(tr("Export as Mod"))
+        drop_export_btn.setToolTip(
+            "ADVANCED — UNSUPPORTED. Contact mod loader dev for help.\n\n"
+            "Export as standalone PAZ overlay mod.")
+        drop_export_btn.clicked.connect(self._dropset_export_mod)
+        drop_export_btn.setVisible(False)
+        top_row.addWidget(drop_export_btn)
+        self._dev_export_btn_drop = drop_export_btn
 
         apply_btn = QPushButton(tr("Apply to Game"))
         apply_btn.setObjectName("accentBtn")
@@ -3283,7 +3237,6 @@ class DropsetTab(QWidget):
 
 
     def _dropset_extract(self):
-        """Load dropsetinfo from game PAZ archive."""
         game_path = self._config.get("game_install_path", "")
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Game Path"),
@@ -3340,7 +3293,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Extract Failed"), str(e))
 
     def _dropset_filter(self):
-        """Populate the drop set list based on search/category/unnamed filters."""
         if not self._dropset_editor:
             return
 
@@ -3372,7 +3324,6 @@ class DropsetTab(QWidget):
         self._dropset_list.setSortingEnabled(True)
 
     def _dropset_selected(self):
-        """Handle selection change in the drop set list — populate items table."""
         if not self._dropset_editor:
             return
         rows = self._dropset_list.selectionModel().selectedRows()
@@ -3396,7 +3347,6 @@ class DropsetTab(QWidget):
         self._dropset_refresh_items(ds)
 
     def _dropset_refresh_items(self, ds=None):
-        """Refresh the items table for the current drop set."""
         if ds is None:
             if self._dropset_current_key is None:
                 return
@@ -3459,7 +3409,6 @@ class DropsetTab(QWidget):
         self._dropset_editing = False
 
     def _dropset_toggle_icons(self, checked):
-        """Toggle item icon display in the drop items table."""
         self._dropset_show_icons = checked
         if checked:
             self._dropset_items.setColumnWidth(0, ICON_SIZE + 16)
@@ -3469,7 +3418,6 @@ class DropsetTab(QWidget):
         self._dropset_refresh_items()
 
     def _dropset_cell_edited(self, row, col):
-        """Handle in-place editing of rate/qty cells."""
         if self._dropset_editing or not self._dropset_editor:
             return
         if self._dropset_current_key is None:
@@ -3501,7 +3449,6 @@ class DropsetTab(QWidget):
         self._dropset_mark_modified()
 
     def _dropset_flush_dirty(self):
-        """Write all in-memory modified DropSets back to body_bytes."""
         if not self._dropset_editor or not self._dropset_dirty_keys:
             return
         modified = []
@@ -3523,7 +3470,6 @@ class DropsetTab(QWidget):
         self._dropset_changes_label.setText(f"{self._dropset_change_count} change(s)")
 
     def _dropset_add_item(self):
-        """Add a new item to the selected drop set via searchable picker."""
         if not self._dropset_editor or self._dropset_current_key is None:
             return
 
@@ -3557,7 +3503,6 @@ class DropsetTab(QWidget):
         self._dropset_add_key.clear()
 
     def _dropset_remove_item(self):
-        """Remove selected items from the drop set."""
         if not self._dropset_editor or self._dropset_current_key is None:
             return
         rows = sorted(set(idx.row() for idx in self._dropset_items.selectedIndexes()), reverse=True)
@@ -3576,7 +3521,6 @@ class DropsetTab(QWidget):
         self._dropset_refresh_items(ds)
 
     def _dropset_swap_item(self):
-        """Swap selected item with a new key via searchable picker."""
         if not self._dropset_editor or self._dropset_current_key is None:
             return
         rows = self._dropset_items.selectionModel().selectedRows()
@@ -3620,7 +3564,6 @@ class DropsetTab(QWidget):
         self._dropset_refresh_items(ds)
 
     def _dropset_bulk_set_rate(self):
-        """Set all rates in selected drop set to the bulk rate value."""
         if not self._dropset_editor or self._dropset_current_key is None:
             return
         ds = self._dropset_editor.parse_dropset(self._dropset_current_key)
@@ -3636,7 +3579,6 @@ class DropsetTab(QWidget):
         self._dropset_status.setText(f"Set all rates to {pct}% in {name}")
 
     def _dropset_bulk_set_qty(self):
-        """Set all quantities in selected drop set."""
         if not self._dropset_editor or self._dropset_current_key is None:
             return
         ds = self._dropset_editor.parse_dropset(self._dropset_current_key)
@@ -3651,7 +3593,6 @@ class DropsetTab(QWidget):
         self._dropset_status.setText(f"Set all qty to x{qty} in {name}")
 
     def _dropset_apply_preset(self):
-        """Apply a preset to all 4 chest tier drop sets."""
         if not self._dropset_editor:
             QMessageBox.warning(self, tr("DropSets"), tr("Load drop set data first."))
             return
@@ -3695,7 +3636,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Preset Failed"), str(e))
 
     def _dropset_global_boost(self, multiplier: int):
-        """Apply 100% rates + Nx quantity to ALL named drop sets."""
         if not self._dropset_editor:
             QMessageBox.warning(self, tr("DropSets"), tr("Load drop set data first."))
             return
@@ -3747,7 +3687,6 @@ class DropsetTab(QWidget):
             f"Use 'Export as Mod' to save.")
 
     def _dropset_apply_to_selected(self):
-        """Apply rate/qty boost to the currently selected drop set."""
         if not self._dropset_editor or self._dropset_current_key is None:
             QMessageBox.information(self, tr("DropSets"), tr("Select a drop set first."))
             return
@@ -3769,7 +3708,6 @@ class DropsetTab(QWidget):
             f"Use 'Export as Mod' to save.")
 
     def _dropset_export_json(self):
-        """Export changes as a JSON patch file."""
         if not self._dropset_editor or not self._dropset_modified:
             QMessageBox.information(self, tr("No Changes"), tr("No modifications to export."))
             return
@@ -3837,11 +3775,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Export Failed"), str(e))
 
     def _dropset_export_mod(self):
-        """Export as raw game files for mod loaders (CD JSON Mod Manager, DMM, CDUMM).
-
-        Outputs raw pabgb/pabgh files at the correct internal path.
-        The mod loader handles PAZ packing and PAPGT updates.
-        """
         if not self._dropset_editor or not self._dropset_modified:
             QMessageBox.information(self, tr("No Changes"), tr("No modifications to export."))
             return
@@ -3911,12 +3844,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Export Failed"), str(e))
 
     def _dropset_apply(self):
-        """Deploy modified dropsetinfo directly to the game.
-
-        Uses compression=NONE so pabgh is stored uncompressed (matching vanilla).
-        LZ4 makes pabgh bigger which crashes the game — NONE avoids this.
-        Includes both pabgb + pabgh so adding/removing items works correctly.
-        """
         if not self._dropset_editor or not self._dropset_modified:
             QMessageBox.information(self, tr("No Changes"), tr("No modifications to apply."))
             return
@@ -4002,7 +3929,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Apply Failed"), str(e))
 
     def _dropset_restore(self):
-        """Remove drop table modifications from the game."""
         game_path = self._config.get("game_install_path", "")
         if not game_path or not os.path.isdir(game_path):
             QMessageBox.warning(self, tr("Game Path"), tr("Game install path not set."))
@@ -4050,7 +3976,6 @@ class DropsetTab(QWidget):
 
 
     def _dropset_save_config(self):
-        """Save current drop table edits as a reusable JSON config."""
         if not self._dropset_editor or not self._dropset_modified:
             QMessageBox.information(self, tr("No Changes"), tr("No modifications to save."))
             return
@@ -4124,7 +4049,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Save Failed"), str(e))
 
     def _dropset_load_config(self):
-        """Load a previously saved drop table config."""
         if not self._dropset_editor:
             QMessageBox.warning(self, tr("DropSets"), tr("Load drop set data first."))
             return
@@ -4197,17 +4121,6 @@ class DropsetTab(QWidget):
             QMessageBox.critical(self, tr("Load Failed"), str(e))
 
     def _dropset_scan_packs(self):
-        """Scan dropset_packs/ in every sensible location and merge results.
-
-        Checks (in order; duplicates by filename are skipped so the first match wins):
-          1. {exe_dir}/dropset_packs/       (next to CrimsonSaveEditor.exe)
-          2. {repo_root}/dropset_packs/     (next to main.py when running from source)
-          3. {gui/tabs}/dropset_packs/      (legacy bundled location)
-          4. {_MEIPASS}/dropset_packs/      (PyInstaller-bundled copy)
-
-        The first writable location (exe_dir or repo_root) is auto-created on
-        startup so users always have a folder to drop .json packs into.
-        """
         self._dropset_pack_combo.clear()
         self._dropset_packs = {}
 
@@ -4253,7 +4166,6 @@ class DropsetTab(QWidget):
                     pass
 
     def _dropset_add_pack(self):
-        """Append all items from the selected pack to the current drop set."""
         if not self._dropset_editor or self._dropset_current_key is None:
             QMessageBox.information(self, tr("DropSets"), tr("Select a drop set first."))
             return
@@ -4306,7 +4218,6 @@ class DropsetTab(QWidget):
 
 
 class PabgbBrowserTab(QWidget):
-    """Raw PABGB binary record browser (experimental)."""
 
     status_message = Signal(str)
 
@@ -4410,11 +4321,9 @@ class PabgbBrowserTab(QWidget):
         self._pabgb_records: list = []
 
     def _pabgb_get_game_path(self) -> str:
-        """Get game path via injected game_path_fn."""
         return self._game_path_fn() if callable(self._game_path_fn) else ""
 
     def _pabgb_scan_files(self) -> None:
-        """Scan PAMT to list all PABGB files."""
         game_path = self._pabgb_get_game_path()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"),
@@ -4458,7 +4367,6 @@ class PabgbBrowserTab(QWidget):
             self._pabgb_status.setText(f"Scan failed: {ex}")
 
     def _pabgb_load_file(self) -> None:
-        """Load and parse the selected PABGB file."""
         label = self._pabgb_file_combo.currentText()
         if not label or not hasattr(self, '_pabgb_entries'):
             return
@@ -4546,7 +4454,6 @@ class PabgbBrowserTab(QWidget):
             self._pabgb_status.setText(f"Load failed: {ex}")
 
     def _pabgb_filter_records(self, text: str = None) -> None:
-        """Filter and display records in the table."""
         if text is None:
             text = self._pabgb_search.text()
         q = text.lower().strip()
@@ -4573,7 +4480,6 @@ class PabgbBrowserTab(QWidget):
         self._pabgb_record_count.setText(f"{len(filtered)}/{len(self._pabgb_records)} records")
 
     def _pabgb_record_selected(self) -> None:
-        """Show hex dump of selected record."""
         if self._pabgb_raw_data is None:
             return
 
@@ -4609,7 +4515,6 @@ class PabgbBrowserTab(QWidget):
 
 
 class BackupTab(QWidget):
-    """Local save-file backup list, restore, and delete."""
 
     status_message = Signal(str)
     restore_requested = Signal(str)
@@ -4622,7 +4527,6 @@ class BackupTab(QWidget):
         self._build_ui()
 
     def set_loaded_path(self, path: str) -> None:
-        """Called by MainWindow when a save is loaded or unloaded."""
         self._loaded_path = path
         self._refresh_backups()
 
@@ -4792,7 +4696,6 @@ class BackupTab(QWidget):
             QMessageBox.critical(self, tr("Delete Error"), f"Failed to delete:\n{e}")
 
     def _reset_pristine(self) -> None:
-        """Replace PRISTINE backup with the currently loaded (known-good) save."""
         if not self._loaded_path:
             QMessageBox.warning(self, tr("Reset PRISTINE"), tr("No save file loaded."))
             return

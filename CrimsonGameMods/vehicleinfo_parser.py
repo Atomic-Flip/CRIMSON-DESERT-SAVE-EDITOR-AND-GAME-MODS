@@ -1,17 +1,7 @@
-"""
-VehicleInfo parser — parses vehicleinfo.pabgb entries.
-
-Reader: sub_14105D470
-Target: F20 (_canCallInSafeZone) — only Horse has this set to 1 in vanilla.
-
-NOTE: pabgh uses u16 count + (u16 key + u32 offset) = 6B per entry,
-NOT the standard 8B format used by most pabgb files.
-"""
 import struct
 
 
 def parse_pabgh_index_u16(G):
-    """Parse pabgh with u16 count + 6B entries (u16 key + u32 offset)."""
     count = struct.unpack_from('<H', G, 0)[0]
     idx = {}
     for i in range(count):
@@ -25,7 +15,6 @@ def parse_pabgh_index_u16(G):
 
 
 def parse_entry(D, eoff, end):
-    """Parse a single VehicleInfo entry. Returns dict or None."""
     try:
         p = eoff
 

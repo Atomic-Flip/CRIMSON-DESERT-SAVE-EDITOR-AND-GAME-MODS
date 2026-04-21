@@ -1,15 +1,3 @@
-"""
-Item Template Database — Collect real game-produced item templates from save files.
-
-Pipeline:
-1. Scan a save file for all items (inventory, equipment, vendor, mercenary)
-2. Extract the raw bytes of each unique itemKey
-3. Store in a JSON database keyed by itemKey
-4. When inserting, look up the exact template the game produced
-
-The templates contain REAL game data — correct mask, sockets, endurance,
-chargedUseableCount, timestamps, everything. We only change the key/no/stack.
-"""
 import json
 import logging
 import os
@@ -43,11 +31,6 @@ def _get_parser():
 _db_cache: dict = None
 
 def load_db() -> dict:
-    """Load the template database from crimson_data.db (SQLite).
-
-    Falls back to a GitHub download if the DB is empty (first run before
-    build_db.py). Returns {itemKey_str: {hex, mask, size, ...}}.
-    """
     global _db_cache
     if _db_cache is not None:
         return _db_cache
@@ -83,18 +66,12 @@ def load_db() -> dict:
 
 
 def _reload_db() -> dict:
-    """Force reload after a write (e.g. after download_master_templates)."""
     global _db_cache
     _db_cache = None
     return load_db()
 
 
 def download_master_templates() -> bool:
-    """Download master_templates.json from GitHub and insert into crimson_data.db.
-
-    Also writes master_templates.json to disk for the CLI ingest tool.
-    Returns True on success.
-    """
     try:
         from urllib.request import urlopen, Request
         req = Request(MASTER_URL, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
@@ -138,7 +115,6 @@ def download_master_templates() -> bool:
 
 
 def save_db(db: dict) -> None:
-    """Save the template database."""
     global _db_cache
     with open(DB_PATH, 'w', encoding='utf-8') as f:
         json.dump(db, f, indent=2)
@@ -147,10 +123,6 @@ def save_db(db: dict) -> None:
 
 
 def extract_items_from_parse_tree(result, raw: bytes, source_label: str = '') -> dict:
-    """Walk the entire parse tree and extract every ItemSaveData element.
-
-    Returns {itemKey: {hex, mask, size, fields, source}}.
-    """
     templates = {}
 
     def scan_fields(fields, location=''):
@@ -226,15 +198,6 @@ def extract_items_from_parse_tree(result, raw: bytes, source_label: str = '') ->
 
 
 def ingest_save(save_path: str, db: dict = None) -> dict:
-    """Scan a save file and add all unique item templates to the database.
-
-    Args:
-        save_path: path to .save file
-        db: existing database to merge into (or None to create new)
-
-    Returns:
-        updated database
-    """
     if db is None:
         db = load_db()
 
@@ -291,7 +254,6 @@ def ingest_save(save_path: str, db: dict = None) -> dict:
 
 
 def ingest_all_saves(saves_dir: str) -> dict:
-    """Scan all save files in a directory and build the template database."""
     db = load_db()
 
     for slot_name in sorted(os.listdir(saves_dir)):
@@ -315,10 +277,6 @@ def ingest_all_saves(saves_dir: str) -> dict:
 
 
 def get_template(item_key: int, db: dict = None) -> dict:
-    """Look up a template for a given item key.
-
-    Returns the template dict or None if not found.
-    """
     if db is None:
         db = load_db()
     return db.get(str(item_key))
@@ -327,11 +285,6 @@ def get_template(item_key: int, db: dict = None) -> dict:
 def build_item_from_template(template: dict, insert_at: int,
                               new_item_key: int, new_item_no: int,
                               new_stack: int = 1) -> bytes:
-    """Build an item entry from a database template.
-
-    Uses the template's raw bytes and patches only the fields that need changing,
-    using the template's stored field positions (from parse tree, not hardcoded).
-    """
     entry = bytearray(bytes.fromhex(template['hex']))
     donor_start = 0
     donor_size = len(entry)

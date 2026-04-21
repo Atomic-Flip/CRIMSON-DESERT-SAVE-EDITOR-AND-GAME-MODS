@@ -1,14 +1,3 @@
-"""
-Dropset Editor — Parse and modify dropsetinfo.pabgb chest loot tables.
-
-Supports:
-  - Rate boosting (set all/specific items to 100%)
-  - Quantity boosting (increase min/max amounts)
-  - Item swaps (replace trash items with valuable ones)
-  - Adding new items to drop tables (grows record + fixes header offsets)
-
-Deploy via same pack_mod pipeline as ItemBuffs/Stores.
-"""
 
 import struct
 import json
@@ -21,15 +10,6 @@ from typing import Dict, List, Optional, Tuple
 
 @dataclass
 class ItemDrop:
-    """A single DropInfoData entry in a DropSet's _list array.
-
-    The 17-byte block after itemKey is decomposed as:
-      unk3(u32) + unk4(u32) + unk1_flag(u8[5]) + unk_cond_flag(u32)
-    unk4 controls variable-length trailing data:
-      unk4 == 13 → extra u8
-      unk4 == 10 → extra u32
-      unk4 == 7  → DropFriendlyData (28 bytes)
-    """
     flag: int
     item_key: int
     unk3: int = 0
@@ -52,13 +32,6 @@ class ItemDrop:
 
 @dataclass
 class DropSet:
-    """A parsed DropSetInfo record.
-
-    Confirmed field names from game's BinarySerializable class:
-      _key, _stringKey, _isBlocked, _dropRollType, _dropRollCount,
-      _dropConditionString, _dropTagNameHash, _list,
-      _neeSlotCount, _needWeight, _totalDropRate, _originalString
-    """
     key: int
     name: str
     is_blocked: int
@@ -77,7 +50,6 @@ class DropSet:
 
 
 class DropsetEditor:
-    """Parse and modify dropsetinfo.pabgb."""
 
     CHEST_KEYS = {
         170204: "DropSet_Chest_Tier1",
@@ -110,7 +82,6 @@ class DropsetEditor:
         self._parsed_sets: Dict[int, DropSet] = {}
 
     def load(self, pabgh_path: str, pabgb_path: str):
-        """Load header + body from files."""
         self.header_bytes = open(pabgh_path, "rb").read()
         self.body_bytes = bytearray(open(pabgb_path, "rb").read())
 
@@ -122,7 +93,6 @@ class DropsetEditor:
             self.records.append((key, offset))
 
     def load_item_names(self, item_names_path: str = ""):
-        """Load item name lookup from SQLite."""
         _db = get_connection()
         for row in _db.execute("SELECT item_key, name FROM items"):
             self.item_names[row['item_key']] = row['name']
@@ -131,12 +101,6 @@ class DropsetEditor:
         return self.item_names.get(key, f"Item_{key}")
 
     def _parse_drop_entry(self, pos: int) -> Tuple[ItemDrop, int]:
-        """Parse a single ItemDrop at body position. Returns (drop, new_pos).
-
-        The 17-byte block after itemKey decomposes as:
-          unk3(u32) + unk4(u32) + unk1_flag(u8[5]) + unk_cond_flag(u32)
-        unk4 controls variable-length trailing data after item_key_dup.
-        """
         start = pos
         flag = self.body_bytes[pos]; pos += 1
         item_key = struct.unpack_from("<I", self.body_bytes, pos)[0]; pos += 4
@@ -173,7 +137,6 @@ class DropsetEditor:
         return drop, pos
 
     def _serialize_drop_entry(self, drop: ItemDrop) -> bytes:
-        """Serialize a single ItemDrop to bytes."""
         buf = bytearray()
         buf.append(drop.flag)
         buf += struct.pack("<I", drop.item_key)
@@ -197,7 +160,6 @@ class DropsetEditor:
         return bytes(buf)
 
     def parse_dropset(self, key: int) -> Optional[DropSet]:
-        """Parse a DropSet by its header key. Returns cached version if available."""
         if key in self._parsed_sets:
             return self._parsed_sets[key]
 
@@ -250,7 +212,6 @@ class DropsetEditor:
         return ds
 
     def _serialize_dropset(self, ds: DropSet) -> bytes:
-        """Serialize an entire DropSet record to bytes."""
         buf = bytearray()
         buf += struct.pack("<I", ds.key)
         name_bytes = ds.name.encode("latin-1", errors="replace")
@@ -275,7 +236,6 @@ class DropsetEditor:
         return bytes(buf)
 
     def get_chest_tiers(self) -> Dict[str, DropSet]:
-        """Parse and return all 4 chest tier drop sets."""
         result = {}
         for key, label in self.CHEST_KEYS.items():
             ds = self.parse_dropset(key)
@@ -285,19 +245,16 @@ class DropsetEditor:
 
 
     def boost_rates(self, ds: DropSet, rate: int = MAX_RATE):
-        """Set all drop rates to the given value (default: 100%)."""
         for drop in ds.drops:
             drop.rates = rate
             drop.rates_100 = rate // 10000
 
     def boost_quantities(self, ds: DropSet, min_qty: int = 10, max_qty: int = 20):
-        """Set all drop quantities to given range."""
         for drop in ds.drops:
             drop.max_amt = max(0, min_qty)
             drop.min_amt = max(0, max_qty)
 
     def swap_item(self, ds: DropSet, old_key: int, new_key: int):
-        """Replace one item key with another in a drop set."""
         for drop in ds.drops:
             if drop.item_key == old_key:
                 drop.item_key = new_key
@@ -309,10 +266,6 @@ class DropsetEditor:
     def add_item(self, ds: DropSet, item_key: int, rate: int = MAX_RATE,
                  min_qty: int = 1, max_qty: int = 1,
                  template_drop: Optional[ItemDrop] = None) -> ItemDrop:
-        """Add a new item to a drop set.
-
-        Uses template_drop for flag/unk bytes, or copies from first existing drop.
-        """
         if template_drop is None:
             template_drop = ds.drops[0] if ds.drops else None
 
@@ -337,7 +290,6 @@ class DropsetEditor:
         return new_drop
 
     def remove_item(self, ds: DropSet, item_key: int) -> bool:
-        """Remove an item from a drop set by key."""
         for i, drop in enumerate(ds.drops):
             if drop.item_key == item_key:
                 ds.drops.pop(i)
@@ -345,12 +297,6 @@ class DropsetEditor:
         return False
 
     def apply_modifications(self, modified_sets: List[DropSet]):
-        """Apply all modified DropSets back to body_bytes, fixing header offsets.
-
-        Strategy: compute all deltas first, then apply splices back-to-front
-        (highest offset first) so earlier offsets stay valid. Finally, fix all
-        header offsets in one pass using the accumulated delta map.
-        """
         mod_info = []
         for ds in modified_sets:
             new_data = self._serialize_dropset(ds)
@@ -389,7 +335,6 @@ class DropsetEditor:
         self._parsed_sets.clear()
 
     def save(self, pabgh_path: str, pabgb_path: str):
-        """Write modified header + body to files."""
         with open(pabgh_path, "wb") as f:
             f.write(self.header_bytes)
         with open(pabgb_path, "wb") as f:
@@ -398,7 +343,6 @@ class DropsetEditor:
 
     @staticmethod
     def categorize_by_name(name: str) -> str:
-        """Derive a display category from a DropSet's string_key name."""
         if not name:
             return "Unnamed"
         low = name.lower()
@@ -451,10 +395,6 @@ class DropsetEditor:
         return "Other"
 
     def get_all_sets_summary(self, named_only: bool = True) -> List[dict]:
-        """Return summary info for all (or named-only) drop sets.
-
-        Returns list of dicts with: key, name, drop_count, category, offset
-        """
         result = []
         sorted_recs = sorted(self.records, key=lambda r: r[1])
         offset_to_next = {}
@@ -491,13 +431,11 @@ class DropsetEditor:
         return result
 
     def get_categories(self, named_only: bool = True) -> List[str]:
-        """Return sorted list of unique categories present in the data."""
         summaries = self.get_all_sets_summary(named_only=named_only)
         cats = sorted(set(s["category"] for s in summaries))
         return cats
 
     def print_dropset(self, ds: DropSet, show_rates: bool = True):
-        """Pretty-print a DropSet."""
         safe_name = ds.name.encode("ascii", errors="replace").decode("ascii")
         print(f"\n{'='*60}")
         print(f"  {safe_name}  (key={ds.key}, {len(ds.drops)} items)")
@@ -565,7 +503,6 @@ TRADE_GOODS = [
 
 
 def apply_loot_bonanza(editor: DropsetEditor):
-    """Apply 'Loot Bonanza' preset: max rates, high quantities, swap trash for good stuff."""
     tiers = editor.get_chest_tiers()
 
     for label, ds in tiers.items():
@@ -606,7 +543,6 @@ def apply_loot_bonanza(editor: DropsetEditor):
 
 
 def apply_generous(editor: DropsetEditor):
-    """Apply 'Generous' preset: boost rates & quantities, keep original items."""
     tiers = editor.get_chest_tiers()
 
     for label, ds in tiers.items():
@@ -619,7 +555,6 @@ def apply_generous(editor: DropsetEditor):
 
 
 def main():
-    """CLI entry point for testing."""
     import argparse
 
     base = os.path.dirname(os.path.abspath(__file__))

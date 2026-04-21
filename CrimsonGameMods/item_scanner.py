@@ -1,16 +1,3 @@
-"""
-Item scanner for Crimson Desert decompressed save blobs.
-
-Primary path: full PARC tree parsing via parc_serializer for exact field
-offsets and zero false positives.
-
-Fallback path (when parc_serializer is unavailable): sentinel-pattern scan
-within PARC-identified item-bearing ranges.
-  - 0xFFFFFFFFFFFFFFFF at offset-16
-  - saveVersion=1 (u32) at offset
-  - Fields: itemNo(u64), itemKey(u32), slotNo(u16), stackCount(u64),
-            enchantLevel(u16), endurance(u16), sharpness(u16)
-"""
 from __future__ import annotations
 
 import struct
@@ -39,11 +26,6 @@ _ITEM_FIELDS = [
 
 
 def compute_item_field_offsets(data: bytes, item_offset: int) -> Dict[str, int]:
-    """Compute real field offsets for an item by walking its bitmask.
-
-    Only computes offsets for fixed-size fields 0-12 (before variable-length lists).
-    Returns {field_name: absolute_offset_in_blob}.
-    """
     result = {}
     payload_start = item_offset - 4
 
@@ -79,13 +61,6 @@ def compute_item_field_offsets(data: bytes, item_offset: int) -> Dict[str, int]:
 
 
 def _get_item_bearing_ranges(data: bytes | bytearray) -> List[Tuple[int, int, str]]:
-    """Parse the PARC TOC to find offset ranges of item-bearing blocks.
-
-    Returns list of (start, end, type_name) for blocks that can contain items:
-    EquipmentSaveData, InventorySaveData, StoreSaveData, MercenaryClanSaveData.
-    This prevents false-positive items in FieldSaveData / QuestSaveData / etc.
-    from corrupting non-item game state when edited.
-    """
     ITEM_BEARING = {"EquipmentSaveData", "InventorySaveData", "StoreSaveData",
                     "MercenaryClanSaveData"}
     length = len(data)
@@ -148,13 +123,6 @@ def _get_item_bearing_ranges(data: bytes | bytearray) -> List[Tuple[int, int, st
 
 
 def scan_items(data: bytes | bytearray) -> List[SaveItem]:
-    """
-    Scan the decompressed save blob for all item records.
-
-    Tries full PARC-tree parsing first for exact field offsets and no false
-    positives.  Falls back to sentinel-pattern scanning within PARC-identified
-    item-bearing ranges when parc_serializer is unavailable.
-    """
     parc_items, parc_status = scan_items_parc(data)
     if parc_items:
         log.debug("PARC primary scan: %s", parc_status)
@@ -174,7 +142,6 @@ def scan_items(data: bytes | bytearray) -> List[SaveItem]:
 
 def _scan_range(data: bytes | bytearray, items: List[SaveItem],
                 start: int, end: int, range_name: str) -> None:
-    """Scan a specific offset range for item records."""
     for off in range(start, end):
         if struct.unpack_from("<I", data, off)[0] != 1:
             continue
@@ -244,7 +211,6 @@ def _scan_range(data: bytes | bytearray, items: List[SaveItem],
 
 
 def _classify_items(data: bytes | bytearray, items: List[SaveItem]) -> None:
-    """Classify items by source using TOC entries and schema type names."""
     length = len(data)
 
     type_names: Dict[int, str] = {}
@@ -329,7 +295,6 @@ def apply_stack_edit(
     item: SaveItem,
     new_stack: int,
 ) -> bytes:
-    """Set the stack count of an item. Returns the old bytes for undo."""
     old = data[item.offset + 18:item.offset + 26]
     struct.pack_into("<q", data, item.offset + 18, new_stack)
     item.stack_count = new_stack
@@ -341,7 +306,6 @@ def apply_itemno_edit(
     item: SaveItem,
     new_itemno: int,
 ) -> bytes:
-    """Set the itemNo of an item. Returns the old bytes for undo."""
     old = data[item.offset + 4:item.offset + 12]
     struct.pack_into("<q", data, item.offset + 4, new_itemno)
     item.item_no = new_itemno
@@ -349,7 +313,6 @@ def apply_itemno_edit(
 
 
 def get_max_itemno(items: List[SaveItem]) -> int:
-    """Find the maximum itemNo across all items."""
     if not items:
         return 0
     return max(it.item_no for it in items)
@@ -360,7 +323,6 @@ def apply_enchant_edit(
     item: SaveItem,
     new_enchant: int,
 ) -> bytes:
-    """Set the enchant level of an item. Returns old bytes for undo."""
     old = data[item.offset + 26:item.offset + 28]
     struct.pack_into("<H", data, item.offset + 26, new_enchant)
     item.enchant_level = new_enchant
@@ -373,7 +335,6 @@ def apply_endurance_edit(
     item: SaveItem,
     new_endurance: int,
 ) -> bytes:
-    """Set the endurance of an item. Returns old bytes for undo."""
     old = data[item.offset + 30:item.offset + 32]
     struct.pack_into("<H", data, item.offset + 30, new_endurance)
     item.endurance = new_endurance
@@ -385,7 +346,6 @@ def apply_sharpness_edit(
     item: SaveItem,
     new_sharpness: int,
 ) -> bytes:
-    """Set the sharpness of an item. Returns old bytes for undo."""
     old = data[item.offset + 32:item.offset + 34]
     struct.pack_into("<H", data, item.offset + 32, new_sharpness)
     item.sharpness = new_sharpness
@@ -397,15 +357,6 @@ def apply_item_swap(
     item: SaveItem,
     new_key: int,
 ) -> List[Tuple[int, bytes, bytes]]:
-    """
-    Swap a SPECIFIC item's key (identified by itemNo) without affecting
-    other items that share the same key.
-
-    SAFETY: Only patches within item-bearing blocks (Equipment, Inventory,
-    Store, Mercenary) to avoid corrupting QuestSaveData, FieldSaveData, etc.
-
-    Returns list of (offset, old_bytes, new_bytes) for undo.
-    """
     patches: List[Tuple[int, bytes, bytes]] = []
     old_key = struct.unpack_from("<I", data, item.offset + 12)[0]
     old_key_bytes = struct.pack("<I", old_key)
@@ -490,7 +441,6 @@ _ITEM_FIELD_NAMES = [
 
 
 def _try_import_parc():
-    """Try to import the PARC serializer. Returns (module, None) or (None, error_str)."""
     try:
         import parc_serializer
         return parc_serializer, None
@@ -505,7 +455,6 @@ def _collect_items_from_blob(
     parc_mod,
     parc_blob,
 ) -> Tuple[List[SaveItem], str]:
-    """Walk a pre-parsed PARC blob and extract all ItemSaveData records."""
     item_type_idx = None
     for idx, td in parc_blob.type_by_index.items():
         if td.name == "ItemSaveData":
@@ -552,12 +501,6 @@ def _collect_items_from_blob(
 
 
 def scan_items_parc(data: bytes | bytearray) -> Tuple[List[SaveItem], str]:
-    """
-    Scan items using full PARC parsing for exact field offsets.
-
-    Returns (items_list, status_message).
-    If PARC parsing fails, returns ([], error_message) so caller can fall back.
-    """
     parc_mod, err = _try_import_parc()
     if parc_mod is None:
         return [], err
@@ -577,10 +520,6 @@ def _find_item_fields_in_parsed(
     item_type_idx: int,
     parc_blob,
 ) -> List[SaveItem]:
-    """
-    Recursively search a parsed PARC block for ItemSaveData inline elements.
-    Extract all 22 field offsets from each one.
-    """
     items: List[SaveItem] = []
 
     for finfo in parsed_block.get("fields", []):
@@ -618,10 +557,6 @@ def _scan_raw_for_item_elements(
     field_name: str,
     items_out: List[SaveItem],
 ) -> None:
-    """
-    Scan the raw bytes of an object list for ItemSaveData elements.
-    Each element has a locator header followed by an inline payload.
-    """
     item_td = parc_blob.type_by_index[item_type_idx]
 
     pos = 0
@@ -694,15 +629,6 @@ def _parse_item_payload(
     parent_name: str,
     field_name: str,
 ) -> Optional[SaveItem]:
-    """
-    Parse an ItemSaveData inline payload at the given absolute offset.
-    Returns a SaveItem with field_offsets populated, or None on failure.
-
-    Strategy: parse fixed-size fields (0-12) forward from payload start,
-    then find the record end via trailing size, and parse fixed fields
-    (16-21) backwards from the end. This avoids needing to skip variable-
-    length sub-lists (fields 13-15) which have complex header formats.
-    """
     try:
         pos = abs_payload + 4
 
@@ -830,7 +756,6 @@ def _parse_item_payload(
 
 
 def _skip_dynamic_array(blob: bytes, pos: int, ms: int) -> int:
-    """Skip a dynamic array (mk=3) at pos."""
     if pos + 14 <= len(blob) and blob[pos:pos + 5] == b'\x00\x00\x06\x01\x00':
         count = struct.unpack_from("<I", blob, pos + 5)[0]
         end = pos + 9 + count * ms + 5
@@ -866,7 +791,6 @@ def _skip_dynamic_array(blob: bytes, pos: int, ms: int) -> int:
 
 
 def _skip_object_locator(blob: bytes, pos: int, mk: int) -> int:
-    """Skip an object locator (mk=4 or mk=5) at pos."""
     body = pos
     if mk == 5:
         for delta in [0, 1, 3]:
@@ -896,7 +820,6 @@ def _skip_object_locator(blob: bytes, pos: int, mk: int) -> int:
 
 
 def _skip_object_list(blob: bytes, pos: int) -> int:
-    """Skip an object list (mk=6/7) at pos."""
     if pos + 18 <= len(blob):
         b0 = blob[pos]
 
@@ -937,7 +860,6 @@ def _skip_object_list(blob: bytes, pos: int) -> int:
 
 
 def _skip_list_element(blob: bytes, cursor: int) -> int:
-    """Skip a single list element (locator + inline payload)."""
     if cursor + 18 > len(blob):
         raise ValueError("List element overruns")
 
@@ -960,7 +882,6 @@ def _skip_list_element(blob: bytes, cursor: int) -> int:
 
 
 def _skip_inline_payload(blob: bytes, payload_start: int) -> int:
-    """Skip an inline object payload by looking for the trailing size field."""
     cursor = payload_start + 4
     max_scan = min(len(blob), payload_start + 4096)
     for probe in range(cursor, max_scan):
@@ -985,18 +906,6 @@ def enrich_items_with_parc(
     items: List[SaveItem],
     progress_cb=None,
 ) -> Tuple[int, str]:
-    """
-    Enrich items with PARC field offsets (especially _transferredItemKey)
-    and bag category.
-
-    When scan_items() already used the PARC primary path (all items have
-    parc_parsed=True), this skips the PARC re-scan for offsets and only
-    runs the bag-category assignment pass.
-
-    progress_cb(step, total) is called at each phase boundary (4 steps total).
-
-    Returns (num_enriched, status_message).
-    """
     TOTAL_STEPS = 4
 
     def _report(step: int) -> None:
@@ -1069,16 +978,6 @@ def apply_item_swap_parc(
     item: SaveItem,
     new_key: int,
 ) -> List[Tuple[int, bytes, bytes]]:
-    """
-    Enhanced item swap using PARC field offsets for exact patching.
-
-    Uses exact offsets for:
-    1. _itemKey (field 2) -- main identity
-    2. _transferredItemKey (field 16) -- visual identity
-
-    Falls back to legacy scanning for GameEvent/Field/duplicate patching.
-    Returns list of (offset, old_bytes, new_bytes) for undo.
-    """
     patches: List[Tuple[int, bytes, bytes]] = []
     old_key = struct.unpack_from("<I", data, item.offset + 12)[0]
     old_key_bytes = struct.pack("<I", old_key)
@@ -1158,17 +1057,6 @@ def template_item_swap(
     item: SaveItem,
     new_key: int,
 ) -> List[Tuple[int, bytes, bytes]]:
-    """Replace the entire item binary with a real template from the database.
-
-    This gives the new item correct stats, sockets, endurance — everything
-    from a real game-produced item. Only works when both items have the
-    same mask and size (most items do — 2312 items share mask 9f280d/227B).
-
-    Preserves: _itemNo, _slotNo, _stackCount (keeps inventory position).
-    Replaces: everything else (key, stats, sockets, endurance, etc.).
-
-    Falls back to smart_item_swap if no template or size mismatch.
-    """
     try:
         from parc_inserter3 import load_item_template
     except ImportError:
@@ -1267,13 +1155,6 @@ def smart_item_swap(
     item: SaveItem,
     new_key: int,
 ) -> List[Tuple[int, bytes, bytes]]:
-    """
-    Automatically choose between PARC-enhanced and legacy item swap.
-
-    If the item has PARC field offsets (parc_parsed=True), uses the enhanced
-    swap that patches _transferredItemKey at its exact offset.
-    Otherwise falls back to the legacy pattern-based swap.
-    """
     if item.parc_parsed and item.field_offsets:
         return apply_item_swap_parc(data, item, new_key)
     return apply_item_swap(data, item, new_key)
@@ -1284,13 +1165,6 @@ def apply_item_swap_all(
     item: SaveItem,
     new_key: int,
 ) -> List[Tuple[int, bytes, bytes]]:
-    """
-    Swap ALL occurrences of an item's key within item-bearing blocks.
-    Use when you want to replace every instance of this item type at once
-    (e.g., all 15 kite shields become balgran shields).
-    Only patches within Equipment/Inventory/Store/Mercenary blocks.
-    Returns list of (offset, old_bytes, new_bytes) for undo.
-    """
     patches: List[Tuple[int, bytes, bytes]] = []
     old_key = struct.unpack_from("<I", data, item.offset + 12)[0]
     old_key_bytes = struct.pack("<I", old_key)

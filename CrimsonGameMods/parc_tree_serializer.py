@@ -1,18 +1,3 @@
-"""
-PARC Tree Serializer — Tree-to-Bytes Engine (v2: range-based)
-
-Strategy: Walk the block's byte range in order. For each region:
-  - Unmodified fields/gaps → copy raw bytes from original blob
-  - Modified fields → serialize from the tree with fresh offsets
-
-This ensures byte-identical round-trip for unmodified blocks (Phase 1 gate)
-and correct serialization for modified blocks (Phase 3+).
-
-Two-pass PO fixup:
-    Pass 1: Copy/serialize all bytes. For inline objects and list elements,
-            record each payload_offset position and its payload start.
-    Pass 2: Given block_abs_start, patch all POs to absolute addresses.
-"""
 
 from __future__ import annotations
 
@@ -29,7 +14,6 @@ from save_parser import GenericFieldValue, ObjectBlock, TypeDef
 
 @dataclass
 class _POFixup:
-    """A payload_offset u32 that needs absolute address fixup."""
     buf_position: int
     payload_rel: int
 
@@ -40,11 +24,6 @@ def serialize_object_block(
     raw_blob: bytes,
     block_abs_start: int = 0,
 ) -> bytes:
-    """Serialize a full ObjectBlock to bytes.
-
-    For round-trip: copies raw bytes, only recomputing POs when needed.
-    For modified blocks: re-serializes changed sub-trees with fresh offsets.
-    """
     if _tree_is_modified(block.fields):
         return _serialize_modified_block(block, schema_types, raw_blob, block_abs_start)
 
@@ -99,10 +78,6 @@ def _collect_ranges(
     fields: list[GenericFieldValue],
     out: list[tuple[int, int, GenericFieldValue | None, bool]],
 ) -> None:
-    """Recursively collect all byte ranges from a field tree.
-
-    Each entry: (abs_start, abs_end, field_ref, is_payload_offset)
-    """
     for f in fields:
         if not f.present:
             continue
@@ -121,7 +96,6 @@ def _collect_inline_object_ranges(
     f: GenericFieldValue,
     out: list[tuple[int, int, GenericFieldValue | None, bool]],
 ) -> None:
-    """Split an inline object into: locator bytes, PO u32, payload bytes."""
     if f.child_payload_offset > 0:
         po_start = f.child_payload_offset - 4
         if f.start_offset < po_start:
@@ -137,7 +111,6 @@ def _collect_list_ranges(
     f: GenericFieldValue,
     out: list[tuple[int, int, GenericFieldValue | None, bool]],
 ) -> None:
-    """Split an object list into: header, then each element's ranges."""
     elements = f.list_elements or []
 
     if not elements:
@@ -163,11 +136,6 @@ def _fixup_all_pos(
     orig_block_start: int,
     delta: int,
 ) -> None:
-    """When a block moves, update all PO u32 values by delta.
-
-    Walks the tree to find every PO position, reads the current value,
-    and adds delta.
-    """
     if delta == 0:
         return
     for f in fields:
@@ -192,7 +160,6 @@ def _fixup_all_pos(
 
 
 def _tree_is_modified(fields: list[GenericFieldValue]) -> bool:
-    """Check if any field in the tree has been modified."""
     for f in fields:
         if f.note and '[modified]' in f.note:
             return True
@@ -217,11 +184,6 @@ def _serialize_modified_block(
     raw_blob: bytes,
     block_abs_start: int,
 ) -> bytes:
-    """Serialize a modified block by re-emitting all bytes with fresh offsets.
-
-    Copies raw bytes for all unmodified regions (including undecoded trailing data).
-    Only re-serializes fields that are marked [modified] or contain new elements.
-    """
     buf = bytearray()
     po_fixups: list[_POFixup] = []
 
@@ -254,12 +216,6 @@ def _emit_fields(
     abs_start: int | None = None,
     abs_end: int | None = None,
 ) -> None:
-    """Emit all present fields in order.
-
-    abs_start / abs_end: absolute offsets in raw_blob of the containing region.
-    When provided, gaps between fields and trailing undecoded bytes are filled
-    from raw_blob, preventing data loss.
-    """
     positioned = [f for f in fields if f.present and f.start_offset > 0]
     new_fields = [f for f in fields if f.present and f.start_offset == 0]
     positioned.sort(key=lambda f: f.start_offset)
@@ -287,7 +243,6 @@ def _emit_single_field(
     raw_blob: bytes,
     schema_types: dict[int, TypeDef],
 ) -> None:
-    """Emit one field — dispatch by meta_kind."""
 
     if field.meta_kind in (0, 1, 2, 3):
         if field.note and '[modified]' in field.note and field.edit_format and field.meta_kind in (0, 2):
@@ -311,7 +266,6 @@ def _emit_single_field(
 
 
 def _serialize_scalar_value(field: GenericFieldValue) -> bytes | None:
-    """Serialize a scalar field from its value_repr and edit_format."""
     fmt = field.edit_format
     val_str = field.value_repr
     try:
@@ -342,7 +296,6 @@ def _emit_inline_object(
     raw_blob: bytes,
     schema_types: dict[int, TypeDef],
 ) -> None:
-    """Emit an inline object: locator header + payload."""
     if field.child_fields is None:
         if field.start_offset > 0 and field.end_offset > field.start_offset:
             buf += raw_blob[field.start_offset:field.end_offset]
@@ -393,7 +346,6 @@ def _emit_object_list(
     raw_blob: bytes,
     schema_types: dict[int, TypeDef],
 ) -> None:
-    """Emit an object list: header + elements."""
     elements = field.list_elements or []
 
     if field.list_elements is None:
@@ -438,7 +390,6 @@ def _emit_list_element(
     raw_blob: bytes,
     schema_types: dict[int, TypeDef],
 ) -> None:
-    """Emit a single list element with fresh PO and trailing_size."""
     if elem.child_fields is None:
         if hasattr(elem, '_raw_bytes') and elem._raw_bytes:
             buf += elem._raw_bytes
@@ -477,7 +428,6 @@ def _emit_list_element(
 
 
 def _patch_list_count(header: bytearray, field: GenericFieldValue, count: int) -> None:
-    """Patch the element count in a list header."""
     prefix_u8 = field.list_prefix_u8
     header_offset = 0
     if field.note and 'header_offset=+' in field.note:
@@ -508,10 +458,6 @@ def _patch_list_count(header: bytearray, field: GenericFieldValue, count: int) -
 
 
 def round_trip_test(raw_blob: bytes, result: dict) -> list[str]:
-    """Test round-trip: parse every block, serialize, compare bytes.
-
-    Returns list of error strings. Empty = all blocks match.
-    """
     schema_types = {t.index: t for t in result['schema']['types']}
     errors = []
 

@@ -1,23 +1,3 @@
-"""
-terrainregionautospawninfo.pabgb deep parser — extracts nested spawn density fields.
-
-Parses the full nested structure:
-  TerrainRegionAutoSpawnInfo
-    -> _spawnList: AutoSpawnTargetData[] (sub_141067560, 112B runtime per element)
-         -> _partySpawnList: AutoSpawnPartyData[] (sub_1410673B0, 72B runtime)
-              -> _characterSpawnList (sub_141059310)
-              -> _spawnRate (f32, default 1.0)
-              -> _spawnPercent (f32)
-         -> _spawnLimitCount (u16 via key lookup)
-         -> _metersPerSpawn (f32 via key lookup)
-         -> _spawnDistance, _spawnSafetyDistance, _timeBegin, _timeEnd
-
-IDA references:
-  sub_141067560 — AutoSpawnTargetData array reader
-  sub_1410597C0 — AutoSpawnTargetData element reader (16 fields)
-  sub_1410673B0 — AutoSpawnPartyData array reader
-  sub_141059420 — AutoSpawnPartyData element reader (15 fields)
-"""
 import struct
 import json
 import sys
@@ -48,7 +28,6 @@ def _read_cstring(D, p):
 
 
 def _skip_cstring_array(D, p):
-    """Skip array of CStrings (sub_140FD2180): u32 count + count * CString."""
     count, p = _u32(D, p)
     if count > 10000: return -1
     for _ in range(count):
@@ -59,37 +38,24 @@ def _skip_cstring_array(D, p):
 
 
 def _skip_key_lookup_array_u16(D, p):
-    """Array: u32 count + count * 2B (sub_14105EA70: reads u16 per element from stream)."""
     count, p = _u32(D, p)
     if count > 100000: return -1
     return p + count * 2
 
 
 def _skip_key_lookup_array_u32(D, p):
-    """Array: u32 count + count * 4B (tag hashes)."""
     count, p = _u32(D, p)
     if count > 100000: return -1
     return p + count * 4
 
 
 def _skip_byte_array(D, p):
-    """Array: u32 count + count * 1B elements (sub_14105F260: byte array)."""
     count, p = _u32(D, p)
     if count > 100000: return -1
     return p + count * 1
 
 
 def parse_character_spawn_list(D, p):
-    """Parse _characterSpawnList (sub_141059310 elements).
-    Each element from IDA decompile:
-      1. enum _1336: 4B stream
-      2. u16 key lookup: 2B stream
-      3. enum _1336: 4B stream
-      4. u16 key lookup: 2B stream
-      5. u8: 1B
-      6. u8: 1B
-    Total: 14B per element in stream.
-    """
     count, p = _u32(D, p)
     if count > 10000: return [], -1
     chars = []
@@ -101,25 +67,6 @@ def parse_character_spawn_list(D, p):
 
 
 def parse_party_data(D, p, end):
-    """Parse one AutoSpawnPartyData element from stream.
-
-    Stream format (from IDA sub_141059420):
-    1. _characterSpawnList: u32 count + count * 4B keys
-    2. _spawnDataName: u32 key lookup
-    3. enum _1341: 4B -> _spawnReason
-    4. enum _1338: 4B
-    5. enum _1335: 4B
-    6. u32 key lookup -> _sequencerSpawnInfo
-    7. 4B -> _spawnPercent (f32)
-    8. 4B -> _spawnRate (f32)
-    9. 4B -> _maxWaterDepth (f32)
-    10. 4B -> _minWaterDepth (f32)
-    11. sub_140F73940 (color/formation): 12B (3 floats)
-    12. 1B -> _isFactionSequencerSpawn
-    13. 1B -> _isPartySameTeam
-    14. 1B -> _isDuplicatable
-    15. 8B -> _gimmickInfo/_itemInfo
-    """
     party = {}
 
     chars, p = parse_character_spawn_list(D, p)
@@ -161,20 +108,6 @@ def parse_party_data(D, p, end):
 
 
 def parse_target_data(D, p, end):
-    """Parse one AutoSpawnTargetData element from stream.
-
-    Stream format (from IDA sub_1410597C0):
-    1. _partySpawnList: sub_1410673B0 (complex array)
-    2. _regionInfoList: sub_14105EA70 (u16 key array)
-    3. _notSpawnRegionInfoList: sub_14105EA70
-    4. _spawnRegionTagList: sub_14105DE80 (u32 array)
-    5. _notSpawnRegionTagList: sub_14105DE80
-    6. 4B key lookup -> _spawnLimitCount
-    7. 4B key lookup -> _metersPerSpawn
-    8-9. 4B, 4B -> distances
-    10-11. 4B, 4B -> more fields
-    12-16. 1B, 1B, 1B, 1B, 1B, 2B -> flags and enum
-    """
     target = {}
 
     party_count, p = _u32(D, p)
@@ -223,7 +156,6 @@ def parse_target_data(D, p, end):
 
 
 def parse_terrain_entry(D, eoff, end):
-    """Parse one TerrainRegionAutoSpawnInfo entry."""
     p = eoff
     entry = {}
 
@@ -277,7 +209,6 @@ def parse_terrain_entry(D, eoff, end):
 
 
 def parse_pabgh(G):
-    """Parse pabgh index file."""
     c16 = struct.unpack_from('<H', G, 0)[0]
     if 2 + c16 * 8 == len(G):
         idx_start, count = 2, c16
@@ -293,7 +224,6 @@ def parse_pabgh(G):
 
 
 def parse_all(pabgb_path, pabgh_path):
-    """Parse all terrain region spawn entries."""
     with open(pabgb_path, 'rb') as f: D = f.read()
     with open(pabgh_path, 'rb') as f: G = f.read()
 
@@ -318,7 +248,6 @@ def parse_all(pabgb_path, pabgh_path):
 
 
 def summarize(entries):
-    """Print summary of parsed data."""
     total_targets = sum(e.get('spawn_count', 0) for e in entries)
     total_parties = sum(
         sum(t.get('party_count', 0) for t in e.get('targets', []))
@@ -354,12 +283,6 @@ def summarize(entries):
 
 
 def find_spawn_rates_by_signature(D):
-    """Find all spawn_rate positions using the signature: 12 zero bytes + float.
-    Returns list of (offset, current_value) tuples.
-
-    The spawn_rate field is always preceded by 3 zero u32s (water depths + padding)
-    and the value is a f32 (typically 1.0).
-    """
     target = struct.pack('<f', 1.0)
     zero12 = b'\x00' * 12
     positions = []
@@ -372,9 +295,6 @@ def find_spawn_rates_by_signature(D):
 
 
 def find_rates_per_entry(D, G):
-    """Map spawn_rate positions to their parent terrain region entries.
-    Returns list of {name, key, rates: [(offset, value)]} dicts.
-    """
     idx = parse_pabgh(G)
     idx_sorted = sorted(idx, key=lambda x: x[1])
     all_rates = find_spawn_rates_by_signature(D)
@@ -399,9 +319,6 @@ def find_rates_per_entry(D, G):
 
 
 def get_verified_rate_offsets(D, G):
-    """Get spawn rate offsets verified by the parse tree (safe to modify).
-    Returns list of (offset, current_value, region_name) tuples.
-    """
     entries, failures, _ = parse_all_from_bytes(D, G)
     verified = []
     for e in entries:
@@ -418,7 +335,6 @@ def get_verified_rate_offsets(D, G):
 
 
 def parse_all_from_bytes(D, G):
-    """Parse from raw bytes (no file I/O)."""
     idx = parse_pabgh(G)
     sorted_offs = sorted(set(off for _, off in idx))
     entries = []
@@ -437,13 +353,6 @@ def parse_all_from_bytes(D, G):
 
 
 def multiply_spawn_rates(D, G, multiplier):
-    """Set/multiply spawn rates. Returns count of changes.
-
-    Vanilla rates are 0.0 (meaning "use default = 1.0").
-    This sets them to the multiplier value, effectively: rate = max(current, 1.0) * multiplier.
-
-    Only modifies offsets verified by the parse tree — no false positives.
-    """
     verified = get_verified_rate_offsets(bytes(D), G)
     count = 0
     for offset, current, name in verified:
@@ -455,20 +364,6 @@ def multiply_spawn_rates(D, G, multiplier):
 
 
 def parse_spawningpool_entry(D, eoff, end):
-    """Parse one SpawningPoolAutoSpawnInfo entry.
-    Field order from IDA decompile of sub_143A533C0_0_61:
-      1. _key (4B)
-      2. _stringKey (CString)
-      3. _isBlocked (1B)
-      4. _spawnList (sub_141067560 — AutoSpawnTargetData[], SAME as terrain)
-      5. _meshNameList (sub_14105DE80 — u32 tag array)
-      6. _spawningPoolData (CString)
-      7. _type (1B)
-      8. _nearOuterRadius (4B f32)
-      9. _nearInnerRadius (4B f32)
-      10. _spawnSafetyDistance (4B f32)
-      11-15. u8 flags
-    """
     p = eoff
     entry = {}
     try:
@@ -507,7 +402,6 @@ def parse_spawningpool_entry(D, eoff, end):
 
 
 def parse_spawningpool_all(pabgb_path_or_bytes, pabgh_path_or_bytes):
-    """Parse all SpawningPoolAutoSpawnInfo entries."""
     if isinstance(pabgb_path_or_bytes, (bytes, bytearray)):
         D = bytes(pabgb_path_or_bytes)
         G = bytes(pabgh_path_or_bytes)

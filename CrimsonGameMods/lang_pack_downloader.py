@@ -1,38 +1,3 @@
-"""
-lang_pack_downloader.py — on-demand language pack fetching.
-
-Responsibilities
-----------------
-* Tell callers whether a pack is already installed (bundled OR user-downloaded).
-* Download `{lang}.json` and, when available, `names_{lang}.json` from GitHub.
-* Provide an atomic write (tempfile + os.replace) so a failed download never
-  leaves a truncated file on disk.
-* Remain dependency-free (stdlib `urllib.request` only).
-
-User-writable directory
------------------------
-Downloaded packs live in a per-user directory so they survive exe re-installs
-and don't require admin rights:
-
-* Frozen build: ``{exe_dir}/locale``  (writable alongside the exe)
-* Dev / source: ``{repo}/locale``    (the bundled folder itself)
-
-Additionally we ALWAYS honor the system user-data dir
-(``%LOCALAPPDATA%/CrimsonSaveEditor/locale`` on Windows,
-``~/.local/share/CrimsonSaveEditor/locale`` on POSIX) as the primary cache, so
-the same downloaded JSON can be shared across multiple installed copies.
-
-The resolver looks in this order when answering ``is_pack_local``:
-
-1. System user-data dir  (highest priority; always writable)
-2. ``{exe_dir}/locale``  (ships/write target for frozen builds)
-3. ``_MEIPASS/locale``   (PyInstaller bundle — read-only)
-4. Repo ``locale/``      (dev)
-5. Repo ``dist/locale/`` (legacy)
-
-Downloads always go to **User_LOCALE_DIR**, which is defined as the first
-writable directory in the list above.
-"""
 
 from __future__ import annotations
 
@@ -97,7 +62,6 @@ ENGLISH_NAMES: Dict[str, str] = {
 
 
 def _system_user_locale_dir() -> Path:
-    """Return the canonical per-user locale dir (always writable for the user)."""
     if sys.platform.startswith("win"):
         base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
         return Path(base) / "CrimsonSaveEditor" / "locale"
@@ -125,7 +89,6 @@ def _dist_locale_dir() -> Path:
 
 
 def search_dirs() -> List[Path]:
-    """All directories to search for a pack, highest priority first."""
     out: List[Path] = []
     seen: set = set()
 
@@ -153,12 +116,10 @@ USER_LOCALE_DIR: Path = _system_user_locale_dir()
 
 
 def local_pack_path(lang: str) -> Path:
-    """Return the download target path for ``{lang}.json``."""
     return USER_LOCALE_DIR / f"{lang}.json"
 
 
 def local_names_path(lang: str) -> Path:
-    """Return the download target path for ``names_{lang}.json``."""
     return USER_LOCALE_DIR / f"names_{lang}.json"
 
 
@@ -184,10 +145,6 @@ def _candidate_filenames(lang: str) -> List[str]:
 
 
 def is_pack_local(lang: str) -> bool:
-    """True if ``{lang}.json`` exists anywhere on the search path.
-
-    English is always 'local' (built into source strings).
-    """
     if not lang or lang == "en":
         return True
     names = _candidate_filenames(lang)
@@ -203,7 +160,6 @@ def is_pack_local(lang: str) -> bool:
 
 
 def has_names_pack(lang: str) -> bool:
-    """True if names_{lang}.json exists locally (pre-translated game data)."""
     if lang == "en":
         return True
     target = f"names_{lang}.json"
@@ -226,7 +182,6 @@ def has_names_pack(lang: str) -> bool:
 
 
 def _atomic_write(dest: Path, data: bytes) -> None:
-    """Write ``data`` to ``dest`` atomically (temp file + replace)."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_path = tempfile.mkstemp(
         prefix=dest.name + ".",
@@ -259,11 +214,6 @@ def _download_one(
     label: str,
     progress_cb: Optional[Callable[[str, int, int], None]] = None,
 ) -> bool:
-    """Download ``url`` to ``dest`` atomically.
-
-    Returns True on success, False if the file wasn't available or the write
-    failed. Never raises to the caller.
-    """
     try:
         if progress_cb:
             progress_cb(label, 0, 0)
@@ -318,12 +268,6 @@ def download_pack(
     lang: str,
     progress_cb: Optional[Callable[[str, int, int], None]] = None,
 ) -> bool:
-    """Download ``{lang}.json`` (and best-effort ``names_{lang}.json``).
-
-    Returns True if the UI pack was downloaded (or already present). The names
-    pack is optional — a False return from the names download does not fail the
-    overall call because not every language has a names pack.
-    """
     if not lang or lang == "en":
         return True
     if lang not in SUPPORTED_LANGS:
@@ -348,11 +292,6 @@ def download_pack(
 
 
 def list_remote_packs() -> List[str]:
-    """Return the list of language codes available on GitHub.
-
-    Attempts to fetch ``manifest.json`` first; falls back to
-    :data:`SUPPORTED_LANGS` when the manifest can't be reached.
-    """
     try:
         data = _http_get(MANIFEST_URL, timeout=10.0)
         parsed = json.loads(data.decode("utf-8"))
@@ -370,7 +309,6 @@ def list_remote_packs() -> List[str]:
 
 
 def get_remote_manifest() -> Dict[str, Dict[str, object]]:
-    """Return the full manifest dict, or a synthesised one if unavailable."""
     try:
         data = _http_get(MANIFEST_URL, timeout=10.0)
         parsed = json.loads(data.decode("utf-8"))
@@ -391,7 +329,6 @@ def get_remote_manifest() -> Dict[str, Dict[str, object]]:
 
 
 def local_pack_native_name(lang: str) -> str:
-    """Read ``_language_name`` from the first local copy of ``{lang}.json``."""
     if lang == "en":
         return "English"
     for d in search_dirs():

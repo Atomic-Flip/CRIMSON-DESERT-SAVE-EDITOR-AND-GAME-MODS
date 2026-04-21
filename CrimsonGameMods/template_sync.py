@@ -1,9 +1,3 @@
-"""
-Template Sync — Download master DB, scan saves, upload new templates.
-
-Integrates with the save editor GUI. Runs in background threads.
-No personal data is uploaded — only item hex, mask, size, and field positions.
-"""
 from __future__ import annotations
 
 import base64
@@ -37,13 +31,11 @@ _SAVE_DIRS = [
 
 
 def _machine_id() -> str:
-    """Generate a short anonymous machine hash (no PII)."""
     raw = f"{platform.node()}-{platform.machine()}-{os.getlogin()}"
     return hashlib.sha256(raw.encode()).hexdigest()[:12]
 
 
 def download_master() -> dict:
-    """Download the master template DB from GitHub."""
     try:
         log.info("Downloading master template DB...")
         req = Request(_MASTER_URL)
@@ -63,7 +55,6 @@ def download_master() -> dict:
 
 
 def load_local_master() -> dict:
-    """Load the cached master DB."""
     if os.path.isfile(_LOCAL_MASTER):
         with open(_LOCAL_MASTER, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -71,7 +62,6 @@ def load_local_master() -> dict:
 
 
 def find_all_saves() -> list:
-    """Find all save files on this machine."""
     saves = []
     for base in _SAVE_DIRS:
         if not os.path.isdir(base):
@@ -93,10 +83,6 @@ def find_all_saves() -> list:
 
 
 def scan_save_for_templates(save_path: str) -> dict:
-    """Scan a single save file and extract item templates.
-
-    Returns {itemKey_str: {hex, mask, size, field_positions}}.
-    """
     try:
         from save_crypto import load_save_file
         from item_template_db import extract_items_from_parse_tree, _get_parser
@@ -125,7 +111,6 @@ def scan_save_for_templates(save_path: str) -> dict:
 
 
 def scan_all_saves() -> dict:
-    """Scan all saves and return combined templates."""
     saves = find_all_saves()
     log.info("Found %d save files to scan", len(saves))
 
@@ -144,7 +129,6 @@ def scan_all_saves() -> dict:
 
 
 def find_new_templates(local: dict, master: dict) -> dict:
-    """Find templates in local that aren't in master (or are smaller)."""
     master_templates = master.get('templates', {})
     new = {}
     for key, t in local.items():
@@ -156,13 +140,6 @@ def find_new_templates(local: dict, master: dict) -> dict:
 
 
 def upload_contribution(new_templates: dict) -> tuple[bool, str]:
-    """Upload new templates to GitHub contributions folder.
-
-    Creates a unique file per upload — no conflicts between users.
-    GitHub Action merges all contributions into master_templates.json.
-
-    Returns (success, message).
-    """
     if not new_templates:
         return True, "No new templates to contribute."
 
@@ -207,16 +184,6 @@ def upload_contribution(new_templates: dict) -> tuple[bool, str]:
 
 
 def get_sync_status() -> dict:
-    """Get the current sync status.
-
-    Returns:
-        {
-            'master_count': int,
-            'local_count': int,
-            'new_count': int,
-            'coverage_pct': float,
-        }
-    """
     master = load_local_master()
     master_count = len(master.get('templates', {}))
 
@@ -244,14 +211,6 @@ def get_sync_status() -> dict:
 
 
 def full_sync(progress_callback=None) -> str:
-    """Run the full sync pipeline:
-    1. Download master DB
-    2. Scan local saves
-    3. Find new templates
-    4. Upload contributions
-
-    Returns a status message.
-    """
     if progress_callback:
         progress_callback("Downloading master template database...")
 

@@ -1,17 +1,3 @@
-"""PAMT index parser for Crimson Desert PAZ archives.
-
-Parses .pamt files to discover file entries, their locations in PAZ archives,
-sizes, and compression info.
-
-Usage:
-    python paz_parse.py <file.pamt> [--paz-dir <dir>] [--filter <pattern>]
-
-Library usage:
-    from paz_parse import parse_pamt
-    entries = parse_pamt("0.pamt", paz_dir="./0003")
-    for e in entries:
-        print(e.path, e.comp_size, e.orig_size)
-"""
 
 import os
 import struct
@@ -21,7 +7,6 @@ from dataclasses import dataclass
 
 @dataclass
 class PazEntry:
-    """A single file entry in a PAZ archive."""
     path: str
     paz_file: str
     offset: int
@@ -36,25 +21,14 @@ class PazEntry:
 
     @property
     def compression_type(self) -> int:
-        """0=none, 2=LZ4, 3=custom, 4=zlib"""
         return (self.flags >> 16) & 0x0F
 
     @property
     def encrypted(self) -> bool:
-        """XML files in encrypted folders are ChaCha20-encrypted."""
         return self.path.lower().endswith('.xml')
 
 
 def parse_pamt(pamt_path: str, paz_dir: str = None) -> list[PazEntry]:
-    """Parse a .pamt index file and return all file entries.
-
-    Args:
-        pamt_path: path to the .pamt file
-        paz_dir: directory containing .paz files (default: same dir as .pamt)
-
-    Returns:
-        list of PazEntry
-    """
     with open(pamt_path, 'rb') as f:
         data = f.read()
 

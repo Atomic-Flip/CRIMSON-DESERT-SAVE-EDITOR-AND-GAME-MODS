@@ -1,14 +1,3 @@
-"""
-PAZ Archive Patcher — Crimson Desert Game Data Patches
-
-Applies in-place binary patches to PAZ archive files using signature scanning.
-Supports backup, restore, and status checking.
-
-After patching PAZ bytes, also updates the PAMT checksum and the PAPGT integrity
-manifest so the game accepts the modified archive.
-
-Also includes ItemBuffPatcher for injecting custom buffs/skills into iteminfo.pabgb.
-"""
 from __future__ import annotations
 
 import io
@@ -34,7 +23,6 @@ _CHECKSUM_TRIPLE = struct.Struct("<III")
 
 
 def _rot(x: int, k: int) -> int:
-    """Rotate left within 32 bits."""
     return ((x << k) | (x >> (32 - k))) & _M
 
 
@@ -60,11 +48,6 @@ def _final(a: int, b: int, c: int) -> tuple:
 
 
 def pa_checksum(data: bytes) -> int:
-    """Calculate the PA archive checksum (Jenkins hashlittle2 variant).
-
-    Used for both PAMT and PAPGT integrity checks.
-    Input should be the file data starting at offset 12 (skip the header).
-    """
     length = len(data)
     if length == 0:
         return 0
@@ -100,7 +83,6 @@ SCAN_CHUNK_SIZE = 4 * 1024 * 1024
 
 @dataclass
 class PatchEntry:
-    """A single byte replacement within a patch."""
     offset_from_sig: int
     old_bytes: bytes
     new_bytes: bytes
@@ -108,7 +90,6 @@ class PatchEntry:
 
 @dataclass
 class PazPatch:
-    """Definition of a PAZ archive patch."""
     name: str
     description: str
     paz_file: str
@@ -119,7 +100,6 @@ class PazPatch:
 
 @dataclass
 class PatchStatus:
-    """Result of checking a patch's current state."""
     name: str
     status: str
     detail: str = ""
@@ -179,7 +159,6 @@ INVENTORY_SIGNATURE = bytes([
 
 
 def _build_inventory_patch() -> PazPatch:
-    """Build the max inventory slots patch."""
     return PazPatch(
         name="Max Inventory Slots",
         description="Sets starting inventory to 200 slots (vanilla: 50). Max stays at 240.",
@@ -202,13 +181,6 @@ def _build_inventory_patch() -> PazPatch:
 
 
 def _build_mount_cooldown_patch() -> PazPatch:
-    """Build the no-cooldown mounts patch.
-
-    Strategy: find "BearWarMachine\\x00" as the anchor signature in the PAZ,
-    then compute all other cooldown locations relative to it.
-    The pabgb data is embedded somewhere in the PAZ, so we find the first
-    vehicle name and use relative offsets from the known absolute pabgb offsets.
-    """
     anchor_name = "BearWarMachine"
     anchor_sig = anchor_name.encode("ascii") + b"\x00"
     anchor_pabgb_offset = VEHICLE_COOLDOWN_OFFSETS[anchor_name]
@@ -235,14 +207,12 @@ def _build_mount_cooldown_patch() -> PazPatch:
 
 
 def get_all_patches() -> List[PazPatch]:
-    """Return all available patch definitions."""
     return [
         _build_mount_cooldown_patch(),
     ]
 
 
 class PazPatchManager:
-    """Manages scanning, applying, and reverting PAZ file patches."""
 
     def __init__(self, game_path: str = ""):
         self.game_path = game_path
@@ -250,7 +220,6 @@ class PazPatchManager:
 
     @staticmethod
     def find_game_path() -> str:
-        """Auto-detect the Crimson Desert installation directory."""
         candidates = []
 
         for letter in string.ascii_uppercase:
@@ -273,17 +242,14 @@ class PazPatchManager:
         return ""
 
     def get_paz_path(self, relative: str) -> str:
-        """Get the full path to a PAZ file."""
         return os.path.join(self.game_path, relative.replace("/", os.sep))
 
     def get_backup_path(self, paz_path: str) -> str:
-        """Get the backup path for a PAZ file."""
         return paz_path + ".backup"
 
 
     @staticmethod
     def scan_for_signature(paz_path: str, signature: bytes) -> int:
-        """Scan a PAZ file for a byte signature. Returns the file offset or -1."""
         sig_len = len(signature)
         overlap = sig_len - 1
 
@@ -309,7 +275,6 @@ class PazPatchManager:
 
 
     def check_status(self, patch: PazPatch) -> PatchStatus:
-        """Check whether a patch is currently applied."""
         paz_path = self.get_paz_path(patch.paz_file)
 
         if not os.path.isfile(paz_path):
@@ -355,7 +320,6 @@ class PazPatchManager:
                                f"{applied_count}/{total_checkable} patches active")
 
     def check_mount_cooldown_status(self, patch: PazPatch) -> PatchStatus:
-        """Specialized status check for mount cooldown patch — reads actual cooldown values."""
         paz_path = self.get_paz_path(patch.paz_file)
 
         if not os.path.isfile(paz_path):
@@ -395,7 +359,6 @@ class PazPatchManager:
                                f"{zeroed}/{total} cooldowns zeroed")
 
     def check_inventory_status(self, patch: PazPatch) -> PatchStatus:
-        """Specialized status check for inventory patch — reads slot counts."""
         paz_path = self.get_paz_path(patch.paz_file)
 
         if not os.path.isfile(paz_path):
@@ -427,7 +390,6 @@ class PazPatchManager:
                                f"Default={default_slots}, Max={max_slots} (custom)")
 
     def get_detailed_status(self, patch: PazPatch) -> PatchStatus:
-        """Get detailed status using the appropriate specialized checker."""
         if patch.name == "Mount Death Respawn (1s)":
             return self.check_mount_cooldown_status(patch)
         elif patch.name == "Max Inventory Slots":
@@ -437,16 +399,13 @@ class PazPatchManager:
 
 
     def _get_pamt_path(self, paz_file: str) -> str:
-        """Get the PAMT path corresponding to a PAZ file (e.g. '0008/0.paz' -> '0008/0.pamt')."""
         folder = os.path.dirname(paz_file)
         return os.path.join(self.game_path, folder, "0.pamt")
 
     def _get_papgt_path(self) -> str:
-        """Get the PAPGT integrity manifest path."""
         return os.path.join(self.game_path, "meta", "0.papgt")
 
     def _get_related_paths(self, paz_file: str) -> List[str]:
-        """Get all files that need backup for a given PAZ file: PAZ, PAMT, PAPGT."""
         paz_path = self.get_paz_path(paz_file)
         pamt_path = self._get_pamt_path(paz_file)
         papgt_path = self._get_papgt_path()
@@ -459,7 +418,6 @@ class PazPatchManager:
 
 
     def _backup_single_file(self, file_path: str) -> Tuple[bool, str]:
-        """Create a backup of a single file. Only creates if no backup exists."""
         backup_path = self.get_backup_path(file_path)
 
         if os.path.isfile(backup_path):
@@ -476,7 +434,6 @@ class PazPatchManager:
             return False, f"Failed to create backup of {file_path}: {e}"
 
     def create_backup(self, paz_path: str) -> Tuple[bool, str]:
-        """Create backups of the PAZ file and its related PAMT/PAPGT files."""
         messages = []
         ok, msg = self._backup_single_file(paz_path)
         if not ok:
@@ -501,7 +458,6 @@ class PazPatchManager:
         return True, "; ".join(messages)
 
     def _restore_single_file(self, file_path: str) -> Tuple[bool, str]:
-        """Restore a single file from its backup."""
         backup_path = self.get_backup_path(file_path)
         if not os.path.isfile(backup_path):
             return False, f"No backup found at {backup_path}"
@@ -512,7 +468,6 @@ class PazPatchManager:
             return False, f"Failed to restore {file_path}: {e}"
 
     def restore_backup(self, patch: PazPatch) -> Tuple[bool, str]:
-        """Restore a PAZ file (and its PAMT/PAPGT) from backups."""
         paz_path = self.get_paz_path(patch.paz_file)
         restored = []
         errors = []
@@ -546,7 +501,6 @@ class PazPatchManager:
         return True, detail
 
     def restore_all_backups(self) -> Tuple[bool, str]:
-        """Restore all PAZ/PAMT files that have backups, then update PAPGT."""
         patches = get_all_patches()
         restored = []
         errors = []
@@ -589,19 +543,11 @@ class PazPatchManager:
             return False, "No backups found to restore"
 
     def has_backup(self, patch: PazPatch) -> bool:
-        """Check if a backup exists for the patch's PAZ file."""
         paz_path = self.get_paz_path(patch.paz_file)
         return os.path.isfile(self.get_backup_path(paz_path))
 
 
     def update_pamt_checksum(self, pamt_path: str) -> Tuple[bool, str]:
-        """Recalculate and write the checksum for a PAMT file.
-
-        PAMT layout:
-          offset 0: u32 checksum (of data from offset 12 onward)
-          offset 4-11: header fields
-          offset 12+: entry data
-        """
         if not os.path.isfile(pamt_path):
             return False, f"PAMT not found: {pamt_path}"
 
@@ -634,21 +580,6 @@ class PazPatchManager:
             return False, f"Failed to update PAMT checksum: {e}"
 
     def update_papgt(self) -> Tuple[bool, str]:
-        """Recalculate and update all CRCs in meta/0.papgt.
-
-        PAPGT layout:
-          offset 0: u32 unknown0
-          offset 4: u32 checksum (of data from offset 12 onward)
-          offset 8: u8 entry_count, u8 unknown1, u16 unknown2
-          offset 12+: entries, each 12 bytes:
-            u32 unknown_a
-            u32 unknown_b
-            u32 pamt_crc  (checksum of that folder's 0.pamt[12:])
-
-        For each numbered folder, we read its 0.pamt, compute the checksum of
-        pamt[12:], and write it into the PAPGT entry. Then we recompute
-        PAPGT's own checksum over its data[12:] and write it at offset 4.
-        """
         papgt_path = self._get_papgt_path()
 
         if not os.path.isfile(papgt_path):
@@ -730,12 +661,6 @@ class PazPatchManager:
 
 
     def apply_patch(self, patch: PazPatch) -> Tuple[bool, str]:
-        """Apply a patch to the PAZ file with instant rollback on failure.
-
-        Saves original bytes before writing. If ANYTHING goes wrong (write error,
-        size change, verification failure), immediately restores original bytes.
-        No Steam verify needed to recover.
-        """
         paz_path = self.get_paz_path(patch.paz_file)
 
         if not os.path.isfile(paz_path):
@@ -817,7 +742,6 @@ class PazPatchManager:
         return True, result_msg
 
     def verify_signatures(self) -> List[PatchStatus]:
-        """Verify all patch signatures are findable in the PAZ files."""
         results = []
         for patch in get_all_patches():
             paz_path = self.get_paz_path(patch.paz_file)
@@ -890,7 +814,6 @@ _RATE_HASHES: Set[int] = set(BUFF_HASHES.values()) - _FLAT2_HASHES - _FLAT1_HASH
 
 
 def _stat_entry_size(hash_val: int) -> int:
-    """Return the byte size of a single stat entry (excluding array count)."""
     if hash_val in _FLAT2_HASHES:
         return 12
     if hash_val in _FLAT1_HASHES:
@@ -899,7 +822,6 @@ def _stat_entry_size(hash_val: int) -> int:
 
 
 def _stat_size_class(hash_val: int) -> str:
-    """Return 'flat2', 'flat1', or 'rate'."""
     if hash_val in _FLAT2_HASHES:
         return "flat2"
     if hash_val in _FLAT1_HASHES:
@@ -915,10 +837,6 @@ _ITEMINFO_PAMT_OFFSET  = 0x00096731
 
 
 def _find_pabgb_in_pamt(game_path: str, filename: str):
-    """Dynamically find a .pabgb file in the PAMT index.
-
-    Returns (paz_path, offset, comp_size, orig_size, pamt_comp_offset) or None.
-    """
     pamt_path = os.path.join(game_path, "0008", "0.pamt")
     if not os.path.isfile(pamt_path):
         return None
@@ -957,7 +875,6 @@ def _find_pabgb_in_pamt(game_path: str, filename: str):
 
 @dataclass
 class StatEntry:
-    """A single stat within a stat array."""
     offset: int
     hash_val: int
     value: int
@@ -975,7 +892,6 @@ class StatEntry:
 
 @dataclass
 class StatArray:
-    """A counted array of stats: [count u32][entries...]."""
     offset: int
     count: int
     entries: List[StatEntry]
@@ -991,7 +907,6 @@ StatTriplet = StatEntry
 
 @dataclass
 class ItemRecord:
-    """Parsed item from iteminfo.pabgb."""
     name: str
     name_offset: int
     data_offset: int
@@ -1001,15 +916,6 @@ class ItemRecord:
 
 
 class ItemBuffPatcher:
-    """Extracts, modifies, and repacks iteminfo.pabgb inside the PAZ archive.
-
-    Workflow:
-      1. extract_iteminfo()  — read + LZ4 decompress from PAZ
-      2. find_items()        — parse item names from the decompressed PABGB
-      3. find_stat_blocks()  — locate [count][hash][value] triplets in an item
-      4. inject_buff()       — insert a new stat triplet into an item
-      5. repack_iteminfo()   — LZ4 HC compress, write to PAZ, update PAMT + PAPGT
-    """
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -1034,16 +940,6 @@ class ItemBuffPatcher:
         self._paz_slot_capacity = self._detect_paz_slot_capacity()
 
     def _detect_paz_slot_capacity(self) -> int:
-        """Detect the actual PAZ slot capacity for iteminfo.pabgb.
-
-        The PAZ file allocates a fixed-size slot for each entry. The PAMT
-        comp_size field reflects the actual compressed data size, which may
-        be smaller than the slot after a repack with high compression.
-
-        We read the slot size from the PAZ file itself: scan from the end
-        of the compressed data to find where the next non-null entry begins.
-        Falls back to the known vanilla slot size (753344).
-        """
         KNOWN_SLOT = 753344
 
         try:
@@ -1061,7 +957,6 @@ class ItemBuffPatcher:
 
 
     def _read_pamt_compressed_size(self) -> int:
-        """Read the actual compressed size from the PAMT entry."""
         try:
             if self._pamt_comp_offset >= 0:
                 with open(self.pamt_path, "rb") as f:
@@ -1074,11 +969,6 @@ class ItemBuffPatcher:
         return self._comp_size
 
     def extract_iteminfo(self) -> bytes:
-        """Read and LZ4-decompress iteminfo.pabgb from the PAZ archive.
-
-        Returns the decompressed bytes.
-        Raises RuntimeError on failure.
-        """
         try:
             import crimson_rs
             pamt = crimson_rs.parse_pamt_file(self.pamt_path)
@@ -1142,12 +1032,6 @@ class ItemBuffPatcher:
 
 
     def find_items(self, data: bytes) -> List[ItemRecord]:
-        """Parse all item records from decompressed iteminfo.pabgb.
-
-        Uses the structural parser (iteminfo_parser) for accurate record
-        boundaries and byte-perfect roundtrip support. Falls back to simple
-        name scanning if the structural parser is unavailable.
-        """
         items: List[ItemRecord] = []
         if len(data) < 4:
             return items
@@ -1229,7 +1113,6 @@ class ItemBuffPatcher:
         return items
 
     def find_item_by_name(self, data: bytes, search: str) -> List[ItemRecord]:
-        """Find items matching a search string (case-insensitive partial match)."""
         all_items = self.find_items(data)
         search_lower = search.lower()
         return [
@@ -1240,17 +1123,6 @@ class ItemBuffPatcher:
 
     @staticmethod
     def find_stat_arrays(data: bytes, item: ItemRecord) -> List[StatArray]:
-        """Find all stat arrays within an item's data region.
-
-        The real binary format is:
-          count(u32) then N entries of variable size:
-            flat2 (12B): hash(4) + param1_u32(4) + param2_u32(4)
-            flat1 (8B):  hash(4) + value_u32(4)
-            rate  (5B):  hash(4) + level_u8(1)
-
-        Scans for [count][known_hash] patterns, then validates by
-        verifying all N entries in the array have known hashes.
-        """
         arrays: List[StatArray] = []
         region_start = item.data_offset
         region_end = item.data_end
@@ -1330,10 +1202,6 @@ class ItemBuffPatcher:
 
     @staticmethod
     def find_stat_blocks(data: bytes, item: ItemRecord) -> List[StatEntry]:
-        """Backwards-compatible: returns flat list of all StatEntry objects.
-
-        GUI code that expects a list of StatTriplet/StatEntry still works.
-        """
         arrays = ItemBuffPatcher.find_stat_arrays(data, item)
         entries: List[StatEntry] = []
         for arr in arrays:
@@ -1348,21 +1216,6 @@ class ItemBuffPatcher:
         buff_hash: int,
         value: int = 1,
     ) -> bytearray:
-        """Insert a 12-byte stat triplet at the given offset.
-
-        Inserts [count=1 u32][buff_hash u32][value u32] and shifts all
-        subsequent bytes forward by 12.
-
-        Args:
-            data: mutable decompressed PABGB data.
-            inject_offset: where to insert (typically right before or after
-                           an existing stat triplet).
-            buff_hash: the status/buff hash to inject.
-            value: the stat value or buff level.
-
-        Returns:
-            The modified bytearray (same object, mutated in-place).
-        """
         payload = struct.pack("<III", 1, buff_hash, value)
         result = data[:inject_offset] + payload + data[inject_offset:]
         return bytearray(result)
@@ -1373,10 +1226,6 @@ class ItemBuffPatcher:
         triplet: StatTriplet,
         new_value: int,
     ) -> bytearray:
-        """Change the value of an existing stat triplet in-place.
-
-        Does not change file size — only overwrites the 4-byte value field.
-        """
         value_offset = triplet.offset + 8
         struct.pack_into("<I", data, value_offset, new_value)
         return data
@@ -1390,12 +1239,6 @@ class ItemBuffPatcher:
         entry: StatEntry,
         new_value: int,
     ) -> bytearray:
-        """Change only the VALUE of an existing stat entry. No size change.
-
-        For flat2: writes param1 (u32) at offset+4.
-        For flat1: writes value (u32) at offset+4.
-        For rate:  writes level (u8 0-15) at offset+4.
-        """
         if entry.size_class == "rate":
             data[entry.offset + 4] = min(new_value, 15) & 0xFF
         else:
@@ -1408,10 +1251,6 @@ class ItemBuffPatcher:
         entry: StatEntry,
         new_hash: int,
     ) -> bool:
-        """Swap the stat hash of an entry. ONLY safe within the same size class.
-
-        Returns True if the swap was performed, False if size classes don't match.
-        """
         old_class = _stat_size_class(entry.hash_val)
         new_class = _stat_size_class(new_hash)
         if old_class != new_class:
@@ -1426,7 +1265,6 @@ class ItemBuffPatcher:
         new_hash: int,
         new_value: int,
     ) -> bytearray:
-        """Legacy compat: overwrite hash + value. Only safe for same size class."""
         old_class = _stat_size_class(triplet.hash_val)
         new_class = _stat_size_class(new_hash)
         if old_class != new_class:
@@ -1444,11 +1282,6 @@ class ItemBuffPatcher:
 
     @staticmethod
     def remove_stat(data: bytearray, triplet: StatEntry) -> bytearray:
-        """Remove a stat entry, shifting subsequent bytes back.
-
-        WARNING: This changes file size! Use with caution — only safe
-        if the array count is also decremented.
-        """
         start = triplet.offset
         end = start + triplet.entry_size
         result = data[:start] + data[end:]
@@ -1461,13 +1294,6 @@ class ItemBuffPatcher:
         target_stack: int = 9999,
         min_original: int = 2,
     ) -> Tuple[int, List[str]]:
-        """Patch stackSize for all items where original stack > min_original.
-
-        Skips equipment (stack=1) and items already at/above target.
-        Uses structural parsing — survives game updates.
-
-        Returns (count_patched, list of descriptions).
-        """
         items = self.find_items(bytes(data))
         patched = 0
         descriptions = []
@@ -1492,13 +1318,6 @@ class ItemBuffPatcher:
 
 
     def repack_iteminfo(self, modified_data: bytes) -> Tuple[bool, str]:
-        """LZ4 HC compress and write back to PAZ + update PAMT + PAPGT.
-
-        The compressed result must fit within the original 753,344-byte slot.
-        Pads with null bytes to match the original compressed size exactly.
-
-        Returns (success, message).
-        """
         if not HAS_LZ4:
             return False, "lz4 package not installed"
 
@@ -1612,7 +1431,6 @@ class ItemBuffPatcher:
         return True, result
 
     def restore_iteminfo(self) -> Tuple[bool, str]:
-        """Restore original PAZ/PAMT/PAPGT from backups."""
         return self._paz_manager.restore_all_backups()
 
 
@@ -1626,7 +1444,6 @@ _VEHICLE_SENTINEL = bytes.fromhex('73e1c5ea')
 
 @dataclass
 class VehicleRecord:
-    """Parsed vehicle record from vehicleinfo.pabgb."""
     name: str
     key: int
     rec_offset: int
@@ -1635,10 +1452,6 @@ class VehicleRecord:
 
 
 class VehiclePatcher:
-    """Extracts, patches cooldowns, and repacks vehicleinfo.pabgb inside the PAZ archive.
-
-    Uses the same decompress→edit→recompress pipeline as ItemBuffPatcher.
-    """
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -1662,12 +1475,6 @@ class VehiclePatcher:
 
 
     def _read_pamt_compressed_size(self) -> int:
-        """Read the actual compressed size from the PAMT entry.
-
-        After patching, the PAMT stores the real compressed size (which may
-        be smaller than the original slot size due to null padding).
-        Falls back to the dynamic or hardcoded value if PAMT cannot be read.
-        """
         if self._pamt_comp_offset >= 0:
             try:
                 with open(self.pamt_path, "rb") as f:
@@ -1680,7 +1487,6 @@ class VehiclePatcher:
         return self._comp_size
 
     def extract_vehicleinfo(self) -> bytes:
-        """Read and LZ4-decompress vehicleinfo.pabgb from the PAZ archive."""
         if not HAS_LZ4:
             raise RuntimeError(
                 "lz4 package is not installed. Install with: pip install lz4"
@@ -1718,12 +1524,6 @@ class VehiclePatcher:
 
     @staticmethod
     def parse_records(data: bytes) -> List[VehicleRecord]:
-        """Parse vehicle records from decompressed vehicleinfo.pabgb.
-
-        Each record: u16 key + u32 name_len + name(ascii) + null + field_data
-        The cooldown is a u16 at tail_offset + 23 (23 bytes from the end of a
-        33-byte tail block that ends each record).
-        """
         records: List[VehicleRecord] = []
         offset = 0
         length = len(data)
@@ -1793,16 +1593,6 @@ class VehiclePatcher:
         cooldown_value: int = 0,
         vehicle_filter: Optional[List[str]] = None,
     ) -> Tuple[bytearray, List[str]]:
-        """Patch cooldown fields in decompressed vehicleinfo.pabgb.
-
-        Args:
-            data: decompressed vehicleinfo.pabgb bytes
-            cooldown_value: target cooldown in seconds (0 = instant)
-            vehicle_filter: optional list of vehicle names to patch (None = all)
-
-        Returns:
-            (modified_data, list of patch descriptions)
-        """
         records = VehiclePatcher.parse_records(data)
         buf = bytearray(data)
         patched: List[str] = []
@@ -1827,7 +1617,6 @@ class VehiclePatcher:
 
 
     def check_cooldown_status(self) -> PatchStatus:
-        """Check current cooldown status by extracting and parsing vehicleinfo."""
         try:
             data = self.extract_vehicleinfo()
         except RuntimeError as e:
@@ -1853,15 +1642,6 @@ class VehiclePatcher:
         cooldown_value: int = 0,
         vehicle_filter: Optional[List[str]] = None,
     ) -> Tuple[bool, str]:
-        """Full pipeline: extract → patch cooldowns → recompress → write back.
-
-        Args:
-            cooldown_value: target cooldown (0 = instant)
-            vehicle_filter: optional list of vehicle names (None = all)
-
-        Returns:
-            (success, message)
-        """
         try:
             data = self.extract_vehicleinfo()
         except RuntimeError as e:
@@ -1963,7 +1743,6 @@ class VehiclePatcher:
         return True, result
 
     def restore_vehicleinfo(self) -> Tuple[bool, str]:
-        """Restore original PAZ/PAMT/PAPGT from backups."""
         return self._paz_manager.restore_all_backups()
 
 
@@ -1971,14 +1750,6 @@ _STORAGE_TARGETS = ["CampWareHouse", "WareHouse", "Bank", "Recovery", "Kuku"]
 
 
 class StoragePatcher:
-    """Patches storage/warehouse slot limits in inventory.pabgb.
-
-    Uses decompress→edit→recompress pipeline with structural record parsing.
-    Survives game updates — finds records by name, not hardcoded offsets.
-
-    Does NOT touch the Character (player inventory) record — expanding that
-    causes bugs (can't loot, crashes on pickup).
-    """
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -1986,7 +1757,6 @@ class StoragePatcher:
         self._entry = None
 
     def _find_entry(self):
-        """Find inventory.pabgb in PAMT index."""
         if self._entry:
             return self._entry
         try:
@@ -2009,7 +1779,6 @@ class StoragePatcher:
         return None
 
     def extract(self) -> bytes:
-        """Extract and decompress inventory.pabgb."""
         entry = self._find_entry()
         if not entry:
             raise RuntimeError("inventory.pabgb not found in PAMT index")
@@ -2023,7 +1792,6 @@ class StoragePatcher:
         return raw
 
     def parse_records(self, data: bytes) -> List[dict]:
-        """Parse inventory.pabgb records. Returns list of {name, key, data_start, data_end}."""
         records = []
         offset = 0
         while offset < len(data) - 8:
@@ -2051,7 +1819,6 @@ class StoragePatcher:
 
     def patch_storage(self, data: bytearray, target_slots: int = 900,
                       char_default: int = 100, char_max: int = 240) -> Tuple[int, List[str]]:
-        """Patch storage slot limits + Character inventory. Returns (count, descriptions)."""
         records = self.parse_records(bytes(data))
         patched = 0
         descriptions = []
@@ -2082,7 +1849,6 @@ class StoragePatcher:
         return patched, descriptions
 
     def check_status(self) -> Tuple[str, List[str]]:
-        """Check current storage slot values. Returns (status, details)."""
         try:
             data = self.extract()
         except Exception as e:
@@ -2110,7 +1876,6 @@ class StoragePatcher:
         return "Applied" if all_patched else "Not Applied", details
 
     def apply(self, target_slots: int = 900) -> Tuple[bool, str]:
-        """Extract, patch, recompress, and write back."""
         entry = self._find_entry()
         if not entry:
             return False, "inventory.pabgb not found in PAMT"
@@ -2171,18 +1936,12 @@ class StoragePatcher:
 
 
 class MountPatcher:
-    """Patches mount/dragon skill parameters and conditions.
-
-    Uses structural record-name scanning — survives game updates.
-    Patches two files: skill.pabgb and conditioninfo.pabgb, both in 0008/0.paz.
-    """
 
     def __init__(self, game_path: str):
         self.game_path = game_path
         self._paz_manager = PazPatchManager(game_path)
 
     def _find_pamt_entry(self, filename: str):
-        """Find a pabgb file in the PAMT index."""
         try:
             import sys as _sys
             my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -2201,7 +1960,6 @@ class MountPatcher:
         return None
 
     def _extract(self, entry) -> bytes:
-        """Extract and decompress a PABGB file."""
         with open(entry.paz_file, 'rb') as f:
             f.seek(entry.offset)
             raw = f.read(entry.comp_size)
@@ -2210,7 +1968,6 @@ class MountPatcher:
         return raw
 
     def _repack(self, entry, data: bytes) -> Tuple[bool, str]:
-        """Recompress and write back a PABGB file."""
         if not HAS_LZ4:
             return False, "lz4 not installed"
 
@@ -2264,7 +2021,6 @@ class MountPatcher:
 
     @staticmethod
     def _find_record_data(data: bytes, record_name: str) -> Optional[int]:
-        """Find a record by name and return the data start offset (after name null)."""
         sig = record_name.encode('ascii') + b'\x00'
         off = data.find(sig)
         if off < 0:
@@ -2272,7 +2028,6 @@ class MountPatcher:
         return off + len(record_name) + 1
 
     def check_status(self) -> List[str]:
-        """Check current mount patch values."""
         results = []
 
         entry = self._find_pamt_entry('skill.pabgb')
@@ -2314,7 +2069,6 @@ class MountPatcher:
                   ride_limit: int = 999999,
                   cooldown_reduction: int = 99999,
                   patch_interaction: bool = True) -> Tuple[bool, str]:
-        """Apply all mount patches."""
         messages = []
 
         entry = self._find_pamt_entry('skill.pabgb')
@@ -2378,12 +2132,6 @@ class MountPatcher:
 
 
 class ItemEffectPatcher:
-    """Swap use-effect hashes between consumable items in iteminfo.pabgb.
-
-    Each consumable has a 4-byte use-effect hash that appears twice in its
-    record, exactly 41 bytes apart. Swapping both occurrences changes what
-    happens when the item is consumed.
-    """
 
     EFFECT_HASH_DISTANCE = 41
 
@@ -2475,12 +2223,6 @@ class ItemEffectPatcher:
 
     @staticmethod
     def find_effect_hash(record: bytes) -> Optional[Tuple[int, int, int]]:
-        """Find the use-effect hash in an item record.
-
-        Returns (hash_value, pos1, pos2) or None.
-        The hash is a 4-byte value appearing exactly twice, 41 bytes apart,
-        in the second half of the record (after description text).
-        """
         start = max(len(record) // 3, 200)
         for i in range(start, len(record) - ItemEffectPatcher.EFFECT_HASH_DISTANCE - 4):
             b = record[i:i+4]
@@ -2498,10 +2240,6 @@ class ItemEffectPatcher:
 
     @staticmethod
     def _find_record_by_name(data: bytes, name: str) -> Optional[Tuple[int, int]]:
-        """Find record start and end by internal name string.
-
-        Returns (start_offset, end_offset) of the full record.
-        """
         sig = name.encode('ascii') + b'\x00'
         pos = data.find(sig)
         if pos < 0:
@@ -2510,15 +2248,6 @@ class ItemEffectPatcher:
         return rec_start, pos + len(sig)
 
     def swap_effect(self, target_item_name: str, source_effect_hash: int) -> Tuple[bool, str]:
-        """Replace the use-effect hash of target_item with source_effect_hash.
-
-        Args:
-            target_item_name: Internal name (e.g. 'Blackberry')
-            source_effect_hash: The 4-byte hash to inject (e.g. 0xB0A8256B)
-
-        Returns:
-            (success, message)
-        """
         entry = self._find_pamt_entry('iteminfo.pabgb')
         if not entry:
             return False, "iteminfo.pabgb not found in PAMT"
@@ -2567,7 +2296,6 @@ class ItemEffectPatcher:
         )
 
     def check_effect(self, item_name: str) -> Optional[Tuple[int, str]]:
-        """Read the current effect hash for an item. Returns (hash, description)."""
         entry = self._find_pamt_entry('iteminfo.pabgb')
         if not entry:
             return None

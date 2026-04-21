@@ -1,21 +1,3 @@
-"""
-gui_i18n.py — single-lever, English-as-key i18n with Qt setter interception.
-
-Design goals
-------------
-1. English is the canonical "key". `tr("Save")` returns the translated string for
-   the current language (or "Save" if untranslated).
-2. Legacy `tr("btn.save")` call sites (keyed JSONs like locale/en.json) keep
-   working via a reverse-key map: English text -> legacy key -> translated value.
-3. ALL user-visible Qt setters are monkey-patched at `install()` time so that
-   every string passed through them is routed through `tr()`. Zero dev discipline
-   required going forward.
-4. Game-data names (items/quests/missions) use `locale/names_{lang}.json` via
-   `translate_item_name` and are wired into `item_db` automatically.
-
-Bypass marker: a string starting with U+200B (zero-width space) is returned
-as-is (the marker is stripped), for verbatim strings (paths, hashes, etc.).
-"""
 
 from __future__ import annotations
 
@@ -46,15 +28,6 @@ _needs_language_picker: bool = False
 
 
 def _locale_dirs() -> List[str]:
-    """Return all directories to search for locale files, highest priority first.
-
-    Order:
-      1. User-writable download cache (e.g. %LOCALAPPDATA%/CrimsonSaveEditor/locale)
-      2. {exe_dir}/locale  (next to the exe for frozen builds)
-      3. PyInstaller _MEIPASS/locale  (bundled, read-only)
-      4. Source tree locale/
-      5. Source tree dist/locale/  (legacy)
-    """
     dirs: List[str] = []
 
     try:
@@ -128,8 +101,6 @@ def _load_names(lang: str) -> Dict[str, Any]:
 _DOTTED_KEY_RE = None
 
 def _looks_like_legacy_key(k: str) -> bool:
-    """A legacy dotted key looks like ``tab.inventory``: lowercase, no spaces,
-    contains a dot, no uppercase, not a UI sentence."""
     if not k or "_" == k[0]:
         return False
     if " " in k:
@@ -140,19 +111,6 @@ def _looks_like_legacy_key(k: str) -> bool:
 
 
 def _load_translations(lang: str) -> None:
-    """Reload ``{lang}.json`` and ``en.json`` into the in-memory dictionaries.
-
-    Call this after the user switches language at runtime.
-
-    Rules (simple, no heuristics):
-      * ``_translations`` is a flat ``english_or_key -> localized`` dict. We just
-        merge every non-underscore string entry from the target JSON into it.
-      * ``_legacy_translations`` is the same dict re-keyed by legacy dotted keys
-        so ``tr("btn.save")`` still resolves.
-      * ``_english_to_key`` maps English text to the legacy dotted key so
-        ``tr("Save")`` still works when the translation lives under the legacy
-        key only (old-style ``locale/en.json`` + ``locale/ko.json`` pairing).
-    """
     global _translations, _legacy_translations, _english_to_key, _names_data
 
     _translations = {}
@@ -191,17 +149,10 @@ def _load_translations(lang: str) -> None:
 
 
 def _classify_and_load(lang: str) -> None:
-    """Back-compat wrapper — kept so external callers don't break."""
     _load_translations(lang)
 
 
 def tr(text: Any, **fmt: Any) -> Any:
-    """Translate ``text`` from English to the active language.
-
-    - Returns non-str unchanged.
-    - Bypass marker (U+200B prefix) returns the remainder verbatim.
-    - Format kwargs applied post-translation (best-effort).
-    """
     if not isinstance(text, str) or not text:
         return text
     if text.startswith(_BYPASS):
@@ -235,12 +186,6 @@ def current_language() -> str:
 
 
 def set_language(lang: str) -> None:
-    """Switch the active language and reload translation tables.
-
-    Safe to call at any point — including after a runtime download via the
-    language picker. New widget strings pick up the change automatically via
-    the Qt setter interceptors patched by :func:`install`.
-    """
     global _current_lang
     if lang and lang != "en":
         try:
@@ -264,11 +209,6 @@ def set_language(lang: str) -> None:
 
 
 def needs_language_picker() -> bool:
-    """True if no default_lang was found in editor_config.json at startup.
-
-    MainWindow reads this after ``show()`` to decide whether to pop the
-    first-run language picker.
-    """
     return _needs_language_picker
 
 
@@ -293,16 +233,6 @@ def available_languages() -> List[str]:
 
 
 def compute_startup_language(config_path: str) -> str:
-    """Read ``default_lang`` from ``editor_config.json`` and decide start lang.
-
-    Semantics (new design):
-      * If ``default_lang`` is present in the config -> use it.
-      * Otherwise start English and set the ``needs_language_picker`` flag so
-        MainWindow can pop the first-run picker after the window is shown.
-
-    The legacy ``language`` key is still honored as a fallback so existing
-    installs don't get re-prompted.
-    """
     cfg: Dict[str, Any] = {}
     try:
         if os.path.isfile(config_path):
@@ -324,7 +254,6 @@ def compute_startup_language(config_path: str) -> str:
 
 
 def translate_item_name(key: Any, fallback: str = "") -> str:
-    """Return localized item name. Falls back to ``fallback`` (English)."""
     if _current_lang == "en" or not _names_data:
         return fallback
     items = _names_data.get("items", {})
@@ -367,12 +296,10 @@ def dump_harvest(path: str) -> None:
 
 
 def bypass(text: str) -> str:
-    """Mark ``text`` to skip translation. Returns U+200B + text."""
     return _BYPASS + text
 
 
 def _patch_method(cls, name: str, arg_indices=(0,)) -> bool:
-    """Wrap ``cls.name`` so that string args at ``arg_indices`` go through tr()."""
     global _patched_count
     try:
         orig = getattr(cls, name)
@@ -401,7 +328,6 @@ def _patch_method(cls, name: str, arg_indices=(0,)) -> bool:
 
 
 def _patch_staticmethod(cls, name: str, str_arg_positions=(0, 1)) -> bool:
-    """Patch a @staticmethod/classmethod on ``cls`` like QMessageBox.information."""
     global _patched_count
     try:
         orig = getattr(cls, name)
@@ -428,7 +354,6 @@ def _patch_staticmethod(cls, name: str, str_arg_positions=(0, 1)) -> bool:
 
 
 def _install_qt_patches() -> None:
-    """Monkey-patch all user-visible Qt setters."""
     global _patched_count
     from PySide6 import QtWidgets, QtGui, QtCore
 
@@ -641,7 +566,6 @@ def _install_qt_patches() -> None:
 
 
 def _install_item_db_adapter() -> None:
-    """Wrap item_db.ItemNameDB.get_name to route through translate_item_name."""
     try:
         import item_db
     except Exception:
@@ -663,10 +587,6 @@ def _install_item_db_adapter() -> None:
 
 
 def install(app=None, lang: str = "en") -> None:
-    """Install i18n: patch Qt setters, load translations, wire adapters.
-
-    Safe to call multiple times — only patches on first call.
-    """
     global _installed
     log.info("gui_i18n: install(lang=%r) called; current_lang=%r", lang, _current_lang)
     set_language(lang)

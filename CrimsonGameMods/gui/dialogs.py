@@ -1,4 +1,3 @@
-"""Dialog and helper widget classes for Crimson Desert Save Editor."""
 from __future__ import annotations
 
 import datetime
@@ -32,8 +31,6 @@ log = logging.getLogger(__name__)
 
 
 class _FloatingTabWindow(QWidget):
-    """A floating window that holds a detached tab's widget.
-    Closing it re-docks the widget back into the parent DetachableTabWidget."""
 
     def __init__(self, widget: QWidget, title: str,
                  owner: "DetachableTabWidget", original_idx: int,
@@ -58,7 +55,6 @@ class _FloatingTabWindow(QWidget):
 
 
 class DetachableTabWidget(QTabWidget):
-    """QTabWidget where tabs can be detached to floating windows via right-click."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -95,7 +91,6 @@ class DetachableTabWidget(QTabWidget):
 
 
 class GiveItemDialog(QDialog):
-    """Two-step dialog: pick target item from DB, then pick donor from inventory."""
 
     def __init__(self, name_db: ItemNameDB, items: List[SaveItem], parent=None, experimental: bool = False, icon_cache=None):
         super().__init__(parent)
@@ -331,7 +326,6 @@ _CATEGORY_TO_INV_KEY = {
 
 
 class AddItemDialog(QDialog):
-    """Dialog to add a brand-new item into inventory (PARC insertion)."""
 
     def __init__(self, name_db: ItemNameDB, parent=None):
         super().__init__(parent)
@@ -546,11 +540,6 @@ class AddItemDialog(QDialog):
 
 
 def _write_quest_state(blob, entry: dict, new_state: int) -> None:
-    """Write a quest/mission state respecting the field's actual byte size.
-
-    The _state field can be 1, 2, or 4 bytes depending on the entry's schema.
-    Writing 4 bytes to a 1-byte field corrupts adjacent fields (_uiState, etc.).
-    """
     off = entry['state_offset']
     sz = entry.get('state_size', 4)
     if sz == 1:
@@ -564,7 +553,6 @@ def _write_quest_state(blob, entry: dict, new_state: int) -> None:
 
 
 class QuestEditorWindow(QDialog):
-    """Standalone Quest Editor window with its own save capability."""
 
     QUEST_STATE_NAMES = {
         QuestState.AVAILABLE:        "Available",
@@ -719,7 +707,6 @@ class QuestEditorWindow(QDialog):
         QTimer.singleShot(100, self._parse_quests)
 
     def _parse_quests(self) -> None:
-        """Parse quest and mission data from the save."""
         from PySide6.QtWidgets import QProgressDialog
 
         self._status.setText("Parsing quest data... please wait")
@@ -901,7 +888,6 @@ class QuestEditorWindow(QDialog):
     STATE_NAMES_SHORT = {0: 'Default', 1: 'Locked', 2: 'Available', 3: 'State 3', 4: 'State 4', 5: 'Completed'}
 
     def _advance_state(self) -> None:
-        """Advance quest to the next state (increment by 1). One byte change, no PARC insertion."""
         entry = self._get_selected()
         if not entry:
             QMessageBox.information(self, "Quest Editor", "Select a quest or mission first.")
@@ -1005,7 +991,6 @@ class QuestEditorWindow(QDialog):
         self._status.setText(f"'{entry['name']}' -> In Progress (unsaved)")
 
     def _reset_available(self) -> None:
-        """Reset quest to Available state (before you started it)."""
         entry = self._get_selected()
         if not entry:
             QMessageBox.information(self, "Quest Editor", "Select a quest or mission first.")
@@ -1029,36 +1014,9 @@ class QuestEditorWindow(QDialog):
         self._status.setText(f"'{entry['name']}' -> Available (unsaved)")
 
     def _advance_chain_counter(self, blob: bytearray, chain_id: str) -> bool:
-        """PLACEHOLDER: Advance the challenge progress counter for a quest chain.
-
-        When we reverse engineer ContentsMiscSaveData, this will:
-        1. Find the counter for the given chain_id
-        2. Increment it by 1
-        3. Return True if successful
-
-        The counter tracks how many sub-quests in a chain are completed
-        (e.g., 30/32 for the Challenges tab).
-
-        Args:
-            blob: the decompressed save blob
-            chain_id: the chain identifier from quest_chains.json
-
-        Returns:
-            True if counter was advanced, False if not implemented yet
-        """
         return False
 
     def _get_chain_info(self, key: int) -> dict:
-        """Get chain information for a quest key.
-
-        Returns dict with:
-            chain_name: name of the parent chain
-            chain_size: total sub-quests in chain
-            chain_id: parent chain identifier
-            siblings: list of all sub-quest keys in the chain
-            completed_siblings: list of completed sibling keys in this save
-        Or empty dict if not part of a chain.
-        """
         chain = self._quest_chains.get(key)
         if not chain or not isinstance(chain, list) or not chain:
             return {}
@@ -1086,7 +1044,6 @@ class QuestEditorWindow(QDialog):
         }
 
     def _batch_complete_filtered(self) -> None:
-        """Mark ALL currently visible entries in the table as completed."""
         table = self._table
         row_count = table.rowCount()
         if row_count == 0:
@@ -1137,7 +1094,6 @@ class QuestEditorWindow(QDialog):
         self._status.setText(f"Completed {count} entries matching '{search_text}' (unsaved)")
 
     def _insert_quest_completed(self) -> None:
-        """Insert a quest that doesn't exist in the save as completed."""
         from PySide6.QtWidgets import QInputDialog
 
         key, ok = QInputDialog.getInt(
@@ -1202,7 +1158,6 @@ class QuestEditorWindow(QDialog):
 
 
 class DescriptionSearchDialog(QDialog):
-    """Search buffs, passives, stats, and items by in-game English description."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1266,7 +1221,6 @@ class DescriptionSearchDialog(QDialog):
         self._load_data()
 
     def _load_data(self):
-        """Load all searchable entries from multiple sources."""
         base = os.path.dirname(os.path.abspath(__file__))
 
         try:
@@ -1375,7 +1329,6 @@ class DescriptionSearchDialog(QDialog):
 
 
 class ItemSearchDialog(QDialog):
-    """Search-by-name dialog that returns an item key."""
 
     def __init__(self, name_db: ItemNameDB, title: str = "Search Items",
                  prompt: str = "Type an item name to search:", parent=None,
@@ -1446,7 +1399,6 @@ class ItemSearchDialog(QDialog):
         self._filter("")
 
     def _load_template_keys(self) -> None:
-        """Load the set of item keys that have community templates."""
         try:
             _db = get_connection()
             self._template_keys.update(
@@ -1503,7 +1455,6 @@ class ItemSearchDialog(QDialog):
 
 
 class ApplyPackDialog(QDialog):
-    """Map each pack item to a donor from inventory."""
 
     def __init__(self, pack: ItemPack, name_db: ItemNameDB, items: List[SaveItem], parent=None, experimental: bool = False):
         super().__init__(parent)
@@ -1759,7 +1710,6 @@ class ApplyPackDialog(QDialog):
                 self._map_table.setItem(row, 4, w)
 
     def _pick_from_stack(self) -> None:
-        """Pick one stacked item — use individual copies from that stack to fill ALL donor slots."""
         read_only = self._read_only
         needed = sum(1 for d in self._donors if d is None)
         if needed == 0:
@@ -1909,7 +1859,6 @@ class ApplyPackDialog(QDialog):
 
 
 class CreatePackDialog(QDialog):
-    """Build a new pack by picking items from the database."""
 
     def __init__(self, name_db: ItemNameDB, parent=None):
         super().__init__(parent)

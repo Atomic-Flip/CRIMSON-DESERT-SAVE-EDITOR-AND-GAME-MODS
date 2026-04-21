@@ -1,21 +1,3 @@
-"""
-Crimson Desert Save File Crypto Pipeline.
-
-Pipeline:
-  Load:  .save -> read header -> decrypt ChaCha20 -> verify HMAC-SHA256 -> decompress LZ4
-  Save:  blob -> compress LZ4 HC -> HMAC-SHA256 -> encrypt ChaCha20 -> write header + payload
-
-Header layout (0x80 bytes):
-  +0x00  "SAVE" magic (4 bytes)
-  +0x04  version u16 = 2
-  +0x06  flags u16 = 0x0080
-  +0x12  uncompressed_size u32
-  +0x16  compressed_size (payload_size) u32
-  +0x1A  nonce (16 bytes): counter(4 LE) + nonce(12)
-  +0x2A  HMAC-SHA256 (32 bytes)
-  +0x4A  reserved (54 bytes, zeros)
-  +0x80  encrypted payload
-"""
 from __future__ import annotations
 
 import hashlib
@@ -40,7 +22,6 @@ _VERSION_PREFIXES = {
 
 
 def _generate_save_key(version: int) -> bytes:
-    """Derive the encryption key from the save file version."""
     prefix = _VERSION_PREFIXES.get(version)
     if prefix is None:
         raise ValueError(f"Unsupported save version {version}")
@@ -62,13 +43,11 @@ PAYLOAD_OFFSET = 0x80
 
 
 def _rotl32(v: int, n: int) -> int:
-    """32-bit left rotation."""
     v &= 0xFFFFFFFF
     return ((v << n) | (v >> (32 - n))) & 0xFFFFFFFF
 
 
 def _quarter_round(s: list, a: int, b: int, c: int, d: int) -> None:
-    """ChaCha20 quarter round."""
     s[a] = (s[a] + s[b]) & 0xFFFFFFFF
     s[d] ^= s[a]
     s[d] = _rotl32(s[d], 16)
@@ -87,7 +66,6 @@ def _quarter_round(s: list, a: int, b: int, c: int, d: int) -> None:
 
 
 def _chacha20_block(key_words: list, counter: int, nonce_words: list) -> bytes:
-    """Generate a single 64-byte ChaCha20 keystream block."""
     s = [
         0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
         key_words[0], key_words[1], key_words[2], key_words[3],
@@ -117,14 +95,6 @@ def _chacha20_block(key_words: list, counter: int, nonce_words: list) -> bytes:
 
 
 def chacha20_crypt(data: bytes, nonce16: bytes, key: bytes = None) -> bytes:
-    """
-    Encrypt/decrypt with ChaCha20 using a 16-byte nonce.
-    nonce16 = counter(4 bytes LE) + nonce(12 bytes)
-    key: 32-byte key (defaults to version 2 key)
-
-    Uses the `cryptography` library for C-backed speed if available,
-    falls back to pure Python implementation.
-    """
     if key is None:
         key = KEY
     init_counter = struct.unpack_from("<I", nonce16, 0)[0]
@@ -158,22 +128,16 @@ def chacha20_crypt(data: bytes, nonce16: bytes, key: bytes = None) -> bytes:
 
 
 def compute_hmac(data: bytes, key: bytes = None) -> bytes:
-    """Compute HMAC-SHA256 of data using the given key."""
     if key is None:
         key = KEY
     return hmac.new(key, data, hashlib.sha256).digest()
 
 
 def verify_hmac(data: bytes, expected: bytes, key: bytes = None) -> bool:
-    """Verify HMAC-SHA256."""
     return hmac.compare_digest(compute_hmac(data, key), expected)
 
 
 def load_save_file(path: str) -> SaveData:
-    """
-    Read and decrypt a .save file.
-    Returns SaveData with the decompressed PARC blob.
-    """
     with open(path, "rb") as f:
         file_data = f.read()
 
@@ -230,7 +194,6 @@ def load_save_file(path: str) -> SaveData:
 
 
 def load_raw_stream(path: str) -> SaveData:
-    """Load a raw decompressed stream (.bin file)."""
     with open(path, "rb") as f:
         blob = f.read()
     return SaveData(
@@ -248,10 +211,6 @@ def write_save_file(
     edited_blob: bytes,
     original_header: bytes | None = None,
 ) -> None:
-    """
-    Write an edited save file:
-    compress -> HMAC -> encrypt -> write header + payload.
-    """
     version = 2
     if original_header and len(original_header) >= 6:
         version = struct.unpack_from("<H", original_header, VERSION_OFFSET)[0]

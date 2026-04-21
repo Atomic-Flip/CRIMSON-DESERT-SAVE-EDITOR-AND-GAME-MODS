@@ -1,6 +1,3 @@
-"""
-Data classes for Crimson Desert Save Editor.
-"""
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import IntEnum
@@ -20,7 +17,6 @@ class QuestState(IntEnum):
 
 @dataclass
 class SaveItem:
-    """Represents a single item found in the decompressed save blob."""
     offset: int = 0
     item_no: int = 0
     item_key: int = 0
@@ -32,12 +28,10 @@ class SaveItem:
 
     @property
     def actual_endurance(self) -> int:
-        """Low byte of endurance — the real durability value."""
         return self.endurance & 0xFF
 
     @property
     def socket_count_from_endurance(self) -> int:
-        """High byte of endurance — number of unlocked socket slots."""
         return (self.endurance >> 8) & 0xFF
     has_enchant: bool = False
     is_equipment: bool = False
@@ -53,11 +47,6 @@ class SaveItem:
 
 @dataclass
 class ParseCache:
-    """Cached result of parse_and_collect for the current decompressed blob.
-
-    Maintained in sync with SaveData.decompressed_blob after each splice.
-    Set to None to force a re-parse on next fill/clear.
-    """
     offset_positions: list
     trailing_sizes: list
     schema_end: int
@@ -71,9 +60,6 @@ class ParseCache:
         new_po_entries: list,
         new_ts_entries: list,
     ) -> None:
-        """Update the cache to reflect a splice that replaced
-        [old_start, old_end) with (old_end - old_start + delta) bytes.
-        """
         updated_po = []
         for po_pos, po_val in self.offset_positions:
             if old_start <= po_pos < old_end:
@@ -105,7 +91,6 @@ class ParseCache:
 
 @dataclass
 class SaveData:
-    """Holds a loaded save file's state."""
     raw_header: bytes = b""
     decompressed_blob: bytearray = field(default_factory=bytearray)
     original_compressed_size: int = 0
@@ -117,7 +102,6 @@ class SaveData:
 
 @dataclass
 class ItemInfo:
-    """An entry from the item name database."""
     item_key: int = 0
     name: str = ""
     internal_name: str = ""
@@ -127,7 +111,6 @@ class ItemInfo:
 
 @dataclass
 class UndoEntry:
-    """Stores an undo-able edit."""
     description: str = ""
     offset: int = 0
     old_bytes: bytes = b""

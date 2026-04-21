@@ -1,23 +1,3 @@
-"""
-gui/language_picker.py — modal dialog for picking & downloading a language.
-
-Intentionally self-contained:
-
-* Pulls language metadata from ``lang_pack_downloader`` and ``gui_i18n``.
-* Never reaches into ``MainWindow``. The caller passes (config_path,
-  config_dict, on_applied_cb) and this dialog updates the config and refreshes
-  the i18n engine.
-* Works in "first-run" mode (blocking pick, no cancel to current lang) or
-  "change-language" mode (has a Cancel button).
-
-Public API
-----------
-``LanguagePickerDialog(parent, *, config_path, config, on_applied=None, blocking=False)``
-``LanguagePickerDialog.run(...)``  — classmethod convenience
-
-The dialog is thread-free. Downloads run in a QThread so the UI stays
-responsive (the user sees a live progress bar).
-"""
 
 from __future__ import annotations
 
@@ -67,7 +47,6 @@ class _LangRow:
 
 
 def _build_rows() -> List[_LangRow]:
-    """Build the full list of supported languages with install state."""
     rows: List[_LangRow] = [
         _LangRow(code="en", native="English", english="English", installed=True),
     ]
@@ -99,7 +78,6 @@ def _build_rows() -> List[_LangRow]:
 
 
 class LanguagePickerDialog(QDialog):
-    """Modal dialog — pick language, download if needed, persist choice."""
 
     def __init__(
         self,
@@ -296,7 +274,6 @@ class LanguagePickerDialog(QDialog):
 
 
     def _persist_language(self, lang: str) -> None:
-        """Write ``default_lang`` and ``language`` into editor_config.json."""
         cfg: dict = {}
         try:
             if os.path.isfile(self._config_path):
@@ -318,8 +295,6 @@ class LanguagePickerDialog(QDialog):
         self._config.update(cfg)
 
     def _apply_runtime(self, lang: str) -> None:
-        """Refresh the live i18n engine (and any legacy shim) so tr() picks up
-        the new language immediately."""
         try:
             import gui_i18n
             gui_i18n.set_language(lang)
@@ -360,7 +335,6 @@ class LanguagePickerDialog(QDialog):
         on_applied: Optional[Callable[[str], None]] = None,
         blocking: bool = False,
     ) -> Optional[str]:
-        """Show the dialog modally; return the chosen code (or None if cancelled)."""
         dlg = cls(parent, config_path=config_path, config=config,
                   on_applied=on_applied, blocking=blocking)
         result = dlg.exec()

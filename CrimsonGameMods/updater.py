@@ -1,16 +1,3 @@
-"""
-Auto-updater for Crimson Desert Save Editor.
-
-Checks a GitHub repo for version.json, downloads the new exe if available,
-and restarts the application.
-
-The update flow:
-  1. Fetch version.json from GitHub raw URL
-  2. Compare remote version with local APP_VERSION
-  3. If newer, download the exe to <current>.update
-  4. Write a restart batch script that swaps the exe and relaunches
-  5. Launch the batch script and exit
-"""
 from __future__ import annotations
 
 import json
@@ -25,7 +12,7 @@ from urllib.error import URLError
 log = logging.getLogger(__name__)
 
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.4"
 
 APP_VARIANT = "gamemods"
 
@@ -49,7 +36,6 @@ _UPDATE_ZIP_NAME = _UPDATE_EXE_NAME.replace(".exe", ".zip")
 
 
 def _version_tuple(v: str) -> tuple:
-    """Convert '2.4.0' to (2, 4, 0) for comparison."""
     try:
         return tuple(int(x) for x in v.strip().split("."))
     except (ValueError, AttributeError):
@@ -57,12 +43,6 @@ def _version_tuple(v: str) -> tuple:
 
 
 def check_for_update() -> Tuple[bool, str, str]:
-    """Check GitHub for a newer version.
-
-    Returns:
-        (update_available, remote_version, download_url)
-        If no update or error, update_available is False.
-    """
     try:
         req = Request(VERSION_URL, headers={"User-Agent": "CrimsonSaveEditor"})
         with urlopen(req, timeout=10) as resp:
@@ -88,17 +68,6 @@ def check_for_update() -> Tuple[bool, str, str]:
 
 
 def download_update(url: str, progress_callback=None) -> Optional[str]:
-    """Download the new exe to a temp path next to the current executable.
-
-    Handles both direct .exe downloads and .zip archives (extracts the exe).
-
-    Args:
-        url: direct download URL for the exe or zip
-        progress_callback: optional callable(bytes_downloaded, total_bytes)
-
-    Returns:
-        Path to the downloaded file, or None on failure.
-    """
     try:
         if getattr(sys, "frozen", False):
             current_exe = sys.executable
@@ -177,14 +146,6 @@ def download_update(url: str, progress_callback=None) -> Optional[str]:
 
 
 def apply_update_and_restart(update_path: str) -> None:
-    """Replace the running exe with the update and restart.
-
-    On Windows, a running exe is locked. We write a small batch script that:
-      1. Waits for this process to exit
-      2. Replaces the exe
-      3. Launches the new exe
-      4. Cleans up
-    """
     if getattr(sys, "frozen", False):
         current_exe = sys.executable
     else:

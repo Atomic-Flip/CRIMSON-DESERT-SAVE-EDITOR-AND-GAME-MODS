@@ -1,22 +1,3 @@
-"""
-Community Mod Loader — Load and apply community JSON mods and ASI plugins.
-
-Reads community JSON mods from SEModLoad/Json/ folder inside the game directory,
-converts PABGB-level offsets to PAZ-level offsets via PAMT, and applies them
-using our existing backup/checksum pipeline.
-
-Also manages ASI plugins from SEModLoad/ASI/ — installs them into bin64/ with
-enable/disable support via .asi/.asi.disabled renaming.
-
-Supports the community JSON format:
-{
-  "name": "...",
-  "patches": [{
-    "game_file": "gamedata/inventory.pabgb",
-    "changes": [{"offset": N, "original": "hex", "patched": "hex", "label": "..."}]
-  }]
-}
-"""
 
 import configparser
 import json
@@ -33,7 +14,6 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class ModChange:
-    """A single byte change within a community mod."""
     offset_in_file: int
     original_hex: str
     patched_hex: str
@@ -52,7 +32,6 @@ class ModChange:
 
 @dataclass
 class ModPatch:
-    """A group of changes targeting one game file."""
     game_file: str
     changes: List[ModChange] = field(default_factory=list)
     paz_path: str = ""
@@ -64,7 +43,6 @@ class ModPatch:
 
 @dataclass
 class CommunityMod:
-    """A loaded community mod."""
     filename: str
     name: str
     version: str = ""
@@ -79,7 +57,6 @@ class CommunityMod:
 
 @dataclass
 class PamtFileEntry:
-    """A file entry resolved from PAMT."""
     path: str
     paz_file: str
     paz_dir_rel: str
@@ -94,7 +71,6 @@ class PamtFileEntry:
 
 
 class PamtIndex:
-    """Builds a lookup table from PAMT: game_file_path -> PAZ location."""
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -102,7 +78,6 @@ class PamtIndex:
         self._built = False
 
     def build(self) -> int:
-        """Parse all PAMT files and build the index. Returns entry count."""
         import sys as _sys
         my_dir = os.path.dirname(os.path.abspath(__file__))
         for d in (os.path.join(my_dir, 'Includes', 'BestCrypto'),
@@ -145,7 +120,6 @@ class PamtIndex:
         return total
 
     def lookup(self, game_file: str) -> Optional[PamtFileEntry]:
-        """Look up a game file path (e.g. 'gamedata/inventory.pabgb')."""
         if not self._built:
             self.build()
         key = game_file.lower().replace("\\", "/")
@@ -159,7 +133,6 @@ class PamtIndex:
 
 
 class CommunityModLoader:
-    """Loads, validates, and applies community JSON mods."""
 
     MODLOAD_DIR = os.path.join("bin64", "SEModLoad")
     JSON_DIR = os.path.join("bin64", "SEModLoad", "Json")
@@ -182,12 +155,10 @@ class CommunityModLoader:
         return os.path.join(self.game_path, self.ASI_DIR)
 
     def ensure_folders(self) -> None:
-        """Create the SEModLoad folder structure if it doesn't exist."""
         os.makedirs(self.json_dir, exist_ok=True)
         os.makedirs(self.asi_dir, exist_ok=True)
 
     def get_pamt_index(self) -> PamtIndex:
-        """Get or create the PAMT index."""
         if self._pamt_index is None:
             self._pamt_index = PamtIndex(self.game_path)
             self._pamt_index.build()
@@ -195,7 +166,6 @@ class CommunityModLoader:
 
 
     def load_config(self) -> dict:
-        """Load the mod loader config (enabled/disabled state per mod)."""
         if os.path.isfile(self._config_path):
             try:
                 with open(self._config_path, "r", encoding="utf-8") as f:
@@ -205,7 +175,6 @@ class CommunityModLoader:
         return {"mods": {}}
 
     def save_config(self) -> None:
-        """Save current mod enable/disable state."""
         config = {"mods": {}}
         for mod in self.mods:
             config["mods"][mod.filename] = {
@@ -218,7 +187,6 @@ class CommunityModLoader:
 
 
     def scan_mods(self) -> List[CommunityMod]:
-        """Scan the Json folder for community mods and load them."""
         self.mods.clear()
 
         if not os.path.isdir(self.json_dir):
@@ -253,7 +221,6 @@ class CommunityModLoader:
         return self.mods
 
     def _parse_mod_file(self, path: str, filename: str) -> Optional[CommunityMod]:
-        """Parse a single community JSON mod file."""
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -298,7 +265,6 @@ class CommunityModLoader:
 
 
     def resolve_mod(self, mod: CommunityMod) -> bool:
-        """Resolve PABGB paths to PAZ offsets via PAMT. Returns True if all resolved."""
         index = self.get_pamt_index()
         all_ok = True
 
@@ -331,14 +297,6 @@ class CommunityModLoader:
         return all_ok
 
     def validate_change(self, change: ModChange) -> Tuple[str, str]:
-        """Validate a single change against current PAZ bytes.
-
-        Returns (status, detail) where status is:
-          "original" — file has original bytes (patch can be applied)
-          "patched"  — file already has patched bytes (already applied)
-          "modified" — file has neither original nor patched bytes (conflict)
-          "error"    — could not read
-        """
         try:
             with open(change.paz_file, "rb") as f:
                 f.seek(change.paz_offset)
@@ -361,14 +319,6 @@ class CommunityModLoader:
 
     def apply_mod(self, mod: CommunityMod,
                   backup_callback=None) -> Tuple[bool, str]:
-        """Apply a single community mod's patches to PAZ files.
-
-        Args:
-            mod: The mod to apply
-            backup_callback: Optional callback(paz_path) to create backups
-
-        Returns (success, message).
-        """
         if not mod.enabled:
             return False, "Mod is disabled"
 
@@ -465,19 +415,6 @@ class CommunityModLoader:
 
     def _apply_compressed_patch(self, patch: ModPatch,
                                backup_callback=None) -> Tuple[int, str]:
-        """Apply patches to a compressed PABGB file via in-place PAZ patching.
-
-        Same approach as GPatch tab / gamedata_editor (proven working):
-        1. Read compressed data from original PAZ
-        2. Decompress with LZ4
-        3. Apply patches to decompressed data
-        4. Recompress with LZ4 HC
-        5. Pad to original compressed size
-        6. Write back at exact same offset in PAZ
-        7. Update checksums (PAMT + PAPGT)
-
-        Returns (applied_count, error_message_or_empty).
-        """
         import lz4.block
         import shutil
 
@@ -546,7 +483,6 @@ class CommunityModLoader:
         return applied, ""
 
     def _update_checksums_for_paz(self, paz_path: str) -> None:
-        """Update PAMT and PAPGT checksums after in-place PAZ patching."""
         import struct
 
         try:
@@ -600,10 +536,6 @@ class CommunityModLoader:
 
     def apply_all_enabled(self, backup_callback=None,
                           progress_callback=None) -> Tuple[int, int, List[str]]:
-        """Apply all enabled mods.
-
-        Returns (applied_count, skipped_count, error_messages).
-        """
         applied_total = 0
         skipped_total = 0
         errors = []
@@ -626,7 +558,6 @@ class CommunityModLoader:
         return applied_total, skipped_total, errors
 
     def get_mod_status_summary(self, mod: CommunityMod) -> str:
-        """Get a human-readable status summary for a mod."""
         if not mod.enabled:
             return "Disabled"
 
@@ -698,14 +629,6 @@ class CommunityModLoader:
 
 
     def detect_all_conflicts(self) -> List[str]:
-        """Detect conflicts between community mods AND with our SE patches.
-
-        Checks:
-        1. Community mod vs SE patches (bytes already modified)
-        2. Community mod vs community mod (overlapping byte ranges)
-
-        Returns list of warning messages.
-        """
         warnings = []
         enabled_mods = [m for m in self.mods if m.enabled]
 
@@ -750,7 +673,6 @@ ASI_LOADERS = {"winmm.dll", "version.dll", "dinput8.dll", "dsound.dll"}
 
 @dataclass
 class AsiPlugin:
-    """An ASI plugin found in bin64/ or SEModLoad/ASI/."""
     name: str
     path: Path
     enabled: bool
@@ -759,7 +681,6 @@ class AsiPlugin:
 
 
 class AsiManager:
-    """Manages ASI plugins: scan, install from SEModLoad/ASI/, enable/disable."""
 
     def __init__(self, game_path: str):
         self.game_path = game_path
@@ -768,11 +689,9 @@ class AsiManager:
         self.plugins: List[AsiPlugin] = []
 
     def has_loader(self) -> bool:
-        """Check if an ASI loader DLL is present in bin64/."""
         return any((self.bin64 / name).exists() for name in ASI_LOADERS)
 
     def scan(self) -> List[AsiPlugin]:
-        """Scan bin64/ for installed ASI plugins and SEModLoad/ASI/ for available ones."""
         self.plugins.clear()
         seen_names = set()
 
@@ -807,7 +726,6 @@ class AsiManager:
         return self.plugins
 
     def install_plugin(self, plugin: AsiPlugin) -> str:
-        """Install an ASI plugin from SEModLoad/ASI/ into bin64/."""
         if plugin.installed:
             return f"{plugin.name} already installed"
 
@@ -835,7 +753,6 @@ class AsiManager:
         return f"Installed {', '.join(installed_files)}"
 
     def uninstall_plugin(self, plugin: AsiPlugin) -> str:
-        """Remove an ASI plugin from bin64/."""
         if not plugin.installed:
             return f"{plugin.name} not installed"
 
@@ -855,7 +772,6 @@ class AsiManager:
         return f"Removed {', '.join(deleted)}"
 
     def enable_plugin(self, plugin: AsiPlugin) -> None:
-        """Enable a disabled ASI plugin (rename .asi.disabled -> .asi)."""
         if plugin.enabled or not plugin.installed:
             return
         new_path = plugin.path.with_name(plugin.name + ASI_SUFFIX)
@@ -864,7 +780,6 @@ class AsiManager:
         plugin.enabled = True
 
     def disable_plugin(self, plugin: AsiPlugin) -> None:
-        """Disable an ASI plugin (rename .asi -> .asi.disabled)."""
         if not plugin.enabled or not plugin.installed:
             return
         new_path = plugin.path.with_name(plugin.name + DISABLED_SUFFIX)
@@ -873,7 +788,6 @@ class AsiManager:
         plugin.enabled = False
 
     def _find_ini(self, asi_path: Path) -> Optional[Path]:
-        """Find companion INI file for an ASI plugin."""
         ini = asi_path.with_suffix(".ini")
         if ini.exists():
             return ini

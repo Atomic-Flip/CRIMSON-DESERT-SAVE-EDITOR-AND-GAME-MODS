@@ -1,32 +1,3 @@
-"""
-FieldEdit tab (v3.1.9 parity) — unified editor for the 0039/ PAZ overlay.
-
-Covers the following pabgb files via a single shared in-memory buffer set and
-ONE pack_mod() call (violating this was Fire's refactor bug):
-  - fieldinfo.pabgb        (zone flags, hidden table — causes day/time bug)
-  - vehicleinfo.pabgb      (per-mount call restrictions, altitude)
-  - gameplaytrigger.pabgb  (safe zone types)
-  - regioninfo.pabgb       (town / dismount flags)
-  - characterinfo.pabgb    (mount duration + cooldown, attackable/invincibility,
-                            _appearanceName u32 for mesh swap)
-  - wantedinfo.pabgb       (wanted-system block + bounty)
-
-Features (ported from gui.py v3.1.9 monolith):
-  - Load FieldInfo                     (17847: _build_field_edit_tab)
-  - Enable Mounts Everywhere           (19019: _field_edit_enable_mounts — 3-layer)
-  - Make All NPCs Killable             (18797: _field_edit_make_killable)
-  - Invincible Mounts                  (18853: _field_edit_invincible_mounts)
-  - Mesh Swap (dialog)                 (19097: _field_edit_open_mesh_swap)
-  - Apply to Game                      (19520: _field_edit_apply)
-  - Export as CDUMM Mod                (19620: _field_edit_export)
-  - Export as JSON                     (19722: _field_edit_export_json)
-  - Restore                            (19919: _field_edit_restore)
-  - Stale-overlay detection            (18080: _check_stale_field_overlay)
-
-Both the "Mesh Swap" dialog and all field/vehicle/region/char edits mutate
-the SAME *_data/*_original buffers on this tab — so the apply/export path
-emits a single pack_mod() call covering every changed file in 0039/.
-"""
 from __future__ import annotations
 
 import json
@@ -42,9 +13,10 @@ from typing import Callable, Optional
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QDialog, QFileDialog, QHBoxLayout, QInputDialog,
-    QLabel, QLineEdit, QListWidget, QListWidgetItem, QMessageBox, QPushButton,
-    QScrollArea, QSplitter, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
+    QApplication, QCheckBox, QComboBox, QDialog, QDoubleSpinBox, QFileDialog,
+    QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem,
+    QMessageBox, QPushButton, QScrollArea, QSplitter, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
 from gui.theme import COLORS
@@ -55,8 +27,6 @@ log = logging.getLogger(__name__)
 
 
 class FieldEditTab(QWidget):
-    """Unified 0039/ overlay editor — mount everywhere, killall, invincible
-    mounts, mesh swap; all edits share one pack_mod call."""
 
     status_message = Signal(str)
     config_save_requested = Signal()
@@ -120,6 +90,9 @@ class FieldEditTab(QWidget):
         if path:
             self._config["game_install_path"] = path
 
+    def set_experimental_mode(self, enabled: bool) -> None:
+        for w in getattr(self, '_dev_export_btns_field', []):
+            w.setVisible(bool(enabled))
 
     def _build_ui(self) -> None:
         outer = QVBoxLayout(self)
@@ -157,6 +130,25 @@ class FieldEditTab(QWidget):
         load_btn.clicked.connect(self._field_edit_load)
         top_row.addWidget(load_btn)
 
+        mesh_swap_btn = QPushButton(tr("🎭 Mesh Swap (Pets / Mounts / NPCs)"))
+        mesh_swap_btn.setStyleSheet(
+            "background-color: #4A148C; color: white; font-weight: bold; "
+            "padding: 8px 14px; font-size: 13px;")
+        mesh_swap_btn.setToolTip(
+            "Visual Transmog for ANY character in the game.\n\n"
+            "• Make your pet cat look like a wolf\n"
+            "• Make your horse look like a dragon\n"
+            "• Make NPCs look like bosses\n"
+            "• Make bosses look like chickens\n\n"
+            "Opens a dedicated dialog with Pet / Animal / Mount / Hero / Boss\n"
+            "categories so you can find what to swap without needing to know\n"
+            "internal names. Target and Source filters are independent — filter\n"
+            "your target to Pet (Cat) on the left, then filter source to Dragon\n"
+            "on the right to make all cats look like wyverns.\n\n"
+            "Queued into the 0039/ overlay — apply via Apply to Game or Export.")
+        mesh_swap_btn.clicked.connect(self._field_edit_open_mesh_swap)
+        top_row.addWidget(mesh_swap_btn)
+
         mount_btn = QPushButton(tr("Enable Mounts Everywhere"))
         mount_btn.setStyleSheet("background-color: #7B1FA2; color: white; font-weight: bold;")
         mount_btn.setToolTip(
@@ -187,53 +179,47 @@ class FieldEditTab(QWidget):
         mount_inv_btn.clicked.connect(self._field_edit_invincible_mounts)
         top_row.addWidget(mount_inv_btn)
 
-        mesh_swap_btn = QPushButton(tr("Mesh Swap"))
-        mesh_swap_btn.setStyleSheet("background-color: #4A148C; color: white; font-weight: bold;")
-        mesh_swap_btn.setToolTip(
-            "Swap a character's visual mesh with another character's. Queued\n"
-            "into the same 0039/ overlay as the other Field Edit buttons.")
-        mesh_swap_btn.clicked.connect(self._field_edit_open_mesh_swap)
-        top_row.addWidget(mesh_swap_btn)
-
         apply_btn = QPushButton(tr("Apply to Game"))
         apply_btn.setObjectName("accentBtn")
         apply_btn.setToolTip(tr("Deploy modified fieldinfo to the game"))
         apply_btn.clicked.connect(self._field_edit_apply)
         top_row.addWidget(apply_btn)
 
+        # Export buttons — only visible in Advanced/Dev mode (unsupported)
         export_mod_btn = QPushButton(tr("Export as Mod"))
         export_mod_btn.setStyleSheet("background-color: #2E7D32; color: white; font-weight: bold;")
         export_mod_btn.setToolTip(
-            "Export as raw-pabgb mod for generic mod loaders (CDMM, DMM, CDUMM).\n"
-            "Output: packs/<name>/files/gamedata/binary__/client/bin/*.pabgb + modinfo.json.\n"
-            "The mod loader handles PAZ packing at install time.")
+            "ADVANCED — UNSUPPORTED. Contact mod loader dev for help.\n\n"
+            "Export as raw-pabgb mod for generic mod loaders.")
         export_mod_btn.clicked.connect(self._field_edit_export_mod)
+        export_mod_btn.setVisible(False)
         top_row.addWidget(export_mod_btn)
 
         export_btn = QPushButton(tr("Export as CDUMM Mod"))
         export_btn.setStyleSheet("background-color: #1B5E20; color: white; font-weight: bold;")
         export_btn.setToolTip(
-            "Export as pre-packed PAZ mod for JMM / CDUMM / DMM.\n"
-            "Output: packs/<name>/0036/0.paz + 0036/0.pamt + meta/0.papgt + modinfo.json.\n"
-            "JMM shows this as 'compiled'. Group 0036 is the community convention.")
+            "ADVANCED — UNSUPPORTED. Contact mod loader dev for help.\n\n"
+            "Export as pre-packed PAZ mod for JMM / CDUMM / DMM.")
         export_btn.clicked.connect(self._field_edit_export)
+        export_btn.setVisible(False)
         top_row.addWidget(export_btn)
 
         export_json_btn = QPushButton(tr("Export as JSON"))
         export_json_btn.setStyleSheet("background-color: #0D47A1; color: white; font-weight: bold;")
-        export_json_btn.setToolTip(tr("Export all changes as a portable JSON patch file"))
+        export_json_btn.setToolTip(
+            "ADVANCED — UNSUPPORTED. Contact mod loader dev for help.\n\n"
+            "Export all changes as a portable JSON patch file.")
         export_json_btn.clicked.connect(self._field_edit_export_json)
+        export_json_btn.setVisible(False)
         top_row.addWidget(export_json_btn)
 
-        export_mesh_json_btn = QPushButton(tr("Export Mesh Swap as JSON Mod"))
-        export_mesh_json_btn.setStyleSheet("background-color: #311B92; color: white; font-weight: bold;")
-        export_mesh_json_btn.setToolTip(
-            "Export queued mesh swaps as a JSON Mod Manager (JMM) format-2\n"
-            "entry-anchored patch file. Each swap becomes a 4-byte patch on\n"
-            "the target's _appearanceName in characterinfo.pabgb.\n\n"
-            "Output: packs/<name>.json — drop into JMM's mods/ folder.")
-        export_mesh_json_btn.clicked.connect(self._field_edit_export_mesh_json)
-        top_row.addWidget(export_mesh_json_btn)
+        self._dev_export_btns_field = [export_mod_btn, export_btn, export_json_btn]
+
+        # Export Mesh Swap as JSON Mod — removed. Redundant with Export as
+        # JSON which already bakes mesh swaps via _apply_mesh_swaps() before
+        # diffing. Apply to Game / Export as Mod / Export as CDUMM also
+        # include mesh swaps. Keep the method around for backward-compat in
+        # case anything still references it, but don't surface a button.
 
         restore_btn = QPushButton(tr("Restore"))
         restore_btn.setToolTip(tr("Remove field mod and restore vanilla"))
@@ -364,7 +350,6 @@ class FieldEditTab(QWidget):
 
 
     def _check_stale_field_overlay(self, game_path: str) -> None:
-        """Detect stale FieldEdit overlays from a previous game version."""
         mod_group = "0039"
         overlay_dir = os.path.join(game_path, mod_group)
         if not os.path.isdir(overlay_dir):
@@ -967,7 +952,6 @@ class FieldEditTab(QWidget):
 
 
     def _ally_ensure_loaded(self) -> bool:
-        """Lazy-load allygroupinfo + relationinfo + factionrelationgroup from PAZ."""
         if (self._allygroup_data is not None and self._relationinfo_data is not None
                 and self._factionrelgrp_data is not None):
             return True
@@ -1030,22 +1014,6 @@ class FieldEditTab(QWidget):
         return out
 
     def _field_edit_all_hostile(self):
-        """Path A: set RelationInfo._order = 99 on every entry.
-
-        Stream layout per entry (stringKey is empty across all 45 entries):
-          +0    u8   _key
-          +1-4  u32  slen (=0)
-          +5    u8   _isBlocked
-          +6    u8   flag
-          +7    u8   _order              ← target (confirmed empirically:
-                                           only slot ranging 0..99 in probe)
-          +8    u8   _detectRestrictCount
-          +9-16 u64  _detectMemorizeTime
-          +17   u8   _isDetectEventOnly
-          +18-21 u32 _detectValueRatio (float)
-          +22   u8   _doCompleteNotPriorityActor
-          +23+  list _gimmickTagDataList
-        """
         if not self._ally_ensure_loaded():
             return
         reply = QMessageBox.question(
@@ -1080,7 +1048,6 @@ class FieldEditTab(QWidget):
             tr(f"Path A: set _order=99 on {flipped} relation entries. Click Apply."))
 
     def _field_edit_wipe_ally_lists(self):
-        """Path B: zero out _addOnAllyGroupList hashes (list slot 0) on every group."""
         if not self._ally_ensure_loaded():
             return
         reply = QMessageBox.question(
@@ -1112,12 +1079,6 @@ class FieldEditTab(QWidget):
             tr(f"Path B: zeroed {zeroed} ally-group hashes across 50 entries. Click Apply."))
 
     def _field_edit_set_ally_flag(self, slot: int):
-        """Path C: set u8 flag slot (0..4) = 1 on every AllyGroup entry.
-
-        Walks the 7 lists to find where flags start (tightly packed 5 bytes
-        right after list 6's hashes). Position of each flag depends on the
-        entry's list counts so we can't hardcode an offset.
-        """
         if slot < 0 or slot > 4:
             return
         if not self._ally_ensure_loaded():
@@ -1152,7 +1113,6 @@ class FieldEditTab(QWidget):
             tr(f"Path C: set flag #{slot}=1 on {set_count} ally groups. Click Apply."))
 
     def _parse_factionrelgrp_index(self) -> list[tuple[int, int]]:
-        """Parse factionrelationgroup.pabgh → [(key, entry_offset), ...]."""
         s = self._factionrelgrp_schema
         count = struct.unpack_from("<H", s, 0)[0]
         kw = (len(s) - 2 - count * 4) // count
@@ -1166,20 +1126,6 @@ class FieldEditTab(QWidget):
         return out
 
     def _field_edit_wipe_faction_relation_allies(self, all_lists: bool = False):
-        """Path D: zero the u16-hash bytes in list #0 (and optionally all 4 lists)
-        of each FactionRelationGroup entry. Targets top-level group protection
-        that allygroupinfo can't reach (e.g. guard immunity).
-
-        Stream layout per entry (CString always empty in this file):
-          +0   u16   _key
-          +2   u32   slen(=0)
-          +6   0B    stringKey
-          +6   u8    _isBlocked
-          +7   list[0]: u32 count + count*u16  ← "allied"
-               list[1]: u32 count + count*u16
-               list[2]: u32 count + count*u16
-               list[3]: u32 count + count*u16
-        """
         if not self._ally_ensure_loaded():
             return
         label = "ALL 4 LISTS" if all_lists else "list #0 (allied)"
@@ -1259,8 +1205,6 @@ class FieldEditTab(QWidget):
         self._field_edit_status.setText(f"Made {count} mounts invincible")
 
     def _field_edit_enable_mounts(self):
-        """v3.1.9: 3-layer (vehicleinfo + regioninfo + characterinfo).
-        fieldinfo + gameplaytrigger intentionally skipped (day/time bug)."""
         log.info("=== enable_mounts: starting ===")
         if not self._vehicle_data:
             log.warning("enable_mounts: _vehicle_data is None — can't patch vehicleinfo")
@@ -1389,10 +1333,97 @@ class FieldEditTab(QWidget):
                 "generate it (6872 characters expected).")
             return
 
+        # Load the authoritative pet catalog (derived from Ghost Hunter's
+        # PetRenamerMod v1.2.0 — 40 named pets/mounts × 216 char_keys).
+        pet_keys: dict[int, str] = {}  # char_key -> group ('Horse'/'Dog'/'Cat'/'Special Mount')
+        pet_display: dict[int, str] = {}  # char_key -> pretty name
+        for base in [os.path.dirname(os.path.abspath(__file__)),
+                     os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'),
+                     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                     os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data'),
+                     os.path.join(getattr(sys, '_MEIPASS', ''), 'data'),
+                     getattr(sys, '_MEIPASS', '') or '',
+                     os.path.join(os.getcwd(), 'data'),
+                     os.getcwd()]:
+            ppath = os.path.join(base, 'pet_catalog.json')
+            if os.path.isfile(ppath):
+                try:
+                    with open(ppath, 'r', encoding='utf-8') as pf:
+                        pdata = json.load(pf)
+                    for group, names in (pdata.get('groups') or {}).items():
+                        for pname, keys in names.items():
+                            for k in (keys or []):
+                                pet_keys[int(k)] = group
+                                pet_display[int(k)] = pname
+                    log.info("Loaded pet_catalog: %d pet keys across %d groups",
+                             len(pet_keys), len(pdata.get('groups') or {}))
+                    break
+                except Exception as e:
+                    log.warning("pet_catalog load failed: %s", e)
+
+        # Re-categorize with friendlier buckets so Pet / Mount / Animal stand
+        # out from the 6000+ generic "Other" characters. Authoritative pet
+        # catalog takes priority; name-heuristic is fallback for unlisted.
+        PET_WORDS = ('_cat', 'cat_', 'dog', 'puppy', 'kitten', 'chicken',
+                     'rabbit', 'bunny', 'fox', 'squirrel', 'mouse_',
+                     'lizard', 'turtle', 'parrot', 'frog', 'sheep_lamb',
+                     'ducks', 'duckling', 'hamster')
+        ANIMAL_WORDS = ('wolf', 'bear', 'tiger', 'lion', 'boar', 'deer',
+                        'moose', 'elk', 'goat', 'sheep', 'cow', 'donkey',
+                        'camel', 'snake', 'eagle', 'hawk', 'owl', 'wyvern',
+                        'horse', 'hound', 'serpent', 'spider', 'scorpion',
+                        'crow_', 'raven')
+        HERO_NAMES = ('kliff', 'damian', 'oongka', 'macduff', 'ziane',
+                      'macgyver')
+        for c in catalog:
+            existing = c.get('category', 'Other')
+            ck = int(c.get('character_key', 0))
+            internal = (c.get('internal_name') or '').lower()
+            display = (c.get('display_name') or '').lower()
+            name_mash = internal + ' ' + display
+
+            # Authoritative pet catalog takes priority
+            if ck in pet_keys:
+                group = pet_keys[ck]
+                if group == 'Horse':
+                    c['category'] = 'Mount (Horse)'
+                elif group == 'Dog':
+                    c['category'] = 'Pet (Dog)'
+                elif group == 'Cat':
+                    c['category'] = 'Pet (Cat)'
+                elif group == 'Special Mount':
+                    c['category'] = 'Mount (Special)'
+                else:
+                    c['category'] = 'Pet'
+                # Override display to the friendly pet name for clarity
+                pretty = pet_display.get(ck)
+                if pretty and not (c.get('display_name') or '').strip():
+                    c['display_name'] = pretty
+                continue
+
+            if existing in ('Boss', 'MiddleBoss'):
+                c['category'] = 'Boss'
+            elif existing == 'Dragon':
+                c['category'] = 'Dragon'
+            elif existing == 'Mount' or internal.startswith('riding_'):
+                c['category'] = 'Mount'
+            elif any(h == display or h == internal for h in HERO_NAMES):
+                c['category'] = 'Hero'
+            elif any(w in name_mash for w in PET_WORDS):
+                c['category'] = 'Pet'
+            elif any(w in name_mash for w in ANIMAL_WORDS):
+                c['category'] = 'Animal'
+            elif existing == 'NPC':
+                c['category'] = 'NPC'
+            # else keep 'Other'
+
         saved = self._config.get('mesh_swap_queue') or []
         if not self._mesh_swap_queue and saved:
             self._mesh_swap_queue = [
-                {'src': int(s['src']), 'tgt': int(s['tgt'])}
+                {'src': int(s['src']), 'tgt': int(s['tgt']),
+                 'scale': float(s.get('scale', 0) or 0),
+                 'rideable': bool(s.get('rideable', False)),
+                 'rider_y': float(s.get('rider_y', 8.0) or 8.0)}
                 for s in saved if isinstance(s, dict) and 'src' in s and 'tgt' in s
             ]
 
@@ -1402,25 +1433,116 @@ class FieldEditTab(QWidget):
         dlg.setSizeGripEnabled(True)
         dlg_layout = QVBoxLayout(dlg)
 
+        tutorial = QLabel(
+            "<b>How to use Mesh Swap (Visual Transmog)</b><br>"
+            "<b>1.</b> Pick what you want to change on the <b>LEFT</b> (Target) "
+            "— e.g. your horse, your pet cat, an NPC.<br>"
+            "<b>2.</b> Pick what you want it to <b>look like</b> on the <b>RIGHT</b> "
+            "(Source) — e.g. a wolf, a dragon, another NPC.<br>"
+            "<b>3.</b> Click <b>Add Swap</b>. Repeat for as many swaps as you want.<br>"
+            "<b>4.</b> Close this dialog and click <b>Apply to Game</b> in the Field Edit tab "
+            "(or <b>Export as Mod</b>).<br>"
+            "<b>Tip:</b> Use the <b>Category</b> dropdown to narrow down to Pets, Mounts, "
+            "Animals, Heroes, or Bosses. Use the search boxes to find a specific character by name.")
+        tutorial.setWordWrap(True)
+        tutorial.setTextFormat(Qt.RichText)
+        tutorial.setStyleSheet(
+            f"color: {COLORS['text']}; background-color: {COLORS['panel']}; "
+            f"padding: 10px; border: 2px solid {COLORS['accent']}; "
+            f"border-radius: 6px; font-size: 12px;")
+        dlg_layout.addWidget(tutorial)
+
         info = QLabel(
             "Swap one character's visual mesh with another's. Same 0039/ overlay "
             "as Field Edit — applied on Apply-to-Game / Export.")
         info.setWordWrap(True)
         info.setStyleSheet(
-            f"color: {COLORS['accent']}; padding: 8px; "
-            f"border: 1px solid {COLORS['border']}; border-radius: 4px;")
+            f"color: {COLORS['text_dim']}; padding: 4px; font-size: 10px;")
         dlg_layout.addWidget(info)
 
-        filter_row = QHBoxLayout()
-        filter_row.addWidget(QLabel(tr("Category:")))
-        cat_combo = QComboBox()
-        cats = sorted({c.get('category', 'Other') for c in catalog})
-        cat_combo.addItem("All")
-        for c in cats:
-            cat_combo.addItem(c)
-        filter_row.addWidget(cat_combo)
-        filter_row.addStretch()
-        dlg_layout.addLayout(filter_row)
+        CATEGORY_ORDER = ['All',
+                          'Pet (Cat)', 'Pet (Dog)', 'Pet',
+                          'Animal',
+                          'Mount (Horse)', 'Mount (Special)', 'Mount',
+                          'Hero', 'Dragon', 'Boss', 'NPC', 'Other']
+        cats_present = {c.get('category', 'Other') for c in catalog}
+        def _make_cat_combo():
+            cb = QComboBox()
+            for key in CATEGORY_ORDER:
+                if key == 'All' or key in cats_present:
+                    cb.addItem(key)
+            cb.setToolTip(
+                "Pet = cats, dogs, bunnies, chickens (small companions).\n"
+                "Animal = wolves, bears, tigers (wild / swap sources).\n"
+                "Mount = rideable (horses, camels, wolves, wagons).\n"
+                "Hero = playable main characters.\n"
+                "Dragon / Boss / NPC / Other — self-explanatory.\n\n"
+                "Target and Source filters are INDEPENDENT — filter the left\n"
+                "to Pet (Cat) and the right to Dragon to make cats look like "
+                "wyverns.")
+            return cb
+        tgt_cat_combo = _make_cat_combo()
+        src_cat_combo = _make_cat_combo()
+
+        # ─── Quick-Swap Presets row ────────────────────────────────────────
+        presets_row = QHBoxLayout()
+        presets_lbl = QLabel("Quick Swap Helpers:")
+        presets_lbl.setStyleSheet(f"color: {COLORS['accent']}; font-weight: bold;")
+        presets_row.addWidget(presets_lbl)
+
+        def _show_filter(target_cat: str, source_cat: str):
+            # Set Target panel to the narrow filter, Source panel to the wider
+            # suggestion (user can pick any source they want).
+            ti = tgt_cat_combo.findText(target_cat)
+            if ti >= 0:
+                tgt_cat_combo.setCurrentIndex(ti)
+            si = src_cat_combo.findText(source_cat)
+            if si >= 0:
+                src_cat_combo.setCurrentIndex(si)
+            QMessageBox.information(
+                dlg, "Quick Swap Tip",
+                f"Target filter set to <b>{target_cat}</b> (left panel).<br>"
+                f"Source filter set to <b>{source_cat}</b> (right panel) — "
+                f"change it on the right if you want something different.<br><br>"
+                f"1. Pick the specific character on the LEFT.<br>"
+                f"2. Pick what to look like on the RIGHT "
+                f"(use the source search or change its category to 'All' for full freedom).<br>"
+                f"3. Click <b>Add Swap</b>.")
+
+        cat_btn = QPushButton("🐱 Cats →")
+        cat_btn.setToolTip(
+            "Guided helper: filter Target to Pet (Cat) — 11 named cat breeds "
+            "from Ghost Hunter's catalog. Then pick what you want them to look "
+            "like (wolves, bears, dragons...) on the RIGHT.")
+        cat_btn.clicked.connect(lambda: _show_filter('Pet (Cat)', 'Animal'))
+        presets_row.addWidget(cat_btn)
+
+        dog_btn = QPushButton("🐶 Dogs →")
+        dog_btn.setToolTip(
+            "Guided helper: filter Target to Pet (Dog) — 12 named dog breeds "
+            "(Beagle, Boarhound, Husky, etc). Then pick what you want them "
+            "to look like on the RIGHT.")
+        dog_btn.clicked.connect(lambda: _show_filter('Pet (Dog)', 'Animal'))
+        presets_row.addWidget(dog_btn)
+
+        horse_btn = QPushButton("🐴 Horses →")
+        horse_btn.setToolTip(
+            "Guided helper: filter Target to Mount (Horse) — named horse "
+            "breeds (Priden, Royler, Camora, etc). Then pick what you want "
+            "them to look like — Dragon / Special Mount / anything.")
+        horse_btn.clicked.connect(lambda: _show_filter('Mount (Horse)', 'Dragon'))
+        presets_row.addWidget(horse_btn)
+
+        special_btn = QPushButton("✨ Special Mounts →")
+        special_btn.setToolTip(
+            "Guided helper: filter Target to Mount (Special) — the 5 unique "
+            "mounts (Silver Fang, White Bear, Snowwhite Deer, Clawed Bear, "
+            "Kuku Bird Hatchling). Swap their appearance to anything else.")
+        special_btn.clicked.connect(lambda: _show_filter('Mount (Special)', 'Animal'))
+        presets_row.addWidget(special_btn)
+
+        presets_row.addStretch()
+        dlg_layout.addLayout(presets_row)
 
         vsplitter = QSplitter(Qt.Vertical)
         dlg_layout.addWidget(vsplitter, 1)
@@ -1430,11 +1552,15 @@ class FieldEditTab(QWidget):
         picker_wrap_layout.setContentsMargins(0, 0, 0, 0)
         cols = QHBoxLayout()
 
-        def make_column(title: str, placeholder: str):
+        def make_column(title: str, placeholder: str, cat_combo):
             box = QVBoxLayout()
             lbl = QLabel(title)
             lbl.setStyleSheet(f"color: {COLORS['accent']}; font-weight: bold;")
             box.addWidget(lbl)
+            cat_row = QHBoxLayout()
+            cat_row.addWidget(QLabel(tr("Filter:")))
+            cat_row.addWidget(cat_combo, 1)
+            box.addLayout(cat_row)
             search = QLineEdit()
             search.setPlaceholderText(placeholder)
             box.addWidget(search)
@@ -1445,10 +1571,12 @@ class FieldEditTab(QWidget):
 
         tgt_col, tgt_search, tgt_list = make_column(
             tr("Target (the character to re-skin)"),
-            tr("Search name, internal name, or character key (e.g. 1000318)"))
+            tr("Search name, internal name, or character key (e.g. 1000318)"),
+            tgt_cat_combo)
         src_col, src_search, src_list = make_column(
-            tr("Source (visual to copy)"),
-            tr("Search name, internal name, or character key (e.g. 30507)"))
+            tr("Source (visual to copy — pick ANY character, any category)"),
+            tr("Search name, internal name, or character key (e.g. 30507). Set filter to 'All' to browse everything."),
+            src_cat_combo)
         cols.addLayout(tgt_col, 1)
         cols.addLayout(src_col, 1)
         picker_wrap_layout.addLayout(cols, 1)
@@ -1507,12 +1635,13 @@ class FieldEditTab(QWidget):
                 lst.setCurrentRow(restore_row)
 
         tgt_search.textChanged.connect(
-            lambda _: populate(tgt_list, tgt_search.text(), cat_combo.currentText()))
+            lambda _: populate(tgt_list, tgt_search.text(), tgt_cat_combo.currentText()))
         src_search.textChanged.connect(
-            lambda _: populate(src_list, src_search.text(), cat_combo.currentText()))
-        cat_combo.currentTextChanged.connect(
-            lambda _: (populate(tgt_list, tgt_search.text(), cat_combo.currentText()),
-                       populate(src_list, src_search.text(), cat_combo.currentText())))
+            lambda _: populate(src_list, src_search.text(), src_cat_combo.currentText()))
+        tgt_cat_combo.currentTextChanged.connect(
+            lambda _: populate(tgt_list, tgt_search.text(), tgt_cat_combo.currentText()))
+        src_cat_combo.currentTextChanged.connect(
+            lambda _: populate(src_list, src_search.text(), src_cat_combo.currentText()))
         populate(tgt_list, '', 'All')
         populate(src_list, '', 'All')
 
@@ -1543,9 +1672,20 @@ class FieldEditTab(QWidget):
         def refresh_queue():
             queue_list.clear()
             for sw in self._mesh_swap_queue:
-                queue_list.addItem(
-                    f"{_name_for(sw['tgt'])}   ->   now looks like   ->   {_name_for(sw['src'])}"
-                )
+                sc = float(sw.get('scale') or 0)
+                tk, sk = sw['tgt'], sw['src']
+                tags = []
+                if sc > 0:
+                    tags.append(f"scale {sc:g}")
+                if sw.get('rideable'):
+                    tags.append(f"rideable Y={float(sw.get('rider_y', 8.0)):g}")
+                tag_str = "   [" + ", ".join(tags) + "]" if tags else ""
+                if tk == sk and sc > 0 and not sw.get('rideable'):
+                    line = f"{_name_for(tk)}   ->   [SCALE ONLY, scale {sc:g}]"
+                else:
+                    line = (f"{_name_for(tk)}   ->   now looks like   ->   "
+                            f"{_name_for(sk)}{tag_str}")
+                queue_list.addItem(line)
             try:
                 self._config['mesh_swap_queue'] = list(self._mesh_swap_queue)
                 self.config_save_requested.emit()
@@ -1559,11 +1699,66 @@ class FieldEditTab(QWidget):
         add_btn.setObjectName("accentBtn")
         remove_btn = QPushButton(tr("Remove Selected"))
         clear_btn = QPushButton(tr("Clear All"))
+        change_all_btn = QPushButton(tr("Change All (visible targets)"))
+        change_all_btn.setToolTip(
+            "Replace the appearance of EVERY character currently visible in "
+            "the Target panel with the selected Source's appearance. "
+            "Respects current category/search filter.")
+        scale_spin = QDoubleSpinBox()
+        scale_spin.setRange(0.0, 10.0)
+        scale_spin.setSingleStep(0.1)
+        scale_spin.setDecimals(1)
+        scale_spin.setValue(0.0)
+        scale_spin.setToolTip("Character scale override (0 = keep default)")
+        scale_only_btn = QPushButton(tr("Scale Only"))
         btn_row.addWidget(add_btn)
+        btn_row.addWidget(change_all_btn)
         btn_row.addWidget(remove_btn)
         btn_row.addWidget(clear_btn)
         btn_row.addStretch()
         dlg_layout.addLayout(btn_row)
+
+        # ── Mount options row: scale + rideable ──
+        mount_row = QHBoxLayout()
+        mount_row.addWidget(QLabel("Scale (0=default):"))
+        mount_row.addWidget(scale_spin)
+        mount_row.addWidget(scale_only_btn)
+        mount_row.addSpacing(20)
+        rideable_cb = QCheckBox("Make Rideable")
+        rideable_cb.setToolTip(
+            "Inject B_Rider_01 bone into the source skeleton so you can ride it.\n"
+            "Only confirmed working for flying dragon-type mounts\n"
+            "(e.g. Golden Star swapped onto Blackstar).")
+        def _on_rideable_toggled(checked):
+            rider_y_spin.setEnabled(checked)
+            if checked:
+                QMessageBox.information(
+                    dlg, "Make Rideable — Limitation",
+                    "This feature currently only works reliably for "
+                    "flying dragon-type mounts.\n\n"
+                    "Example: swap Golden Star onto Blackstar (both dragons, "
+                    "same mount controller).\n\n"
+                    "Cross-family swaps (spider on horse, human on mount, etc.) "
+                    "will NOT produce rideable results — the mount movement "
+                    "controller is tied to the target character type, not the "
+                    "visual mesh.\n\n"
+                    "Scale overrides work for any mount regardless.")
+        rideable_cb.toggled.connect(_on_rideable_toggled)
+        mount_row.addWidget(rideable_cb)
+        mount_row.addWidget(QLabel("Rider Height:"))
+        rider_y_spin = QDoubleSpinBox()
+        rider_y_spin.setRange(0.0, 20.0)
+        rider_y_spin.setSingleStep(0.5)
+        rider_y_spin.setDecimals(1)
+        rider_y_spin.setValue(8.0)
+        rider_y_spin.setEnabled(False)
+        rider_y_spin.setToolTip(
+            "Y offset for rider seat position (relative to Spine1 bone).\n"
+            "Higher = rider sits higher above the mount's body.\n"
+            "Golden Star: ~8.0, Wyvern: ~4.0, Wolf: ~2.0")
+        mount_row.addWidget(rider_y_spin)
+        mount_row.addStretch()
+        dlg_layout.addLayout(mount_row)
 
         cfg_row = QHBoxLayout()
         export_btn = QPushButton(tr("Export Config"))
@@ -1584,13 +1779,89 @@ class FieldEditTab(QWidget):
                 return
             tk = ti.data(Qt.UserRole)
             sk = si.data(Qt.UserRole)
-            if tk == sk:
+            scale = float(scale_spin.value())
+            rideable = rideable_cb.isChecked()
+            rider_y = float(rider_y_spin.value())
+            if tk == sk and scale <= 0 and not rideable:
                 QMessageBox.information(dlg, tr("Mesh Swap"),
-                    tr("Target and source must be different characters."))
+                    "Target and source are the same and no scale override or rideable is set. "
+                    "Either pick a different source, or raise the Scale value above 0 "
+                    "to queue a scale-only entry (alternatively use 'Scale Only' button).")
                 return
             self._mesh_swap_queue[:] = [s for s in self._mesh_swap_queue if s['tgt'] != tk]
-            self._mesh_swap_queue.append({'src': int(sk), 'tgt': int(tk)})
+            self._mesh_swap_queue.append(
+                {'src': int(sk), 'tgt': int(tk), 'scale': scale,
+                 'rideable': rideable, 'rider_y': rider_y})
             refresh_queue()
+
+        def on_scale_only():
+            scale = float(scale_spin.value())
+            if scale <= 0:
+                QMessageBox.information(dlg, tr("Scale Only"),
+                    "Raise the Scale value above 0 first. Scale Only needs a "
+                    "positive override value — it does nothing with scale=0.")
+                return
+            ti = tgt_list.currentItem()
+            si = src_list.currentItem()
+            pick = ti or si
+            if not pick:
+                QMessageBox.information(dlg, tr("Scale Only"),
+                    "Select a character in either the TARGET or SOURCE panel first.")
+                return
+            ck = int(pick.data(Qt.UserRole))
+            self._mesh_swap_queue[:] = [s for s in self._mesh_swap_queue if s['tgt'] != ck]
+            self._mesh_swap_queue.append(
+                {'src': ck, 'tgt': ck, 'scale': scale,
+                 'rideable': False, 'rider_y': 8.0})
+            refresh_queue()
+
+        def on_change_all():
+            si = src_list.currentItem()
+            if not si:
+                QMessageBox.information(dlg, tr("Mesh Swap"),
+                    "Pick one SOURCE (right panel) first. Change All will add "
+                    "a swap entry for every character currently visible in the "
+                    "Target panel (respects your category/search filter).")
+                return
+            sk = int(si.data(Qt.UserRole))
+            target_keys = []
+            for i in range(tgt_list.count()):
+                it = tgt_list.item(i)
+                if it is None:
+                    continue
+                tk = int(it.data(Qt.UserRole))
+                if tk == sk:
+                    continue
+                target_keys.append(tk)
+            if not target_keys:
+                QMessageBox.information(dlg, tr("Mesh Swap"),
+                    "No targets currently visible. Clear or adjust filters first.")
+                return
+            scale = float(scale_spin.value())
+            scale_note = f" (scale {scale:g})" if scale > 0 else ""
+            ans = QMessageBox.question(
+                dlg, tr("Change All"),
+                f"Replace the appearance of ALL {len(target_keys)} visible target(s) "
+                f"with '{_name_for(sk)}'{scale_note}?\n\n"
+                "This overwrites existing queue entries for those targets.",
+                QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
+            if ans != QMessageBox.Yes:
+                return
+            existing_by_tgt = {s['tgt']: s for s in self._mesh_swap_queue}
+            added = updated = 0
+            for tk in target_keys:
+                if tk in existing_by_tgt:
+                    updated += 1
+                else:
+                    added += 1
+                existing_by_tgt[tk] = {'src': sk, 'tgt': tk, 'scale': scale,
+                                       'rideable': rideable_cb.isChecked(),
+                                       'rider_y': float(rider_y_spin.value())}
+            self._mesh_swap_queue[:] = list(existing_by_tgt.values())
+            refresh_queue()
+            QMessageBox.information(dlg, tr("Change All"),
+                f"Added {added}, updated {updated}. Queue now has "
+                f"{len(self._mesh_swap_queue)} swap(s).")
 
         def on_remove():
             row = queue_list.currentRow()
@@ -1608,7 +1879,7 @@ class FieldEditTab(QWidget):
             if not path:
                 return
             out = {
-                'version': 1,
+                'version': 2,
                 'kind': 'character_mesh_swap',
                 'swaps': [
                     {
@@ -1616,6 +1887,9 @@ class FieldEditTab(QWidget):
                         'target_name': _name_for(s['tgt']),
                         'source_key': s['src'],
                         'source_name': _name_for(s['src']),
+                        'scale': float(s.get('scale') or 0),
+                        'rideable': bool(s.get('rideable', False)),
+                        'rider_y': float(s.get('rider_y', 8.0) or 8.0),
                     }
                     for s in self._mesh_swap_queue
                 ],
@@ -1665,17 +1939,23 @@ class FieldEditTab(QWidget):
             for s in entries:
                 tk = s.get('target_key')
                 sk = s.get('source_key')
+                sc = float(s.get('scale') or 0)
                 if tk is None or sk is None or tk not in by_key or sk not in by_key:
                     missed += 1
                     continue
                 self._mesh_swap_queue[:] = [x for x in self._mesh_swap_queue if x['tgt'] != tk]
-                self._mesh_swap_queue.append({'src': int(sk), 'tgt': int(tk)})
+                self._mesh_swap_queue.append(
+                    {'src': int(sk), 'tgt': int(tk), 'scale': sc,
+                     'rideable': bool(s.get('rideable', False)),
+                     'rider_y': float(s.get('rider_y', 8.0) or 8.0)})
                 added += 1
             refresh_queue()
             QMessageBox.information(dlg, tr("Import"),
                 f"Imported {added} swap(s). {missed} skipped (character not in catalog).")
 
         add_btn.clicked.connect(on_add)
+        scale_only_btn.clicked.connect(on_scale_only)
+        change_all_btn.clicked.connect(on_change_all)
         remove_btn.clicked.connect(on_remove)
         clear_btn.clicked.connect(on_clear)
         export_btn.clicked.connect(on_export)
@@ -1686,13 +1966,6 @@ class FieldEditTab(QWidget):
         dlg.exec()
 
     def _field_edit_apply_mesh_swaps(self) -> int:
-        """Apply queued mesh swaps to self._charinfo_data in place.
-
-        Returns the number of byte-patches applied. No-op if the queue is
-        empty or characterinfo hasn't been loaded. Callers (Apply-to-Game,
-        Export) invoke this BEFORE pack_mod so the modified buffer is what
-        gets packed into 0.paz.
-        """
         queue = self._mesh_swap_queue or []
         if not queue:
             return 0
@@ -1744,14 +2017,189 @@ class FieldEditTab(QWidget):
             elif queue:
                 log.warning("mesh swap: %d queued swap(s) produced 0 byte changes "
                             "— check character_catalog / parser output", len(queue))
+
+            try:
+                needs_overlay = [
+                    s for s in queue
+                    if float(s.get('scale') or 0) > 0 or s.get('rideable')
+                ]
+                if needs_overlay:
+                    overlay_msg = self._deploy_mount_overlays(game_path, needs_overlay)
+                    if overlay_msg:
+                        log.info("mount overlay: %s", overlay_msg)
+            except Exception:
+                log.exception("mount overlay deploy failed")
+
             return applied
         except Exception:
             log.exception("mesh swap apply failed (queue=%d)", len(queue))
             return 0
 
 
+    _MOUNT_OVERLAY_GROUP = "0062"
+
+    def _deploy_mount_overlays(self, game_path: str, queue: list[dict]) -> str:
+        """Deploy skeleton (rider bone) + appearance (scale) overlays for mesh swaps."""
+        import crimson_rs
+        import crimson_rs.pack_mod
+        from character_mesh_swap import _load_appearance_paths, _guess_xml_path
+        from characterinfo_full_parser import parse_all_entries
+        from rider_bone_injector import inject_rider_bone, has_rider_bone, \
+            _write_scaled_appearance
+
+        gp = Path(game_path)
+        catalog = _load_appearance_paths() or []
+        dp = 'gamedata/binary__/client/bin'
+        pabgh = crimson_rs.extract_file(game_path, '0008', dp, 'characterinfo.pabgh')
+        entries = parse_all_entries(bytes(self._charinfo_data), bytes(pabgh))
+        # parse_all_entries uses 'name', but _guess_xml_path expects 'internal_name'
+        by_key = {}
+        for e in entries:
+            k = int(e.get('entry_key', 0))
+            if 'name' in e and 'internal_name' not in e:
+                e['internal_name'] = e['name']
+            by_key[k] = e
+
+        files_written = 0
+        with tempfile.TemporaryDirectory(prefix='mount_overlay_') as tmp_dir:
+            for sw in queue:
+                sk = int(sw['src'])
+                entry = by_key.get(sk)
+                if not entry:
+                    log.warning("mount overlay: src=%d not in characterinfo", sk)
+                    continue
+
+                # Find the appearance XML path for this character
+                xml_path = _guess_xml_path(entry, catalog)
+
+                # ── Scale override ──
+                scale = float(sw.get('scale') or 0)
+                if scale > 0 and xml_path:
+                    try:
+                        _write_scaled_appearance(
+                            game_path, xml_path, scale, tmp_dir)
+                        files_written += 1
+                        log.info("mount overlay: scale %.1f for src=%d xml=%s",
+                                 scale, sk, xml_path)
+                    except Exception:
+                        log.exception("mount overlay: scale failed for src=%d", sk)
+
+                # ── Rider bone injection ──
+                if sw.get('rideable'):
+                    rider_y = float(sw.get('rider_y', 8.0) or 8.0)
+                    # Find the skeleton .pab path from the prefabdata
+                    skel_path = self._find_skeleton_path(game_path, entry, catalog)
+                    if not skel_path:
+                        log.warning("mount overlay: can't find skeleton for src=%d", sk)
+                        continue
+                    try:
+                        skel_dir = '/'.join(skel_path.split('/')[:-1])
+                        skel_file = skel_path.split('/')[-1]
+                        pab_data = bytes(crimson_rs.extract_file(
+                            game_path, '0009', skel_dir, skel_file))
+                        if has_rider_bone(pab_data):
+                            log.info("mount overlay: src=%d already has B_Rider_01", sk)
+                        else:
+                            modified = inject_rider_bone(pab_data, rider_y=rider_y)
+                            out_dir = os.path.join(tmp_dir, *skel_path.split('/')[:-1])
+                            os.makedirs(out_dir, exist_ok=True)
+                            with open(os.path.join(out_dir, skel_file), 'wb') as f:
+                                f.write(modified)
+                            files_written += 1
+                            log.info("mount overlay: injected B_Rider_01 Y=%.1f "
+                                     "for src=%d skel=%s", rider_y, sk, skel_path)
+                    except Exception:
+                        log.exception("mount overlay: rider inject failed for src=%d", sk)
+
+            if files_written == 0:
+                return "no overlay files needed"
+
+            # Pack and deploy
+            pack_out = os.path.join(tmp_dir, 'output')
+            os.makedirs(pack_out, exist_ok=True)
+            group = self._MOUNT_OVERLAY_GROUP
+            crimson_rs.pack_mod.pack_mod(
+                game_dir=game_path, mod_folder=tmp_dir,
+                output_dir=pack_out, group_name=group)
+
+            papgt = gp / 'meta' / '0.papgt'
+            backup = papgt.with_suffix(f'.papgt.mount_{group}_bak')
+            if papgt.exists() and not backup.exists():
+                shutil.copy2(papgt, backup)
+
+            dest = gp / group
+            dest.mkdir(exist_ok=True)
+            shutil.copyfile(
+                os.path.join(pack_out, group, '0.paz'), dest / '0.paz')
+            shutil.copyfile(
+                os.path.join(pack_out, group, '0.pamt'), dest / '0.pamt')
+            shutil.copyfile(
+                os.path.join(pack_out, 'meta', '0.papgt'), papgt)
+
+        return f"deployed {files_written} file(s) to {group}/"
+
+    def _find_skeleton_path(self, game_path: str, entry: dict,
+                            catalog: list[dict]) -> str | None:
+        """Resolve a characterinfo entry to its skeleton .pab PAZ path.
+
+        Strategy: find the appearance XML path, then search the PAMT for
+        a .pab skeleton in a matching model/ directory. The appearance path
+        encodes the creature family which maps to the skeleton directory.
+
+        Example:
+          appearance: character/appearance/2_mon/cd_m0004_00_dragon/cd_m0004_00_golemdragon_0001/...
+          skeleton:   character/model/2_mon/cd_m0004_00_dragon/cd_m0004_00_golemdragon/cd_m0004_00_golemdragon.pab
+        """
+        try:
+            import crimson_rs
+            from character_mesh_swap import _guess_xml_path
+
+            xml_path = _guess_xml_path(entry, catalog)
+            if not xml_path:
+                log.warning("_find_skeleton_path: no xml_path for %s",
+                            entry.get('internal_name'))
+                return None
+
+            # Extract the creature stem from the appearance path DIRECTORIES (not filename)
+            # e.g. ".../cd_m0004_00_golemdragon_0001/file.app.xml" -> "cd_m0004_00_golemdragon"
+            parts = xml_path.split('/')
+            dirs = parts[:-1]  # exclude filename
+            creature_stem = None
+            for p in reversed(dirs):
+                if p.startswith('cd_') and '_00_' in p:
+                    # Strip trailing variant number suffix
+                    # "cd_m0004_00_golemdragon_0001" -> "cd_m0004_00_golemdragon"
+                    segs = p.split('_')
+                    while segs and segs[-1].isdigit():
+                        segs.pop()
+                    creature_stem = '_'.join(segs)
+                    break
+
+            if not creature_stem:
+                log.warning("_find_skeleton_path: can't extract creature stem from %s",
+                            xml_path)
+                return None
+
+            # Search PAMT for a .pab skeleton matching this creature
+            pamt = crimson_rs.parse_pamt_file(
+                os.path.join(game_path, '0009', '0.pamt'))
+
+            target_pab = creature_stem + '.pab'
+            for d in pamt.get('directories', []):
+                if '/model/' in d['path']:
+                    for f in d.get('files', []):
+                        if f['name'] == target_pab:
+                            result = d['path'] + '/' + f['name']
+                            log.info("_find_skeleton_path: %s -> %s",
+                                     entry.get('internal_name'), result)
+                            return result
+
+            log.warning("_find_skeleton_path: no .pab named %s in PAMT", target_pab)
+        except Exception:
+            log.exception("_find_skeleton_path failed")
+        return None
+
     def _write_modified_files(self, mod_dir: str) -> None:
-        """Write every buffer that diverged from vanilla into mod_dir."""
         written: list[str] = []
         if (self._field_edit_data and self._field_edit_original
                 and bytes(self._field_edit_data) != self._field_edit_original):
@@ -1930,14 +2378,6 @@ class FieldEditTab(QWidget):
             QMessageBox.critical(self, tr("Apply Failed"), str(e))
 
     def _field_edit_export_mod(self):
-        """Export as raw-pabgb mod folder for generic mod loaders.
-
-        Output layout (matches ItemBuffs "Export as Mod" convention):
-            packs/<ModName>/
-                files/gamedata/binary__/client/bin/*.pabgb   (only modified files)
-                modinfo.json
-        Mod loader re-packs into PAZ at install time.
-        """
         mesh_queue = self._mesh_swap_queue or []
         ally_dirty = self._ally_relation_dirty()
         if (not self._field_edit_data and not ally_dirty
@@ -2251,17 +2691,6 @@ class FieldEditTab(QWidget):
             f"Saved {total_changes} changes across {len(patches)} files to:\n{path}")
 
     def _field_edit_export_mesh_json(self):
-        """Export queued mesh swaps as a JSON Mod Manager (JMM) format-2
-        entry-anchored patch file.
-
-        Each queued {'tgt', 'src'} swap becomes a single 4-byte patch on
-        the target entry's _appearanceName u32 inside characterinfo.pabgb.
-        The patch is anchored by entry name + rel_offset (offset within
-        the entry's blob), so JMM can re-locate it across schema versions
-        without hardcoding absolute file offsets.
-
-        Does NOT mutate self._charinfo_data — this is a pure-export path.
-        """
         queue = self._mesh_swap_queue or []
         if not queue:
             QMessageBox.information(
@@ -2429,24 +2858,39 @@ class FieldEditTab(QWidget):
             QMessageBox.warning(self, tr("Game Path"), tr("Game path not set."))
             return
         mod_group = "0039"
+        mount_group = self._MOUNT_OVERLAY_GROUP
         game_mod = os.path.join(game_path, mod_group)
-        if not os.path.isdir(game_mod):
-            QMessageBox.information(self, tr("Restore"), f"No {mod_group}/ overlay found.")
+        mount_mod = os.path.join(game_path, mount_group)
+        has_field = os.path.isdir(game_mod)
+        has_mount = os.path.isdir(mount_mod)
+        if not has_field and not has_mount:
+            QMessageBox.information(self, tr("Restore"),
+                f"No {mod_group}/ or {mount_group}/ overlay found.")
             return
+        parts = []
+        if has_field:
+            parts.append(f"{mod_group}/ (field edits + mesh swap)")
+        if has_mount:
+            parts.append(f"{mount_group}/ (skeleton + scale overlays)")
         reply = QMessageBox.question(
             self, tr("Restore Vanilla FieldInfo"),
-            f"Remove {mod_group}/ overlay and restore vanilla?",
+            f"Remove overlays and restore vanilla?\n\n" + "\n".join(parts),
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
         try:
-            msg = ""
-            if self._rebuild_papgt_fn:
-                msg = self._rebuild_papgt_fn(game_path, mod_group)
-            shutil.rmtree(game_mod)
+            msgs = []
+            if has_field:
+                if self._rebuild_papgt_fn:
+                    msgs.append(self._rebuild_papgt_fn(game_path, mod_group))
+                shutil.rmtree(game_mod)
+            if has_mount:
+                if self._rebuild_papgt_fn:
+                    msgs.append(self._rebuild_papgt_fn(game_path, mount_group))
+                shutil.rmtree(mount_mod)
             self._field_edit_status.setText(tr("Restored vanilla fieldinfo"))
             QMessageBox.information(self, tr("Restored"),
-                f"Removed {mod_group}/ overlay.\n{msg}\n"
+                f"Removed overlays.\n" + "\n".join(msgs) + "\n"
                 f"Restart the game for changes to take effect.")
         except Exception as e:
             QMessageBox.critical(self, tr("Restore Failed"), str(e))

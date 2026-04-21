@@ -1,4 +1,3 @@
-"""Item database browser, repurchase vendor, and dye editor tabs."""
 from __future__ import annotations
 
 import json as _json
@@ -38,7 +37,6 @@ log = logging.getLogger(__name__)
 
 
 class DatabaseBrowserTab(QWidget):
-    """Item ID lookup database — search for item keys by name or category."""
 
     dirty = Signal()
     status_message = Signal(str)
@@ -71,7 +69,6 @@ class DatabaseBrowserTab(QWidget):
         self._build_ui()
 
     def update_icons(self, enabled: bool) -> None:
-        """Called by MainWindow._toggle_icons to sync icon column state."""
         self._icons_enabled = enabled
         self._db_show_icons_btn.setText("Hide Icons" if enabled else "Show Icons")
         self._db_table.setColumnWidth(0, (ICON_SIZE + 16) if enabled else 0)
@@ -286,7 +283,6 @@ class DatabaseBrowserTab(QWidget):
 
 
     def _db_context_menu(self, pos):
-        """Right-click context menu for Item Database table."""
         rows = sorted(set(idx.row() for idx in self._db_table.selectedIndexes()))
         if not rows:
             return
@@ -314,7 +310,6 @@ class DatabaseBrowserTab(QWidget):
 
 
     def _db_export_dropset_pack(self, rows):
-        """Export selected Item Database rows as a DropSet pack JSON."""
         from PySide6.QtWidgets import QInputDialog, QFileDialog
 
         name, ok = QInputDialog.getText(
@@ -390,7 +385,6 @@ class DatabaseBrowserTab(QWidget):
 
 
     def _sync_all_icons(self) -> None:
-        """Download all item icons from GitHub. Skips already downloaded files."""
         import json as _json
         from urllib.request import urlopen, Request
 
@@ -452,7 +446,6 @@ class DatabaseBrowserTab(QWidget):
 
 
 class RepurchaseTab(QWidget):
-    """Vendor repurchase list editor."""
 
     dirty = Signal()
     status_message = Signal(str)
@@ -501,7 +494,6 @@ class RepurchaseTab(QWidget):
         self._vendor_template_swap_btn.setVisible(enabled)
 
     def scan_repurchase_items(self) -> List[SaveItem]:
-        """Public accessor for _enrich_vendor_names on MainWindow."""
         return self._scan_repurchase_items()
 
     def _mark_dirty(self) -> None:
@@ -633,7 +625,6 @@ class RepurchaseTab(QWidget):
 
 
     def _scan_repurchase_items(self) -> List[SaveItem]:
-        """Scan StoreSaveData block for items sold to vendors, with vendor identification."""
         if not self._save_data:
             return []
 
@@ -884,7 +875,6 @@ class RepurchaseTab(QWidget):
 
 
     def _template_add_to_vendor(self) -> None:
-        """Insert a new item into vendor buyback using PARC insertion + real template."""
         if not self._save_data:
             QMessageBox.warning(self, tr("Template Add"), tr("No save loaded."))
             return
@@ -944,7 +934,6 @@ class RepurchaseTab(QWidget):
 
 
     def _vendor_template_swap(self) -> None:
-        """Swap a vendor repurchase item using template matching with validation."""
         if not self._save_data:
             QMessageBox.warning(self, tr("Vendor Template Swap"), tr("No save loaded."))
             return
@@ -1113,7 +1102,6 @@ class RepurchaseTab(QWidget):
 
 
     def _add_to_vendor(self) -> None:
-        """Add a new item to vendor by overwriting a junk vendor item."""
         if not self._save_data:
             QMessageBox.warning(self, tr("Add to Vendor"), tr("No save loaded."))
             return
@@ -1285,7 +1273,6 @@ class RepurchaseTab(QWidget):
 
 
     def _parc_add_to_vendor(self) -> None:
-        """Add a new item to a vendor's buyback list via PARC insertion."""
         if not self._save_data:
             QMessageBox.warning(self, tr("PARC Vendor Insert"), tr("No save loaded."))
             return
@@ -1445,7 +1432,6 @@ class RepurchaseTab(QWidget):
 
 
     def _clone_vendor_item(self) -> None:
-        """Clone a selected vendor item with a new key and stack, insert as new entry."""
         try:
             if not self._save_data:
                 QMessageBox.warning(self, tr("Clone Item"), tr("No save loaded."))
@@ -1520,7 +1506,6 @@ class RepurchaseTab(QWidget):
 
 
 class DyeTab(QWidget):
-    """Dye slot editor for equipment color customization."""
 
     dirty = Signal()
     status_message = Signal(str)
@@ -1580,7 +1565,6 @@ class DyeTab(QWidget):
         self._is_dirty = False
 
     def _load_dye_slot_db(self) -> dict:
-        """Load the persistent dye slot count database."""
         import json as _json
         p = os.path.join(self._app_dir_fn(), 'dye_slot_counts.json')
         if os.path.isfile(p):
@@ -1592,7 +1576,6 @@ class DyeTab(QWidget):
 
 
     def _save_dye_slot_db(self, db: dict) -> None:
-        """Save the persistent dye slot count database."""
         import json as _json
         p = os.path.join(self._app_dir_fn(), 'dye_slot_counts.json')
         try:
@@ -1603,7 +1586,6 @@ class DyeTab(QWidget):
 
 
     def _dye_auto_learn_slots(self) -> None:
-        """Auto-learn dye slot counts from currently loaded dye data."""
         if not self._dye_items:
             return
         db = self._load_dye_slot_db()
@@ -1624,7 +1606,6 @@ class DyeTab(QWidget):
 
 
     def _dye_sync_slot_db(self) -> None:
-        """Download community dye slot database from GitHub and merge with local."""
         import urllib.request, json as _json
         url = (
             "https://raw.githubusercontent.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR"
@@ -1669,7 +1650,6 @@ class DyeTab(QWidget):
 
 
     def _build_ui(self) -> None:
-        """Build the Dye Editor tab — edit equipment colors per-slot."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(6)
@@ -1822,7 +1802,6 @@ class DyeTab(QWidget):
 
 
     def _dye_load(self) -> None:
-        """Kick off dye parsing on a background thread."""
         if not self._save_data:
             QMessageBox.warning(self, tr("Dye"), tr("Load a save file first."))
             return
@@ -1925,7 +1904,6 @@ class DyeTab(QWidget):
         threading.Thread(target=_parse, daemon=True).start()
 
     def _dye_populate(self, dye_items: list) -> None:
-        """Populate the gear table from parsed dye data (main thread)."""
         self._dye_items = dye_items
 
         self._dye_gear_table.setRowCount(len(dye_items))
@@ -1957,7 +1935,6 @@ class DyeTab(QWidget):
 
 
     def _dye_gear_selected(self) -> None:
-        """Handle gear item selection — show its dye parts."""
         rows = self._dye_gear_table.selectionModel().selectedRows()
         if not rows:
             return
@@ -1971,7 +1948,6 @@ class DyeTab(QWidget):
 
 
     def _dye_refresh_parts(self) -> None:
-        """Refresh the parts table for the current item."""
         if not self._dye_current_item:
             return
         entries = self._dye_current_item['dye_entries']
@@ -2004,7 +1980,6 @@ class DyeTab(QWidget):
 
 
     def _dye_part_clicked(self, row: int, col: int) -> None:
-        """Handle clicking a part row — select it and load controls."""
         if not self._dye_current_item:
             return
         entries = self._dye_current_item['dye_entries']
@@ -2041,7 +2016,6 @@ class DyeTab(QWidget):
 
 
     def _dye_get_current_part_or_first(self) -> dict | None:
-        """Get the selected part, or the first part if none selected."""
         if self._dye_current_part:
             return self._dye_current_part
         if self._dye_current_item and self._dye_current_item['dye_entries']:
@@ -2051,7 +2025,6 @@ class DyeTab(QWidget):
 
 
     def _dye_find_cli(self) -> Optional[str]:
-        """Find dye_cli.exe — bundled next to the exe or in the source dir."""
         import sys as _sys
         candidates = [
             os.path.join(os.path.dirname(os.path.abspath(_sys.argv[0])), "dye_cli.exe"),
@@ -2065,7 +2038,6 @@ class DyeTab(QWidget):
         return None
 
     def _dye_reselect(self, cur_slot: int, cur_part_slot: int) -> None:
-        """Re-select the gear item and dye part after reload."""
         for row, item in enumerate(self._dye_items):
             if item['slot'] == cur_slot:
                 self._dye_gear_table.selectRow(row)
@@ -2078,12 +2050,6 @@ class DyeTab(QWidget):
                 break
 
     def _dye_edit_inplace(self, p: dict, **kwargs) -> bool:
-        """Fast in-place dye edit using cached offsets. No re-parse needed.
-
-        Writes values to fields that exist in the mask. If a non-zero value
-        needs a field that doesn't exist in the mask, returns False so the
-        caller can trigger a full rebuild (which adds the field).
-        """
         if not self._save_data or not p.get('offsets'):
             return False
 
@@ -2133,11 +2099,6 @@ class DyeTab(QWidget):
 
     def _dye_rebuild_native(self, cli: str, item_key: int, entries: list,
                             cur_slot: int, cur_part_slot: int) -> bool:
-        """Full dye rebuild via native dye_cli.exe (~1s).
-
-        Handles both in-place edits (delta=0) and mask-changing rebuilds
-        with full tree-aware PO fixup.
-        """
         import subprocess, tempfile, sys as _sys
 
         self._dye_status.setText(tr("Rebuilding dye data (native)..."))
@@ -2194,7 +2155,6 @@ class DyeTab(QWidget):
 
     def _dye_rebuild_python(self, item_key: int, entries: list,
                             cur_slot: int, cur_part_slot: int) -> bool:
-        """Fallback: Python dye rebuild via parc_inserter3."""
         self._dye_status.setText(tr("Rebuilding dye data (Python fallback)..."))
         QApplication.processEvents()
 
@@ -2234,16 +2194,6 @@ class DyeTab(QWidget):
             return False
 
     def _dye_rebuild_list(self) -> bool:
-        """Rebuild the entire dye list for the current item with correct masks.
-
-        Uses native dye_cli.exe for speed (~1s full tree parse + rebuild).
-        Falls back to Python parc_inserter3 if CLI not found.
-
-        The golden rule: mask bit SET iff color channel value > 0.
-        The game CRASHES if a mask bit is set but value is 0.
-
-        Returns True if successful.
-        """
         if not self._save_data or not self._dye_current_item:
             return False
         if not self._dye_current_item['dye_entries']:
@@ -2262,11 +2212,6 @@ class DyeTab(QWidget):
             return self._dye_rebuild_python(item_key, entries, cur_slot, cur_part_slot)
 
     def _dye_set_color(self, r: int, g: int, b: int) -> None:
-        """Set color on the current part (or first part if none selected).
-
-        Uses fast in-place edit when possible (no mask change needed).
-        Falls back to full rebuild only when mask bits would toggle.
-        """
         p = self._dye_get_current_part_or_first()
         if not p:
             return
@@ -2289,7 +2234,6 @@ class DyeTab(QWidget):
 
 
     def _dye_pick_color(self) -> None:
-        """Open color picker for the selected dye part."""
         p = self._dye_get_current_part_or_first()
         if not p:
             self._dye_status.setText(tr("No dye parts on this item"))
@@ -2303,7 +2247,6 @@ class DyeTab(QWidget):
 
 
     def _dye_apply_quick_color(self, r: int, g: int, b: int) -> None:
-        """Apply a quick-pick color to the selected part (or first part)."""
         if not self._dye_current_item or not self._dye_current_item['dye_entries']:
             self._dye_status.setText(tr("Select an item with dye data first"))
             return
@@ -2311,7 +2254,6 @@ class DyeTab(QWidget):
 
 
     def _dye_material_changed(self, index: int) -> None:
-        """Handle material combo change — fast in-place if possible."""
         if self._dye_updating or not self._dye_current_part:
             return
         mat = self._dye_material_combo.itemData(index)
@@ -2323,7 +2265,6 @@ class DyeTab(QWidget):
 
 
     def _dye_grime_changed(self, value: int) -> None:
-        """Handle grime/repair spinner change — fast in-place if possible."""
         if self._dye_updating or not self._dye_current_part:
             return
         if not self._dye_edit_inplace(self._dye_current_part, grime=value):
@@ -2332,7 +2273,6 @@ class DyeTab(QWidget):
 
 
     def _dye_group_changed(self, index: int) -> None:
-        """Handle color group combo change — fast in-place if possible."""
         if self._dye_updating or not self._dye_current_part:
             return
         grp = self._dye_group_combo.itemData(index)
@@ -2343,7 +2283,6 @@ class DyeTab(QWidget):
 
 
     def _dye_add_to_item(self) -> None:
-        """Add dye data to an item that has never been dyed (PARC insertion)."""
         if not self._save_data or not self._dye_current_item:
             self._dye_status.setText(tr("Select an equipped item first"))
             return
@@ -2449,10 +2388,6 @@ class DyeTab(QWidget):
 
 
     def _dye_apply_to_all_parts(self) -> None:
-        """Apply a color to all parts on this item. Uses selected part's color, or first part.
-
-        Updates all entries in-memory then rebuilds the entire list with correct masks.
-        """
         if not self._dye_current_item or not self._dye_current_item['dye_entries']:
             self._dye_status.setText(tr("Select an item with dye data first"))
             return

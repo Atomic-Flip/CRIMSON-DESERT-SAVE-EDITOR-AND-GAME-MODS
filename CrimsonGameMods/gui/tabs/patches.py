@@ -1,13 +1,3 @@
-"""
-Patches tabs: GamePatchesTab, GameMapTab, SkillsTab, FieldEditTab.
-
-GamePatchesTab  — PAZ game-file patches: storage expansion, ride limit, effect swaps.
-GameMapTab      — game map entity browser backed by game_map.json.
-SkillsTab       — skill.pabgb parameter editor with CDUMM mod export.
-FieldEditTab    — fieldinfo / vehicleinfo / gameplaytrigger.pabgb editor.
-
-Extracted from gui/main_window.py — step 8 of the gui-split refactor.
-"""
 from __future__ import annotations
 
 import json
@@ -42,14 +32,12 @@ log = logging.getLogger(__name__)
 
 
 def _validate_game_path(path: str) -> bool:
-    """Check if a path looks like a valid Crimson Desert installation."""
     paz = os.path.join(path, "0008", "0.paz")
     paz_bak = os.path.join(path, "0008", "0.paz.sebak")
     return os.path.isfile(paz) or os.path.isfile(paz_bak)
 
 
 class GamePatchesTab(QWidget):
-    """PAZ game-file patch manager: storage expansion, ride limit, effect patches."""
 
     status_message = Signal(str)
     game_path_changed = Signal(str)
@@ -64,18 +52,20 @@ class GamePatchesTab(QWidget):
         self._build_ui()
 
     def set_game_path(self, path: str) -> None:
-        """Called by MainWindow when the global game path changes."""
         if path and hasattr(self, '_paz_game_path'):
             self._paz_game_path.setText(path)
             self._paz_manager.game_path = path
             self._paz_refresh_status()
 
     def _apply_game_path(self, path: str) -> None:
-        """Apply game path locally and notify MainWindow of the change."""
         self._paz_game_path.setText(path)
         self._paz_manager.game_path = path
         self._paz_refresh_status()
         self.game_path_changed.emit(path)
+
+    def set_experimental_mode(self, enabled: bool) -> None:
+        if hasattr(self, '_dev_export_btn_skill'):
+            self._dev_export_btn_skill.setVisible(bool(enabled))
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -217,7 +207,6 @@ class GamePatchesTab(QWidget):
 
 
     def _paz_populate_table(self) -> None:
-        """Populate the patches table with current status."""
         table = self._paz_patch_table
         patches = self._paz_patches
         table.setRowCount(len(patches))
@@ -238,7 +227,6 @@ class GamePatchesTab(QWidget):
         QTimer.singleShot(100, self._paz_refresh_status)
 
     def _paz_refresh_status(self) -> None:
-        """Refresh patch status by scanning PAZ files on a background thread."""
         if not hasattr(self, '_paz_patch_table'):
             return
         if not self._paz_manager.game_path:
@@ -275,7 +263,6 @@ class GamePatchesTab(QWidget):
         threading.Thread(target=_do_scan, daemon=True).start()
 
     def _paz_apply_status_results(self, results: list) -> None:
-        """Apply PAZ scan results to the table (main thread)."""
         if not hasattr(self, '_paz_patch_table'):
             return
         table = self._paz_patch_table
@@ -317,7 +304,6 @@ class GamePatchesTab(QWidget):
 
 
     def _paz_browse_game_path(self) -> None:
-        """Browse for the game installation directory."""
         current = self._paz_game_path.text().strip() or self._config.get("game_install_path", "")
         path = QFileDialog.getExistingDirectory(
             self, "Select Crimson Desert Install Folder",
@@ -335,7 +321,6 @@ class GamePatchesTab(QWidget):
             self._apply_game_path(path)
 
     def _paz_auto_detect_path(self) -> None:
-        """Auto-detect the game install path."""
         detected = PazPatchManager.find_game_path()
         if detected:
             self._apply_game_path(detected)
@@ -346,7 +331,6 @@ class GamePatchesTab(QWidget):
             )
 
     def _paz_get_selected_patch(self) -> Optional[PazPatch]:
-        """Get the currently selected patch from the table."""
         rows = self._paz_patch_table.selectionModel().selectedRows()
         if not rows:
             QMessageBox.information(self, tr("No Selection"), tr("Select a patch from the table first."))
@@ -357,7 +341,6 @@ class GamePatchesTab(QWidget):
         return None
 
     def _paz_apply_selected(self) -> None:
-        """Apply the selected patch."""
         if not self._paz_manager.game_path:
             QMessageBox.warning(self, tr("No Game Path"),
                                 tr("Set the game install path first (Auto-Detect or Browse)."))
@@ -397,7 +380,6 @@ class GamePatchesTab(QWidget):
         self._paz_refresh_status()
 
     def _paz_apply_mount_cooldown(self) -> Tuple[bool, str]:
-        """Apply mount cooldown patch using decompress/recompress pipeline."""
         game_path = self._paz_manager.game_path
         if not game_path:
             return False, "No game path set."
@@ -414,7 +396,6 @@ class GamePatchesTab(QWidget):
             return False, f"Mount cooldown patch failed: {e}"
 
     def _paz_restore_selected(self) -> None:
-        """Restore the selected patch's PAZ file from backup."""
         if not self._paz_manager.game_path:
             QMessageBox.warning(self, tr("No Game Path"),
                                 tr("Set the game install path first."))
@@ -458,7 +439,6 @@ class GamePatchesTab(QWidget):
         self._paz_refresh_status()
 
     def _paz_restore_all(self) -> None:
-        """Restore all PAZ files from backups."""
         if not self._paz_manager.game_path:
             QMessageBox.warning(self, tr("No Game Path"),
                                 tr("Set the game install path first."))
@@ -492,7 +472,6 @@ class GamePatchesTab(QWidget):
         self._paz_refresh_status()
 
     def _paz_expand_storage(self) -> None:
-        """Expand all storage to 700 slots."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -531,7 +510,6 @@ class GamePatchesTab(QWidget):
             QMessageBox.critical(self, tr("Error"), str(e))
 
     def _paz_check_storage(self) -> None:
-        """Check current storage slot values."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -545,7 +523,6 @@ class GamePatchesTab(QWidget):
             self._storage_status.setText(f"Error: {e}")
 
     def _effect_swap_blackberry_test(self) -> None:
-        """Test: swap Blackberry effect to instant Dragon CD reset."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -582,7 +559,6 @@ class GamePatchesTab(QWidget):
             QMessageBox.critical(self, tr("Error"), str(e))
 
     def _effect_check_blackberry(self) -> None:
-        """Check current effect hash on Blackberry."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -599,7 +575,6 @@ class GamePatchesTab(QWidget):
             self._effect_status.setText(f"Error: {e}")
 
     def _patch_ride_limit(self) -> None:
-        """Patch Gimmick_RideLimit in skill.pabgb to 999999."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -651,7 +626,6 @@ class GamePatchesTab(QWidget):
             self._ride_limit_status.setText(f"Error: {e}")
 
     def _check_ride_limit(self) -> None:
-        """Check current Gimmick_RideLimit value."""
         game_path = self._paz_game_path.text().strip()
         if not game_path:
             QMessageBox.warning(self, tr("No Game Path"), tr("Set the game install path first."))
@@ -674,7 +648,6 @@ class GamePatchesTab(QWidget):
             self._ride_limit_status.setText(f"Error: {e}")
 
     def _paz_verify_signatures(self) -> None:
-        """Verify all patch signatures can be found in the PAZ files."""
         if not self._paz_manager.game_path:
             QMessageBox.warning(self, tr("No Game Path"),
                                 tr("Set the game install path first."))
@@ -707,7 +680,6 @@ class GamePatchesTab(QWidget):
 
 
 class GameMapTab(QWidget):
-    """Game map entity browser backed by game_map.json."""
 
     status_message = Signal(str)
 
@@ -717,7 +689,6 @@ class GameMapTab(QWidget):
         self._build_ui()
 
     def _build_ui(self) -> None:
-        """Build the Game Map tab — searchable relationship browser for all game data."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
         layout.setSpacing(4)
@@ -828,7 +799,6 @@ class GameMapTab(QWidget):
         self._load_game_map()
 
     def _load_game_map(self):
-        """Load game map data from crimson_data.db."""
         try:
             db = get_connection()
 
@@ -852,7 +822,6 @@ class GameMapTab(QWidget):
             self._gm_status.setText(f"Load failed: {exc}")
 
     def _gm_do_search(self):
-        """Search the game map."""
         if not self._gm_all_entities:
             return
 
@@ -909,7 +878,6 @@ class GameMapTab(QWidget):
         self._gm_status.setText(f"{len(results)} results")
 
     def _gm_on_selected(self, *_args):
-        """Show detail for selected entity."""
         rows = self._gm_table.selectionModel().selectedRows()
         if not rows:
             return
@@ -973,7 +941,6 @@ class GameMapTab(QWidget):
             row += 1
 
     def _gm_follow_link(self, index):
-        """Double-click a relationship to navigate to that entity."""
         row = index.row()
         key_w = self._gm_relations.item(row, 2)
         if not key_w:
@@ -989,7 +956,6 @@ class GameMapTab(QWidget):
 
 
 class SkillsTab(QWidget):
-    """skill.pabgb parameter editor with CDUMM mod export."""
 
     status_message = Signal(str)
 
@@ -1001,13 +967,11 @@ class SkillsTab(QWidget):
         self._build_ui()
 
     def set_game_path(self, path: str) -> None:
-        """Called by MainWindow when the game path changes."""
         self._game_path = path
         if hasattr(self, '_skill_game_path') and path:
             self._skill_game_path.setText(path)
 
     def _build_ui(self) -> None:
-        """Build the Skills tab — browse and edit skill.pabgb parameters."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
         layout.setSpacing(4)
@@ -1121,11 +1085,12 @@ class SkillsTab(QWidget):
         bottom_bar.setSpacing(6)
 
         export_btn = QPushButton(tr("Export as Mod"))
-        export_btn.setObjectName("accentBtn")
         export_btn.setStyleSheet("background-color: #7B1FA2; color: white; font-weight: bold;")
-        export_btn.setToolTip(tr("Export modified skill.pabgb as a CDUMM-compatible mod folder"))
+        export_btn.setToolTip(tr("ADVANCED — UNSUPPORTED. Export modified skill.pabgb as mod."))
         export_btn.clicked.connect(self._skill_export_mod)
+        export_btn.setVisible(False)
         bottom_bar.addWidget(export_btn)
+        self._dev_export_btn_skill = export_btn
 
         save_cfg_btn = QPushButton(tr("Save Config"))
         save_cfg_btn.setToolTip(tr("Save edits as a reusable config file"))
@@ -1154,7 +1119,6 @@ class SkillsTab(QWidget):
         self._skill_edits: dict = {}
 
     def _skill_extract(self) -> None:
-        """Extract skill.pabgb from game PAZ and parse all entries."""
         game_path = self._game_path
         if not game_path:
             QMessageBox.warning(self, tr("Skills"), tr("Set the game path first (Browse at top)."))
@@ -1231,7 +1195,6 @@ class SkillsTab(QWidget):
             QMessageBox.critical(self, tr("Parse Failed"), str(e))
 
     def _skill_search_items(self) -> None:
-        """Search skills by name or display name."""
         if not self._skill_parser_result:
             QMessageBox.warning(self, tr("Skills"), tr("Extract skills first."))
             return
@@ -1286,7 +1249,6 @@ class SkillsTab(QWidget):
         self._skill_status.setText(f"{len(results)} skills found")
 
     def _skill_on_selected(self, *_args) -> None:
-        """When a skill is selected, show its fields."""
         rows = self._skill_table.selectionModel().selectedRows()
         if not rows:
             return
@@ -1300,7 +1262,6 @@ class SkillsTab(QWidget):
         self._skill_refresh_fields(entry)
 
     def _skill_refresh_fields(self, entry) -> None:
-        """Populate the fields table for a skill entry."""
         self._skill_field_header.setText(
             f"{entry.name} (key={entry.key}, {entry.entry_size}B, "
             f"payload={len(entry.payload)}B)")
@@ -1362,7 +1323,6 @@ class SkillsTab(QWidget):
             self._skill_strings_label.setVisible(False)
 
     def _skill_edit_field(self, index) -> None:
-        """Double-click a field to edit its value."""
         if not self._skill_data or not self._skill_current_entry:
             return
 
@@ -1421,7 +1381,6 @@ class SkillsTab(QWidget):
             f"{len(self._skill_edits)} edit(s). Click 'Export as Mod' to write.")
 
     def _skill_export_mod(self) -> None:
-        """Export modified skill.pabgb as a CDUMM-compatible mod folder."""
         if not self._skill_data or not self._skill_modified:
             QMessageBox.information(self, tr("Skills"), tr("No modifications to export."))
             return
@@ -1515,7 +1474,6 @@ class SkillsTab(QWidget):
             QMessageBox.critical(self, tr("Export Failed"), str(e))
 
     def _skill_save_config(self) -> None:
-        """Save skill edits as a reusable config file."""
         if not self._skill_edits:
             QMessageBox.information(self, tr("Save Config"), tr("No edits to save."))
             return
@@ -1558,7 +1516,6 @@ class SkillsTab(QWidget):
         self._skill_status.setText(f"Config saved: {os.path.basename(path)}")
 
     def _skill_load_config(self) -> None:
-        """Load a skill config and re-apply edits."""
         if not self._skill_data:
             QMessageBox.warning(self, tr("Load Config"), tr("Extract skills first."))
             return

@@ -1,18 +1,3 @@
-"""
-PABGB Field Parsers — Specialized record payload decoders for each game data file.
-
-Each parser extracts USEFUL editable fields from raw PABGB record payloads
-by cross-referencing with known game data (item keys, stat hashes, etc.).
-
-These are NOT full schema decodings — they extract the fields players want to edit:
-  - dropsetinfo: drop rates, item references, count ranges
-  - skill: cooldowns, damage values, SP costs, skill references
-  - buffinfo: stat modifications, durations, buff levels
-  - characterinfo: HP, attack, defense, level, faction
-  - conditioninfo: condition parameters, unlock requirements
-  - faction: reputation thresholds, rank rewards
-  - storeinfo: item keys, prices, limits (handled by storeinfo_parser.py)
-"""
 
 import struct
 import logging
@@ -24,7 +9,6 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class ParsedField:
-    """A single parsed field from a PABGB record payload."""
     name: str
     offset: int
     size: int
@@ -47,7 +31,6 @@ RATE_RANGES = [(1, 100000)]
 
 
 def _scan_item_keys(data: bytes, start: int, end: int, known_keys: set) -> List[ParsedField]:
-    """Scan for u32 values matching known item keys."""
     fields = []
     for off in range(start, min(end - 3, len(data) - 3), 4):
         v = struct.unpack_from('<I', data, off)[0]
@@ -61,7 +44,6 @@ def _scan_item_keys(data: bytes, start: int, end: int, known_keys: set) -> List[
 
 
 def _scan_stat_hashes(data: bytes, start: int, end: int) -> List[ParsedField]:
-    """Scan for known stat hash references with their values."""
     fields = []
     for off in range(start, min(end - 7, len(data) - 7), 4):
         v = struct.unpack_from('<I', data, off)[0]
@@ -77,7 +59,6 @@ def _scan_stat_hashes(data: bytes, start: int, end: int) -> List[ParsedField]:
 
 
 def _scan_rates(data: bytes, start: int, end: int) -> List[ParsedField]:
-    """Scan for values that look like drop rates or percentages."""
     fields = []
     seen = set()
     for off in range(start, min(end - 3, len(data) - 3), 4):
@@ -96,7 +77,6 @@ def _scan_rates(data: bytes, start: int, end: int) -> List[ParsedField]:
 
 def _scan_ff_separated_entries(data: bytes, start: int, end: int,
                                 known_keys: set) -> List[ParsedField]:
-    """Scan for FF FF separated entries (common in drop/store data)."""
     fields = []
     pos = start
     idx = 0
@@ -118,7 +98,6 @@ def _scan_ff_separated_entries(data: bytes, start: int, end: int,
 
 def parse_dropset_record(data: bytes, rec_offset: int, rec_size: int,
                           known_item_keys: set) -> List[ParsedField]:
-    """Parse a dropsetinfo record payload for editable drop fields."""
     end = rec_offset + rec_size
     fields = []
 
@@ -136,7 +115,6 @@ def parse_dropset_record(data: bytes, rec_offset: int, rec_size: int,
 
 
 def parse_skill_record(data: bytes, rec_offset: int, rec_size: int) -> List[ParsedField]:
-    """Parse a skill record for cooldown, damage, SP cost fields."""
     end = rec_offset + rec_size
     fields = []
 
@@ -164,7 +142,6 @@ def parse_skill_record(data: bytes, rec_offset: int, rec_size: int) -> List[Pars
 
 
 def parse_buff_record(data: bytes, rec_offset: int, rec_size: int) -> List[ParsedField]:
-    """Parse a buffinfo record for stat modifications and durations."""
     end = rec_offset + rec_size
     fields = []
 
@@ -185,7 +162,6 @@ def parse_buff_record(data: bytes, rec_offset: int, rec_size: int) -> List[Parse
 
 
 def parse_character_record(data: bytes, rec_offset: int, rec_size: int) -> List[ParsedField]:
-    """Parse a characterinfo record for HP, attack, defense, level."""
     end = rec_offset + rec_size
     fields = []
 
@@ -210,7 +186,6 @@ def parse_character_record(data: bytes, rec_offset: int, rec_size: int) -> List[
 
 
 def parse_condition_record(data: bytes, rec_offset: int, rec_size: int) -> List[ParsedField]:
-    """Parse a conditioninfo record for condition parameters."""
     end = rec_offset + rec_size
     fields = []
 
@@ -227,7 +202,6 @@ def parse_condition_record(data: bytes, rec_offset: int, rec_size: int) -> List[
 
 
 def parse_faction_record(data: bytes, rec_offset: int, rec_size: int) -> List[ParsedField]:
-    """Parse a faction record for reputation thresholds and rewards."""
     end = rec_offset + rec_size
     fields = []
 
@@ -256,5 +230,4 @@ PARSERS = {
 
 
 def get_parser(file_name: str):
-    """Get the specialized parser for a file type, or None."""
     return PARSERS.get(file_name)

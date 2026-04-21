@@ -1,63 +1,3 @@
-"""
-Storeinfo Parser — Full binary parser for Crimson Desert storeinfo.pabgb/pabgh.
-
-Properly decodes the PABGB store record format:
-  Store Record = u16(store_key) + CString(name) + FixedHeader(51B) + Items(N*105B) + Tail(17B)
-  Total overhead = 68 bytes (51 header + 17 tail)
-
-FixedHeader (51 bytes after name):
-  +0x00: u8(0)          null/flag
-  +0x01: u32             field_a (usually 1)
-  +0x05: u32             field_b (usually 1)
-  +0x09: u32             field_c (usually 1)
-  +0x0D: u64             field_d (usually 0, sometimes a timestamp)
-  +0x15: u32             field_e (usually 0)
-  +0x19: u8              field_f (usually 0)
-  +0x1A: u8              format_tag_a (0x1D for standard stores)
-  +0x1B: u8              format_tag_b (0xFD for standard stores)
-  +0x1C: u32             sentinel_a (0xFFFFFFFF or variant)
-  +0x20: u32             sentinel_b (0xFFFFFFFF or variant)
-  +0x24: u16             sentinel_c (usually 0xFFFF or 0x0000 or 0x0700)
-  +0x26: u32             item_count
-  +0x2A: u32             field_g (usually 0)
-  +0x2E: u8              field_h (usually 1)
-  +0x2F: u32             item_count_2 (MUST match item_count!)
-
-Item Entry (105 bytes):
-  +0x00: u16             store_key_ref (copy of parent store key)
-  +0x02: u64             buy_price
-  +0x0A: u64             sell_price
-  +0x12: u32             trade_flags (varies)
-  +0x16: u32             field_1
-  +0x1A: u32             field_2
-  +0x1E: u8              pre_marker_a
-  +0x1F: u8              pre_marker_b
-  +0x20: u16             marker (always 0x0101)
-  +0x22: u32             item_key
-  +0x26: bytes[30]       item_data_1
-  +0x44: u32             extra_field
-  +0x48: bytes[28]       item_data_2
-  +0x5B: u16             separator (usually 0xFFFF)
-  +0x5D: u32             item_key_dup (same as item_key)
-  +0x61: bytes[8]        item_tail
-
-Tail (17 bytes):
-  +0x00: u32             tail_field_a (usually 0)
-  +0x04: u32             version_field (usually 2)
-  +0x08: u32             tail_hash (e.g. 0x3E3D)
-  +0x0C: u32             tail_field_b (usually 0)
-  +0x10: u8              tail_flag (usually 1)
-
-Format types at +0x1A/+0x1B from after_name:
-  1D FD: Standard format (148 stores) — 68 + N*105 formula
-  00 00: Special format (42 stores) — Camp, Church, Bank, Contribution
-  40 42: BlackMarket format (13 stores)
-  40 0D: StreetVendor format (8 stores)
-  66 FC: Fishing format (17 stores)
-  C6 FC: Leather format
-  60 E3: Special high-tier stores
-  80 4F: Salt BlackMarket
-"""
 
 import json
 import logging
@@ -77,7 +17,6 @@ TOTAL_OVERHEAD = HEADER_OVERHEAD + TAIL_SIZE
 
 @dataclass
 class StoreItemEntry:
-    """A parsed item entry within a store (105 bytes)."""
     offset: int
     store_key_ref: int
     buy_price: int
@@ -91,7 +30,6 @@ class StoreItemEntry:
 
 @dataclass
 class StoreRecord:
-    """A parsed store record from storeinfo.pabgb."""
     index: int
     key: int
     name: str
@@ -108,7 +46,6 @@ class StoreRecord:
 
 
 class StoreinfoParser:
-    """Full parser for storeinfo.pabgb + pabgh."""
 
     def __init__(self):
         self.stores: List[StoreRecord] = []
@@ -119,7 +56,6 @@ class StoreinfoParser:
         self._loaded = False
 
     def load_from_files(self, pabgh_path: str, pabgb_path: str) -> bool:
-        """Load from extracted .pabgh and .pabgb files."""
         try:
             with open(pabgh_path, 'rb') as f:
                 self._header_data = f.read()
@@ -134,7 +70,6 @@ class StoreinfoParser:
             return False
 
     def load_from_bytes(self, header_bytes: bytes, body_bytes: bytes) -> bool:
-        """Load from raw bytes (for PAZ extraction)."""
         self._header_data = header_bytes
         self._body_data = bytearray(body_bytes)
         self._parse_header()
@@ -143,7 +78,6 @@ class StoreinfoParser:
         return True
 
     def load_names(self, names_path: str = '') -> None:
-        """Load item name database."""
         _db = get_connection()
         for row in _db.execute("SELECT item_key, name FROM items"):
             self._name_lookup[row['item_key']] = row['name']
@@ -152,7 +86,6 @@ class StoreinfoParser:
         return self._name_lookup.get(key, f"Unknown({key})")
 
     def _parse_header(self) -> None:
-        """Parse pabgh header: u16(count) + N * (u16 key, u32 offset)."""
         count = struct.unpack_from('<H', self._header_data, 0)[0]
         self._header_entries = []
         for i in range(count):
@@ -162,7 +95,6 @@ class StoreinfoParser:
             self._header_entries.append((key, off))
 
     def _parse_all_stores(self) -> None:
-        """Parse all store records from body data."""
         self.stores.clear()
         data = self._body_data
         n = len(self._header_entries)
@@ -263,7 +195,6 @@ class StoreinfoParser:
         return next((s for s in self.stores if name_lower in s.name.lower()), None)
 
     def swap_item(self, store_key: int, old_item_key: int, new_item_key: int) -> bool:
-        """Swap an item key in a standard-format store."""
         store = self.get_store_by_key(store_key)
         if not store or not store.is_standard:
             log.warning("Store %d not found or not standard format", store_key)
@@ -282,10 +213,6 @@ class StoreinfoParser:
 
     def add_item(self, store_key: int, donor_item_key: int, new_item_key: int,
                  buy_price: int = -1, sell_price: int = -1) -> bool:
-        """Add an item to a standard-format store by cloning a donor entry.
-
-        Properly updates BOTH count fields and rebuilds header offsets.
-        """
         store = self.get_store_by_key(store_key)
         if not store or not store.is_standard:
             log.warning("Store %d not found or not standard format", store_key)
@@ -324,7 +251,6 @@ class StoreinfoParser:
         return True
 
     def remove_item(self, store_key: int, item_key: int) -> bool:
-        """Remove an item from a standard-format store."""
         store = self.get_store_by_key(store_key)
         if not store or not store.is_standard:
             return False
@@ -344,10 +270,6 @@ class StoreinfoParser:
         return False
 
     def _rebuild_header_offsets(self, changed_index: int, size_delta: int) -> None:
-        """Update header offsets after insertion/removal.
-
-        All stores after changed_index need their offsets shifted.
-        """
         new_entries = list(self._header_entries)
         for i in range(changed_index + 1, len(new_entries)):
             key, off = new_entries[i]
@@ -361,22 +283,18 @@ class StoreinfoParser:
         self._header_data = bytes(new_hdr)
 
     def get_header_bytes(self) -> bytes:
-        """Get the current pabgh header bytes."""
         return self._header_data
 
     def get_body_bytes(self) -> bytes:
-        """Get the current pabgb body bytes."""
         return bytes(self._body_data)
 
     def get_summary(self) -> str:
-        """Human-readable summary."""
         std = sum(1 for s in self.stores if s.is_standard)
         total_items = sum(len(s.items) for s in self.stores)
         return (f"{len(self.stores)} stores ({std} standard, {len(self.stores)-std} special), "
                 f"{total_items} total items, body={len(self._body_data):,} bytes")
 
     def validate(self) -> List[str]:
-        """Validate all standard-format stores. Returns list of issues."""
         issues = []
         for store in self.stores:
             if not store.is_standard:
@@ -394,7 +312,6 @@ class StoreinfoParser:
 
 
 def parse_storeinfo(pabgh_path: str, pabgb_path: str) -> StoreinfoParser:
-    """Convenience: parse storeinfo files and return parser."""
     parser = StoreinfoParser()
     parser.load_from_files(pabgh_path, pabgb_path)
     parser.load_names()

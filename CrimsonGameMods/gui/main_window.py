@@ -1,7 +1,3 @@
-"""
-Crimson Desert Save Editor - PySide6 GUI.
-Main window with tabs: Inventory, Equipment, Item Swap, Item Database, Backup/Restore.
-"""
 from __future__ import annotations
 
 import datetime
@@ -57,13 +53,12 @@ from localization import tr, set_language, get_language, get_available_languages
 
 from gui.theme import (
     COLORS, CATEGORY_COLORS, _TAB_SELECTED_BG, _TAB_SELECTED_COLOR,
-    _TAB_SELECTED_BORDER, DARK_STYLESHEET,
+    _TAB_SELECTED_BORDER, DARK_STYLESHEET, LIGHT_STYLESHEET, apply_theme,
 )
 from gui.utils import _num_item
 
 
 def find_save_files() -> List[dict]:
-    """Find save files in known locations."""
     results = []
     local_app = os.environ.get("LOCALAPPDATA", "")
 
@@ -119,12 +114,14 @@ def find_save_files() -> List[dict]:
 
 from gui.tabs.items import DatabaseBrowserTab
 from gui.tabs.buffs_v319 import ItemBuffsTab
+from gui.tabs.stacker import StackerTab
 from iteminfo_reader import ItemInfoCache
 from gui.tabs.world import (
     DropsetTab, SpawnTab, StoreEditorTab,
 )
 from gui.tabs.patches import GamePatchesTab
 from gui.tabs.field_edit import FieldEditTab
+from gui.tabs.skill_tree import SkillTreeTab
 from gui.dialogs import (
     _FloatingTabWindow, DetachableTabWidget,
     GiveItemDialog, AddItemDialog, QuestEditorWindow,
@@ -133,8 +130,42 @@ from gui.dialogs import (
 )
 
 
+def _enable_drag_drop_under_uipi(hwnd: int) -> None:
+    """Allow drag-drop from unelevated Explorer into this elevated window.
+
+    Windows UIPI (User Interface Privilege Isolation) blocks messages
+    from lower-integrity processes to higher-integrity ones by default.
+    When the app is launched via "Run as administrator" and the user
+    drags from a regular Explorer, the drag enters but the drop is
+    silently filtered. Calling ChangeWindowMessageFilterEx with
+    MSGFLT_ALLOW on the relevant messages lets them through.
+
+    The three messages that matter:
+      WM_DROPFILES     (0x0233) — legacy file-drop
+      WM_COPYDATA      (0x004A) — used internally by some drag handlers
+      WM_COPYGLOBALDATA(0x0049) — undocumented, required by OLE drop
+
+    No-op on non-Windows platforms. No-op if user32.dll can't be loaded.
+    """
+    if not sys.platform.startswith("win"):
+        return
+    import ctypes
+    user32 = ctypes.windll.user32
+    # The function is available on Vista+ and still present on Win 11.
+    try:
+        func = user32.ChangeWindowMessageFilterEx
+    except AttributeError:
+        return
+    MSGFLT_ALLOW = 1
+    for msg in (0x0233, 0x004A, 0x0049):
+        # Signature: BOOL ChangeWindowMessageFilterEx(HWND, UINT, DWORD, PCHANGEFILTERSTRUCT)
+        # 4th arg is optional — pass NULL. Return value ignored; if the
+        # call fails (e.g. running unelevated, where UIPI doesn't
+        # apply), the message was never filtered to begin with.
+        func(ctypes.c_void_p(hwnd), msg, MSGFLT_ALLOW, None)
+
+
 class MainWindow(QMainWindow):
-    """Main application window."""
 
     _icon_ready = Signal(int)
     _parc_step = Signal(int)
@@ -202,6 +233,14 @@ class MainWindow(QMainWindow):
         self._experimental_mode: bool = self._config.get("experimental_mode", False)
         self._icons_enabled: bool = self._config.get("show_icons", False)
 
+        # CRITICAL — apply theme BEFORE building any widgets, so the COLORS
+        # dict is already mutated to light/dark and inline setStyleSheet
+        # calls during widget construction bake the correct palette.
+        saved_theme = self._config.get("theme", "dark")
+        app = QApplication.instance()
+        if app is not None:
+            apply_theme(app, saved_theme)
+
         db_path = self._name_db.load_auto()
         self._name_db.apply_localization()
 
@@ -210,7 +249,12 @@ class MainWindow(QMainWindow):
         self._setup_lazy_tab_loading()
         self._build_status_bar()
 
-        self.setStyleSheet(DARK_STYLESHEET)
+        # Re-apply after construction in case a lazy widget creation path
+        # changed COLORS. No-op if already applied, safe either way.
+        if app is not None:
+            apply_theme(app, saved_theme)
+        else:
+            self.setStyleSheet(LIGHT_STYLESHEET if saved_theme == "light" else DARK_STYLESHEET)
 
         saved_scale = self._config.get("font_scale")
         if saved_scale and saved_scale != 1.0:
@@ -686,6 +730,14 @@ class MainWindow(QMainWindow):
         self._buffs_tab.navigate_requested.connect(self._on_tab_navigate_requested)
         if hasattr(self, "_scan_items"):
             self._buffs_tab.scan_requested.connect(self._scan_items)
+
+        def _pop_save_browser() -> None:
+            if hasattr(self, "_save_dock"):
+                self._save_dock.setFloating(True)
+                self._save_dock.show()
+                self._save_dock.raise_()
+                self._save_dock.activateWindow()
+        self._buffs_tab.open_save_browser_requested.connect(_pop_save_browser)
         _saved_gp_for_buffs = self._config.get("game_install_path", "")
         if _saved_gp_for_buffs:
             try:
@@ -693,6 +745,27 @@ class MainWindow(QMainWindow):
             except Exception:
                 pass
         self._mods_tabs.addTab(self._buffs_tab, tr("tab.itembuffs"))
+
+        # Stacker Tool — multi-mod iteminfo.pabgb merger. Single sink for
+        # all mod changes targeting iteminfo: external mods (folder PAZ,
+        # loose pabgb, legacy JSON) + ItemBuffs tab edits pulled on demand.
+        # Produces ONE overlay instead of N fighting-each-other overlays.
+        self._stacker_tab = StackerTab(
+            name_db=self._name_db,
+            icon_cache=self._icon_cache,
+            config=self._config,
+            show_guide_fn=self._show_guide,
+            buffs_tab=self._buffs_tab,
+        )
+        self._stacker_tab.status_message.connect(self._update_status)
+        self._stacker_tab.config_save_requested.connect(self._save_config)
+        _saved_gp_for_stacker = self._config.get("game_install_path", "")
+        if _saved_gp_for_stacker:
+            try:
+                self._stacker_tab.set_game_path(_saved_gp_for_stacker)
+            except Exception:
+                pass
+        self._mods_tabs.addTab(self._stacker_tab, "Stacker Tool")
 
         self._store_tab = StoreEditorTab(
             name_db=self._name_db,
@@ -726,6 +799,32 @@ class MainWindow(QMainWindow):
         self._spawn_tab = SpawnTab(config=self._config, show_guide_fn=self._show_guide)
         self._spawn_tab.status_message.connect(self._update_status)
         self._mods_tabs.addTab(self._spawn_tab, "SpawnEdit")
+
+        self._skill_tree_tab = SkillTreeTab(
+            config=self._config,
+            rebuild_papgt_fn=self._rebuild_papgt_without,
+        )
+        self._skill_tree_tab.status_message.connect(self._update_status)
+        self._skill_tree_tab.config_save_requested.connect(self._save_config)
+        _saved_gp_st = self._config.get("game_install_path", "")
+        if _saved_gp_st:
+            try:
+                self._skill_tree_tab.set_game_path(_saved_gp_st)
+            except Exception:
+                pass
+        self._mods_tabs.addTab(self._skill_tree_tab, "SkillTree")
+
+        if self._experimental_mode:
+            try:
+                from gui.tabs.mercpets import MercPetsTab
+                self._mercpets_tab = MercPetsTab(
+                    self._config,
+                    lambda: self._config.get("game_install_path", ""),
+                )
+                self._mercpets_tab.config_save_requested.connect(self._save_config)
+                self._mods_tabs.addTab(self._mercpets_tab, "MercPets (dev)")
+            except Exception as e:
+                log.warning("MercPets tab load failed: %s", e)
 
         self._tabs = _real_tabs
 
@@ -764,7 +863,6 @@ class MainWindow(QMainWindow):
             self._apply_ui_settings()
 
     def _toggle_save_sidebar(self) -> None:
-        """Show/hide the Save Browser dock."""
         if self._save_dock.isVisible():
             self._save_dock.hide()
             self._sb_collapse_btn.setText("\u25B6")
@@ -775,7 +873,6 @@ class MainWindow(QMainWindow):
             self._sb_collapse_btn.setToolTip("Collapse Save Browser")
 
     def _toggle_pack_sidebar(self) -> None:
-        """Show/hide the Pack Browser dock."""
         if self._pack_dock.isVisible():
             self._pack_dock.hide()
             self._ps_collapse_btn.setText("\u25C0")
@@ -797,11 +894,6 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _friendly_slot_name(slot_dir: str) -> str:
-        """Convert a slot directory name to a game-friendly display name.
-
-        slot0-2  -> Auto Save 1-3
-        slot100+ -> Save Slot 1, 2, ...
-        """
         try:
             num = int(slot_dir.replace("slot", ""))
             if num < 100:
@@ -1043,7 +1135,6 @@ class MainWindow(QMainWindow):
             subprocess.Popen(['xdg-open', folder])
 
     def _open_language_picker(self) -> None:
-        """Open the language picker to download + apply a language pack."""
         try:
             from gui.language_picker import LanguagePickerDialog
         except Exception as e:
@@ -1234,7 +1325,6 @@ class MainWindow(QMainWindow):
             self._refresh_sidebar()
 
     def _settings_export_lang_template(self, parent_dlg) -> None:
-        """Export the English strings as a template for translators."""
         from localization import export_template
         locale_dir = os.path.join(self._app_dir(), 'locale')
         os.makedirs(locale_dir, exist_ok=True)
@@ -1258,7 +1348,6 @@ class MainWindow(QMainWindow):
             f"6. Share with the community!")
 
     def _settings_import_lang(self, parent_dlg) -> None:
-        """Import a community translation .json file into the locale folder."""
         path, _ = QFileDialog.getOpenFileName(
             parent_dlg, "Import Translation File", "",
             "JSON Files (*.json)")
@@ -1304,7 +1393,6 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(parent_dlg, "Import Error", str(e))
 
     def _settings_download_name_pack(self, parent_dlg) -> None:
-        """Download a language name pack from GitHub."""
         lang_code = self._settings_lang.currentData()
         if not lang_code or lang_code == 'en':
             QMessageBox.information(parent_dlg, "Download",
@@ -1377,7 +1465,6 @@ class MainWindow(QMainWindow):
                     f"Failed: {e2}\n\nDownload manually from:\n{url}")
 
     def _settings_download_all_lang_packs(self, parent_dlg) -> None:
-        """Download all language packs (UI + names) from GitHub."""
         import urllib.request
 
         LANGS = ['de', 'es', 'es-mx', 'fr', 'it', 'ja', 'ko', 'pl', 'pt-br', 'ru', 'tr', 'zh', 'zh-tw']
@@ -1441,7 +1528,6 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _make_wip_banner() -> QLabel:
-        """Create a large red WORK IN PROGRESS banner."""
         wip = QLabel("WORK IN PROGRESS")
         wip.setAlignment(Qt.AlignCenter)
         wip.setStyleSheet(
@@ -1519,6 +1605,21 @@ class MainWindow(QMainWindow):
         change_lang_act.triggered.connect(self._open_language_picker)
         help_menu.addAction(change_lang_act)
 
+        discord_act = QAction("💬 Discord (community help)", self)
+        discord_act.setToolTip("Opens the Crimson Desert Modding Discord — "
+                               "support, mod sharing, bug reports.")
+        discord_act.triggered.connect(lambda: self._open_discord())
+        help_menu.addAction(discord_act)
+
+        # Top-level Discord shortcut in the menu bar itself — more
+        # discoverable than burying it inside Help.
+        discord_top = QAction("Discord", self)
+        discord_top.setToolTip(
+            "Join the Crimson Desert Modding community Discord "
+            "(https://discord.gg/nBqSzunyFS).")
+        discord_top.triggered.connect(lambda: self._open_discord())
+        menu_bar.addAction(discord_top)
+
         update_menu = menu_bar.addMenu("Update")
         check_update_act = QAction(f"Check for Updates  (current: v{APP_VERSION})", self)
         check_update_act.triggered.connect(self._check_for_update)
@@ -1565,6 +1666,19 @@ class MainWindow(QMainWindow):
         zoom_reset_act.setShortcut(QKeySequence("Ctrl+0"))
         zoom_reset_act.triggered.connect(self._zoom_reset)
         view_menu.addAction(zoom_reset_act)
+
+        view_menu.addSeparator()
+
+        theme_menu = view_menu.addMenu("Theme")
+        theme_group = QActionGroup(self)
+        cur_theme = self._config.get("theme", "dark")
+        for label, key in [("Dark (default)", "dark"), ("Light (high contrast)", "light")]:
+            act = QAction(label, self)
+            act.setCheckable(True)
+            act.setChecked(cur_theme == key)
+            act.triggered.connect(lambda checked, k=key: self._set_theme(k))
+            theme_group.addAction(act)
+            theme_menu.addAction(act)
 
         view_menu.addSeparator()
 
@@ -1617,7 +1731,6 @@ class MainWindow(QMainWindow):
 
 
     def _rebuild_view_tab_list(self) -> None:
-        """Rebuild the tab list in the View menu with ALL tabs (including sub-tabs)."""
         if not hasattr(self, '_tabs'):
             return
         for action in self._tab_actions:
@@ -1664,7 +1777,6 @@ class MainWindow(QMainWindow):
                 self._tab_actions.append(action)
 
     def _goto_subtab(self, group_widget, tab_widget) -> None:
-        """Navigate to a sub-tab — same logic as View menu."""
         _real_tabs = getattr(self, '_real_tabs', None)
         if not _real_tabs:
             for attr in ['_save_tabs', '_mods_tabs', '_items_tabs', '_world_tabs']:
@@ -1682,19 +1794,45 @@ class MainWindow(QMainWindow):
             group_widget.setCurrentIndex(sub_idx)
 
     def _on_tab_changed_view_menu(self, index: int) -> None:
-        """Rebuild tab list when tabs change (experimental mode toggle adds/removes tabs)."""
         if len(self._tab_actions) != self._tabs.count():
             self._rebuild_view_tab_list()
 
 
     def _set_ui_scale(self, pct: int) -> None:
-        """Apply global UI scale by setting font size + re-applying stylesheet."""
         self._config["ui_scale"] = pct
         self._save_config()
         self._apply_ui_settings()
 
+    def _set_theme(self, mode: str) -> None:
+        self._config["theme"] = mode
+        self._save_config()
+        app = QApplication.instance()
+        if app is None:
+            return
+        # Mutate the COLORS dict to the new palette.
+        apply_theme(app, mode)
+        # _apply_ui_settings rebuilds the ENTIRE stylesheet from COLORS
+        # values live — this is what makes the UI-scale menu also change
+        # colors (we piggyback on that path for theme changes too).
+        try:
+            self._apply_ui_settings()
+        except Exception as e:
+            log.warning("theme _apply_ui_settings failed: %s", e)
+        # Force all widgets to re-query style, in case any sub-panel holds
+        # its own inline stylesheet that needs repolish.
+        try:
+            style = app.style()
+            for w in app.allWidgets():
+                try:
+                    style.unpolish(w)
+                    style.polish(w)
+                    w.update()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
     def _toggle_compact_mode(self, checked: bool) -> None:
-        """Toggle compact mode — smaller padding, fonts, row heights."""
         self._config["compact_mode"] = checked
         self._save_config()
         self._apply_ui_settings()
@@ -1712,13 +1850,6 @@ class MainWindow(QMainWindow):
         self._apply_zoom()
 
     def _apply_zoom(self) -> None:
-        """Apply zoom to every widget (retroactive, bypasses Qt's widget-time caching).
-
-        The past ui_scale slider only re-rendered the stylesheet, which doesn't
-        affect widgets that cached their font at construction. This walks
-        QApplication.allWidgets() and force-resets the font on each, then calls
-        updateGeometry() so layouts recompute.
-        """
         try:
             app = QApplication.instance()
             if app is None:
@@ -1749,7 +1880,6 @@ class MainWindow(QMainWindow):
             log.warning("apply_zoom failed: %s", e)
 
     def _apply_ui_settings(self) -> None:
-        """Rebuild and apply stylesheet based on scale + compact settings."""
         scale = self._config.get("ui_scale", 100) / 100.0
         compact = self._config.get("compact_mode", False)
 
@@ -1993,7 +2123,6 @@ QCheckBox::indicator {{
 
 
     def _global_toggle_icons(self, checked: bool) -> None:
-        """Toggle icons on/off globally (inventory + item buffs)."""
         if self._icons_enabled != checked:
             self._toggle_icons()
         if hasattr(self, '_buffs_tab'):
@@ -2004,15 +2133,17 @@ QCheckBox::indicator {{
 
 
     def _toggle_experimental_mode(self, checked: bool) -> None:
-        """Toggle experimental mode on/off with a confirmation dialog."""
         if checked:
             reply = QMessageBox.warning(
-                self, "Enable Experimental Mode",
-                "Experimental features are a work in progress and may:\n\n"
-                "  - Corrupt save files\n"
-                "  - Crash the game\n"
-                "  - Require Steam Verify Integrity to fix\n\n"
-                "Only enable this if you know what you are doing.\n"
+                self, "Enable Advanced / Dev Mode",
+                "Advanced mode unlocks experimental features and export options.\n\n"
+                "By enabling this you agree to the following:\n\n"
+                "  - Experimental features may corrupt saves or crash the game\n"
+                "  - Export as Mod / CDUMM / JSON are UNSUPPORTED\n"
+                "  - We do NOT provide help for exported mod packages\n"
+                "  - Contact the mod loader developer for loader issues\n"
+                "  - Bug reports about exported mods will be closed\n\n"
+                "Apply to Game remains the supported deployment method.\n\n"
                 "Do you want to continue?",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No,
@@ -2032,7 +2163,8 @@ QCheckBox::indicator {{
         )
 
     def _update_experimental_tabs(self) -> None:
-        """Show or hide tabs that require experimental mode."""
+        if hasattr(self, '_buffs_tab'):
+            self._buffs_tab.set_experimental_mode(self._experimental_mode)
         if hasattr(self, '_community_tab'):
             self._community_tab.set_experimental_mode(self._experimental_mode)
         if hasattr(self, '_inventory_tab'):
@@ -2061,6 +2193,12 @@ QCheckBox::indicator {{
             self._unlock_all_dev_btn.setVisible(self._experimental_mode)
         if hasattr(self, '_dye_tab'):
             self._dye_tab.set_experimental_mode(self._experimental_mode)
+        # Game Mods tab export buttons (dev-gated, unsupported)
+        for tab_attr in ('_field_edit_tab_obj', '_patches_tab', '_store_tab',
+                         '_dropset_tab', '_spawn_tab', '_mercpets_tab'):
+            tab = getattr(self, tab_attr, None)
+            if tab and hasattr(tab, 'set_experimental_mode'):
+                tab.set_experimental_mode(self._experimental_mode)
         for w in getattr(self, '_dev_mount_widgets', []):
             w.setVisible(self._experimental_mode)
         for attr, label_key in [
@@ -2090,7 +2228,6 @@ QCheckBox::indicator {{
 
 
     def _check_for_update(self) -> None:
-        """Check GitHub for a newer version and offer to download + install."""
         self._update_status("Checking for updates...")
         QApplication.processEvents()
 
@@ -2177,7 +2314,6 @@ QCheckBox::indicator {{
 
 
     def _enrich_vendor_names(self) -> None:
-        """Update source label for store items with their vendor name."""
         store_items = [it for it in self._items if it.source == "Sold to Vendor"]
         if not store_items:
             return
@@ -2192,7 +2328,6 @@ QCheckBox::indicator {{
                 item.source = vendor_by_offset[item.offset]
 
     def _nav_to_swap(self) -> None:
-        """Navigate to Save Editor > Item Swap sub-tab (called by InventoryTab context menu)."""
         self._tabs.setCurrentIndex(self._tabs.indexOf(self._save_tabs))
         if hasattr(self, '_swap_tab'):
             swap_idx = self._save_tabs.indexOf(self._swap_tab)
@@ -2200,7 +2335,6 @@ QCheckBox::indicator {{
                 self._save_tabs.setCurrentIndex(swap_idx)
 
     def _open_quest_editor(self) -> None:
-        """Open the Quest Editor in a separate window."""
         if not self._save_data:
             QMessageBox.warning(self, "Quest Editor", "Load a save file first.")
             return
@@ -2213,7 +2347,6 @@ QCheckBox::indicator {{
 
 
     def _set_game_path(self, path: str) -> None:
-        """Central method to update game path everywhere."""
         self._config["game_install_path"] = path
         self._save_config()
         self._iteminfo_cache.set_game_path(path)
@@ -2246,7 +2379,6 @@ QCheckBox::indicator {{
             self._field_edit_tab_obj.set_game_path(path)
 
     def _validate_game_path(self, path: str) -> bool:
-        """Check if a path looks like a valid Crimson Desert installation."""
         paz = os.path.join(path, "0008", "0.paz")
         paz_bak = os.path.join(path, "0008", "0.paz.sebak")
         if os.path.isfile(paz) or os.path.isfile(paz_bak):
@@ -2254,7 +2386,6 @@ QCheckBox::indicator {{
         return False
 
     def _toggle_global_info(self, checked):
-        """Toggle the game path and center status bars."""
         self._center_status.setVisible(not checked)
         for w in self._global_info_widget.findChildren(QWidget):
             if w is not self._global_hide_btn:
@@ -2262,7 +2393,6 @@ QCheckBox::indicator {{
         self._global_hide_btn.setText("+" if checked else "X")
 
     def _global_browse_game_path(self) -> None:
-        """Browse for game path — accessible from any tab."""
         current = self._config.get("game_install_path", "")
         path = QFileDialog.getExistingDirectory(
             self, "Select Crimson Desert Install Folder",
@@ -2282,7 +2412,6 @@ QCheckBox::indicator {{
         self._set_game_path(path)
 
     def _global_auto_detect_path(self) -> None:
-        """Auto-detect game path."""
         detected = PazPatchManager.find_game_path()
         if detected:
             self._set_game_path(detected)
@@ -2293,8 +2422,6 @@ QCheckBox::indicator {{
 
 
     def _on_tab_navigate_requested(self, selector: str) -> None:
-        """Handle navigate_requested from standalone v3.1.9 ItemBuffsTab.
-        Selector is a free-form string; we match what we can, else no-op."""
         try:
             if selector.startswith("tab_index:"):
                 tab = getattr(self, '_buffs_tab', None)
@@ -2306,8 +2433,6 @@ QCheckBox::indicator {{
             pass
 
     def _open_transmog_tab(self) -> None:
-        """v3.2.0: Transmog folded into ItemBuffsTab. This shortcut is a no-op
-        now — the transmog sub-section lives inside the Buffs tab itself."""
         try:
             tab = getattr(self, '_buffs_tab', None)
             if tab is None:
@@ -2325,11 +2450,6 @@ QCheckBox::indicator {{
             pass
 
     def _rebuild_papgt_without(self, game_path: str, group_to_remove: str) -> str:
-        """Rebuild PAPGT by removing a specific group entry.
-
-        Preserves all other overlay entries (e.g. removing 0058 keeps 0060).
-        Returns a status message.
-        """
         try:
             import crimson_rs
             papgt_path = os.path.join(game_path, "meta", "0.papgt")
@@ -2372,7 +2492,6 @@ QCheckBox::indicator {{
 
 
     def _set_refresh_local(self) -> None:
-        """Refresh the sets table from local files."""
         sets = self._set_mgr.scan_local()
         table = self._set_table
         table.setRowCount(len(sets))
@@ -2392,7 +2511,6 @@ QCheckBox::indicator {{
         return sets[idx] if idx < len(sets) else None
 
     def _set_preview(self) -> None:
-        """Preview the contents of the selected set."""
         es = self._set_get_selected()
         if not es:
             QMessageBox.information(self, "No Set", "Select a set first.")
@@ -2413,7 +2531,6 @@ QCheckBox::indicator {{
         QMessageBox.information(self, f"Set Preview: {es.name}", "\n".join(lines))
 
     def _set_create_new(self) -> None:
-        """Create a new empty equipment set."""
         from PySide6.QtWidgets import QInputDialog
         import datetime
         name, ok = QInputDialog.getText(self, "New Equipment Set", "Set name:")
@@ -2435,7 +2552,6 @@ QCheckBox::indicator {{
         self._set_status.setText(f"Created set '{es.name}'")
 
     def _set_delete(self) -> None:
-        """Delete the selected set."""
         es = self._set_get_selected()
         if not es:
             return
@@ -2448,7 +2564,6 @@ QCheckBox::indicator {{
             self._set_refresh_local()
 
     def _set_import(self) -> None:
-        """Import a set from a JSON file."""
         path, _ = QFileDialog.getOpenFileName(self, "Import Equipment Set", "", "JSON (*.json)")
         if not path:
             return
@@ -2461,7 +2576,6 @@ QCheckBox::indicator {{
             QMessageBox.warning(self, "Import Failed", "Could not parse set file.")
 
     def _set_export(self) -> None:
-        """Export the selected set to a JSON file."""
         es = self._set_get_selected()
         if not es:
             return
@@ -2474,7 +2588,6 @@ QCheckBox::indicator {{
             self._set_status.setText(f"Exported '{es.name}' to {os.path.basename(path)}")
 
     def _set_refresh_github(self) -> None:
-        """Fetch community sets from GitHub and download new ones."""
         self._set_status.setText("Fetching community sets...")
         QApplication.processEvents()
         ok, msg = self._set_mgr.fetch_remote_index()
@@ -2493,7 +2606,6 @@ QCheckBox::indicator {{
         self._set_status.setText(f"{msg} Downloaded {downloaded} new sets.")
 
     def _backup_to_local(self) -> None:
-        """Manually backup current save to the local backups/ folder next to exe."""
         if not self._save_data or not self._loaded_path:
             QMessageBox.warning(self, "Backup", "Load a save file first.")
             return
@@ -2531,13 +2643,11 @@ QCheckBox::indicator {{
 
     @staticmethod
     def _app_dir() -> str:
-        """Return the directory where the exe (or script) lives — NOT the temp extract dir."""
         if getattr(sys, 'frozen', False):
             return os.path.dirname(sys.executable)
         return os.path.dirname(os.path.abspath(__file__))
 
     def _get_pack_dirs(self) -> list:
-        """Return list of pack directory paths to scan (creates if missing)."""
         base = self._app_dir()
         dirs = []
         for folder in ['quest_packs', 'knowledge_packs']:
@@ -2547,7 +2657,6 @@ QCheckBox::indicator {{
         return dirs
 
     def _pack_browser_refresh(self) -> None:
-        """Scan pack folders and populate the tree."""
         from PySide6.QtWidgets import QTreeWidgetItem
         self._pack_tree.clear()
         self._pack_data = {}
@@ -2599,7 +2708,6 @@ QCheckBox::indicator {{
             cat_node.setExpanded(True)
 
     def _pack_browser_create(self) -> None:
-        """Create a new empty pack from the inline name + type fields."""
         pack_name = self._pack_name_input.text().strip()
         if not pack_name:
             self._pack_name_input.setFocus()
@@ -2629,7 +2737,6 @@ QCheckBox::indicator {{
         self._update_status(f"Created pack: '{pack_name}'")
 
     def _pack_browser_inject(self) -> None:
-        """Inject the selected pack into the save."""
         item = self._pack_tree.currentItem()
         if not item:
             return
@@ -2657,7 +2764,6 @@ QCheckBox::indicator {{
             self._quest_db_tab._qdb_mark_pack_complete(pack)
 
     def _pack_browser_delete(self) -> None:
-        """Delete the selected pack file."""
         item = self._pack_tree.currentItem()
         if not item:
             return
@@ -2677,7 +2783,6 @@ QCheckBox::indicator {{
                 QMessageBox.critical(self, "Error", str(e))
 
     def _pack_browser_navigate(self, item, column) -> None:
-        """Double-click a pack entry to navigate to it in the relevant tab."""
         key = item.data(0, Qt.UserRole + 2)
         pack_type = item.data(0, Qt.UserRole + 1)
 
@@ -2709,7 +2814,6 @@ QCheckBox::indicator {{
                 self._qdb_search.setText(key_str)
 
     def _pack_browser_open_folder(self) -> None:
-        """Open the pack folders in file explorer."""
         for pack_dir in self._get_pack_dirs():
             if os.path.isdir(pack_dir):
                 os.startfile(pack_dir)
@@ -2720,7 +2824,6 @@ QCheckBox::indicator {{
 
 
     def _setup_lazy_tab_loading(self) -> None:
-        """Register per-tab loaders and connect currentChanged on every tab widget."""
         entries = [
             ('_buffs_tab',        lambda: self._buffs_tab.load(self._save_data, self._items)),
             ('_repurchase_tab',   lambda: self._repurchase_tab.load(self._save_data, self._items)),
@@ -2744,7 +2847,6 @@ QCheckBox::indicator {{
             tw.currentChanged.connect(lambda idx, t=tw: self._on_tab_activated(t, idx))
 
     def _on_tab_activated(self, tab_widget, index: int) -> None:
-        """Load a tab's data the first time it becomes visible after a save is loaded."""
         if not self._save_data:
             return
         widget = tab_widget.widget(index)
@@ -2759,7 +2861,6 @@ QCheckBox::indicator {{
                 log.warning("Lazy tab load failed for %s: %s", widget.__class__.__name__, e)
 
     def _reload_visible_tabs(self) -> None:
-        """Re-trigger the currently visible tab in each group (handles navigation during enrichment)."""
         for tw in [self._tabs, self._save_tabs, self._mods_tabs, self._items_tabs, self._world_tabs]:
             self._on_tab_activated(tw, tw.currentIndex())
 
@@ -3030,17 +3131,6 @@ QCheckBox::indicator {{
 
 
     def _fix_duplicate_item_nos(self) -> None:
-        """Detect and fix duplicate ItemNo values in the save blob.
-
-        When users duplicate equipment (set stack + unequip in-game), the game
-        spawns copies that share the same ItemNo as the original.  This causes
-        'Swap Single' to hit every copy instead of just the target.
-
-        This method finds all duplicate ItemNos across self._items and assigns
-        each duplicate a new unique value by incrementing from the current max.
-        The fix is written directly to the decompressed blob so that subsequent
-        saves persist the change.
-        """
         if not self._items or not self._save_data:
             return
 
@@ -3107,7 +3197,6 @@ QCheckBox::indicator {{
         QTimer.singleShot(100, self._deferred_parc_enrich)
 
     def _deferred_parc_enrich(self) -> None:
-        """Kick off PARC enrichment on a background thread so the UI stays responsive."""
         if not self._save_data or not self._items:
             return
 
@@ -3137,12 +3226,10 @@ QCheckBox::indicator {{
     }
 
     def _on_parc_step(self, step: int) -> None:
-        """Update the PARC progress bar (always called on the main thread via signal)."""
         self._parc_progress.setValue(step)
         self._parc_progress.setFormat(self._PARC_STEP_LABELS.get(step, "..."))
 
     def _finish_parc_enrich(self, enriched: int, parc_status: str) -> None:
-        """Apply PARC enrichment results, then stagger tab loads across event loop iterations."""
         self._parc_progress.hide()
         self._parc_status = parc_status
         if enriched > 0:
@@ -3169,9 +3256,6 @@ QCheckBox::indicator {{
         self._prefetch_parse_cache()
 
     def _prefetch_parse_cache(self) -> None:
-        """Run parse_and_collect on a background thread and stash the result
-        on SaveData.parse_cache. No-op if already warm or no save is loaded.
-        """
         sd = self._save_data
         if not sd or not sd.decompressed_blob:
             return
@@ -3203,14 +3287,10 @@ QCheckBox::indicator {{
         threading.Thread(target=_worker, daemon=True).start()
 
     def _on_parse_cache_ready(self) -> None:
-        """Slot — runs on main thread after the prefetch thread finishes."""
         log.info("PARC parse cache warmed")
 
 
     def _toggle_icons(self) -> None:
-        """Toggle icon display on/off. Persists across sessions.
-        If enabling and icons are missing, offers to download all from GitHub.
-        """
         self._icons_enabled = not self._icons_enabled
         self._config["show_icons"] = self._icons_enabled
         self._save_config()
@@ -3249,12 +3329,10 @@ QCheckBox::indicator {{
 
 
     def _on_icon_loaded(self, item_key: int, pixmap) -> None:
-        """Called from background thread when an icon finishes downloading."""
         self._icon_ready.emit(item_key)
 
 
     def _create_backup(self, save_path: str) -> str:
-        """Create a timestamped backup. Keeps last 10 backups (PRISTINE never pruned). Returns backup path."""
         if not os.path.isfile(save_path):
             return ""
 
@@ -3302,12 +3380,6 @@ QCheckBox::indicator {{
         return backup_path
 
     def _create_pristine_backup(self, save_path: str) -> str:
-        """Create a one-time PRISTINE backup that is never pruned. Returns backup path or '' if already exists.
-
-        The PRISTINE backup is validated before creation — if the save file
-        can't be decrypted and parsed, we don't create a PRISTINE (it would
-        just preserve a corrupted file).
-        """
         if not os.path.isfile(save_path):
             return ""
 
@@ -3336,7 +3408,6 @@ QCheckBox::indicator {{
 
 
     def _set_font_scale(self, scale: float) -> None:
-        """Scale all fonts in the application by replacing px sizes in stylesheet."""
         import re
         def _scale_px(m):
             orig = int(m.group(1))
@@ -3348,11 +3419,6 @@ QCheckBox::indicator {{
         self._update_status(f"Font size: {int(scale * 100)}%")
 
     def _set_widget_scale(self, scale: float) -> None:
-        """Scale all widget sizes — row heights, padding, margins, min sizes.
-
-        This is separate from font scaling. Use this when the UI is smushed
-        on small monitors or when you want bigger click targets.
-        """
         import re
 
         base_ss = self.styleSheet() or DARK_STYLESHEET
@@ -3896,7 +3962,6 @@ QCheckBox::indicator {{
     }
 
     def _make_help_btn(self, guide_key: str) -> QPushButton:
-        """Create a small '?' help button that opens the guide for a tab."""
         btn = QPushButton("?")
         btn.setFixedSize(28, 28)
         btn.setToolTip("Show help for this tab")
@@ -3910,7 +3975,6 @@ QCheckBox::indicator {{
         return btn
 
     def _make_scope_label(self, scope: str) -> QLabel:
-        """Create a scope indicator label showing what this tab modifies."""
         if scope == "save":
             text = "This tab modifies your SAVE FILE"
             color = "#4FC3F7"
@@ -3937,9 +4001,12 @@ QCheckBox::indicator {{
         return lbl
 
     def _show_guide(self, key: str) -> None:
-        """Show a guide dialog for the given tab."""
         title, text = self._GUIDES.get(key, ("Unknown", "No guide available."))
         QMessageBox.information(self, f"Guide: {title}", text)
+
+    def _open_discord(self) -> None:
+        import webbrowser
+        webbrowser.open("https://discord.gg/nBqSzunyFS")
 
     def _show_about(self) -> None:
         QMessageBox.about(
@@ -3959,7 +4026,6 @@ QCheckBox::indicator {{
 
 
     def _on_sub_tab_changed(self, tab_widget, index: int) -> None:
-        """Handle sub-tab changes within category tabs."""
         widget = tab_widget.widget(index)
         if hasattr(self, '_community_tab_widget') and widget is self._community_tab_widget:
             self._update_community_status()
@@ -3977,3 +4043,14 @@ QCheckBox::indicator {{
         self._tabs.currentChanged.connect(self._on_tab_changed)
         for sub in [self._save_tabs, self._mods_tabs, self._items_tabs, self._world_tabs]:
             sub.currentChanged.connect(lambda idx, t=sub: self._on_sub_tab_changed(t, idx))
+        # Windows UIPI fix: when the app runs elevated (Run as admin) and
+        # Explorer is not, Windows silently blocks drag-drop messages
+        # coming from the unelevated process. Call
+        # ChangeWindowMessageFilterEx on WM_DROPFILES / WM_COPYDATA /
+        # 0x0049 (WM_COPYGLOBALDATA) so they pass through the integrity
+        # boundary and reach our drop zones (Stacker, Mods, etc.).
+        # No-op on non-Windows builds.
+        try:
+            _enable_drag_drop_under_uipi(int(self.winId()))
+        except Exception as exc:
+            log.debug("UIPI drop filter not applied: %s", exc)

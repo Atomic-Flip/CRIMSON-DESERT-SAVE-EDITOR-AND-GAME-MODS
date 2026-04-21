@@ -1,25 +1,3 @@
-"""
-Game Data Editor — Generic PABGB parser and in-place PAZ patcher.
-
-Handles ALL Crimson Desert game data files (buffinfo, skill, dropsetinfo,
-characterinfo, faction, conditioninfo, knowledgeinfo, equipslotinfo,
-equiptypeinfo, questinfo, storeinfo, iteminfo, etc.)
-
-PABGB Format (universal):
-  Header (.pabgh): u16(count) + N × (u32 key, u32 offset)
-    Exception: questinfo uses u32(count) + N × (u32 key, u32 offset)
-  Body (.pabgb): Variable-length records at offsets from header
-    Standard record: u32(id) + u32(name_len) + name(ASCII) + payload
-    Some files (equipslotinfo) have no name field
-
-In-place PAZ patching:
-  1. Read compressed data from original PAZ
-  2. Decompress LZ4
-  3. Apply edits
-  4. Recompress LZ4 HC (always fits — HC is smaller)
-  5. Pad to original size, write back
-  6. Update checksums (PAMT + PAPGT)
-"""
 
 import json
 import logging
@@ -35,7 +13,6 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class PabgbRecord:
-    """A single record from a PABGB file."""
     index: int
     key: int
     offset: int
@@ -48,7 +25,6 @@ class PabgbRecord:
 
 @dataclass
 class PabgbFile:
-    """A parsed PABGB file pair (header + body)."""
     file_name: str
     game_file: str
     header_bytes: bytes
@@ -65,7 +41,6 @@ class PabgbFile:
 
 
 class GameDataEditor:
-    """Generic editor for any PABGB game data file."""
 
     KNOWN_FILES = {
         "buffinfo":       "Buff definitions — duration, stat values, levels",
@@ -91,7 +66,6 @@ class GameDataEditor:
         self._name_lookup: Dict[int, str] = {}
 
     def _get_pamt_index(self):
-        """Build PAMT index if not already done."""
         if self._pamt_index is not None:
             return self._pamt_index
 
@@ -135,10 +109,6 @@ class GameDataEditor:
         return self._pamt_index
 
     def list_available(self) -> List[Tuple[str, str, bool]]:
-        """List all PABGB files available in the game.
-
-        Returns list of (file_name, description, is_loaded).
-        """
         index = self._get_pamt_index()
         result = []
         for name, desc in self.KNOWN_FILES.items():
@@ -150,13 +120,6 @@ class GameDataEditor:
         return result
 
     def extract_file(self, file_name: str) -> Optional[PabgbFile]:
-        """Extract and parse a PABGB file from the game PAZ archives.
-
-        Args:
-            file_name: Base name without extension (e.g. "buffinfo")
-
-        Returns PabgbFile or None on failure.
-        """
         import lz4.block
 
         index = self._get_pamt_index()
@@ -222,7 +185,6 @@ class GameDataEditor:
         return pf
 
     def _parse_records(self, pf: PabgbFile) -> None:
-        """Parse header to build record list."""
         hdr = pf.header_bytes
         body = pf.body_bytes
         if not hdr or len(hdr) < 4:
@@ -304,7 +266,6 @@ class GameDataEditor:
         return self._loaded_files.get(file_name)
 
     def search_records(self, file_name: str, query: str) -> List[PabgbRecord]:
-        """Search records by name or key."""
         pf = self._loaded_files.get(file_name)
         if not pf:
             return []
@@ -319,7 +280,6 @@ class GameDataEditor:
 
     def get_record_hex(self, file_name: str, record_index: int,
                        max_bytes: int = 512) -> str:
-        """Get hex dump of a record's payload."""
         pf = self._loaded_files.get(file_name)
         if not pf or record_index >= len(pf.records):
             return ""
@@ -340,7 +300,6 @@ class GameDataEditor:
         return '\n'.join(lines)
 
     def patch_bytes(self, file_name: str, offset: int, new_bytes: bytes) -> bool:
-        """Patch bytes in a loaded file at the given offset."""
         pf = self._loaded_files.get(file_name)
         if not pf:
             return False
@@ -350,10 +309,6 @@ class GameDataEditor:
         return True
 
     def apply_to_game(self, file_name: str) -> Tuple[bool, str]:
-        """Apply changes via in-place PAZ patching.
-
-        Same method community tools use — proven working.
-        """
         pf = self._loaded_files.get(file_name)
         if not pf:
             return False, f"{file_name} not loaded"
@@ -410,7 +365,6 @@ class GameDataEditor:
 
     def _update_checksums(self, paz_file: str, paz_dir_name: str,
                           pamt_table_offset: int = 0, new_comp_size: int = 0) -> str:
-        """Update PAMT comp_size, chunk checksum, and PAPGT after in-place patching."""
         try:
             import crimson_rs
 
@@ -467,7 +421,6 @@ class GameDataEditor:
             return f"Checksum update error: {ex}"
 
     def restore_file(self, file_name: str) -> Tuple[bool, str]:
-        """Restore a file from .sebak backup."""
         pf = self._loaded_files.get(file_name)
         if not pf:
             return False, f"{file_name} not loaded"
@@ -488,7 +441,6 @@ class GameDataEditor:
         return False, "No backups found"
 
     def load_item_names(self) -> None:
-        """Load item name database for display."""
         _db = get_connection()
         for row in _db.execute("SELECT item_key, name FROM items"):
             self._name_lookup[row['item_key']] = row['name']
@@ -512,14 +464,9 @@ class GameDataEditor:
         return self._name_lookup.get(key, "")
 
     def get_localized_name(self, key: int) -> str:
-        """Look up a localization string by numeric key."""
         return self._localization.get(str(key), "")
 
     def resolve_record_display_name(self, file_name: str, rec) -> str:
-        """Get a human-readable display name for a record.
-
-        Tries: localization lookup by record_id → clean up internal name → raw name
-        """
         loc = self.get_localized_name(rec.record_id)
         if loc and len(loc) < 100:
             return f"{loc}  ({rec.name})"

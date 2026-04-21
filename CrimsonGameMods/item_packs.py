@@ -1,8 +1,3 @@
-"""
-Item Pack system for Crimson Desert Save Editor.
-Packs are sharable sets of items that can be applied to a save via donor replacement.
-Hosted on GitHub for community sharing.
-"""
 from __future__ import annotations
 
 import json
@@ -22,7 +17,6 @@ PACK_BASE_URL = f"https://raw.githubusercontent.com/{PACKS_REPO}/{PACKS_BRANCH}/
 
 @dataclass
 class PackItem:
-    """A single item in a pack."""
     item_key: int
     name: str = ""
     count: int = 1
@@ -34,7 +28,6 @@ class PackItem:
 
 @dataclass
 class ItemPack:
-    """A sharable collection of items."""
     name: str = ""
     author: str = ""
     description: str = ""
@@ -84,7 +77,6 @@ class ItemPack:
 
 @dataclass
 class PackIndexEntry:
-    """Entry in the community pack index."""
     filename: str
     name: str
     author: str
@@ -94,7 +86,6 @@ class PackIndexEntry:
 
 
 class PackManager:
-    """Manages local and remote item packs."""
 
     def __init__(self, local_dir: str = ""):
         import sys
@@ -111,7 +102,6 @@ class PackManager:
 
 
     def scan_local(self) -> List[ItemPack]:
-        """Scan local packs directory for .json files."""
         self._local_packs = []
         if not os.path.isdir(self.local_dir):
             return []
@@ -130,7 +120,6 @@ class PackManager:
         return self._local_packs
 
     def save_pack(self, pack: ItemPack, filename: str = "") -> str:
-        """Save a pack to local directory. Returns the file path."""
         if not filename:
             safe_name = "".join(c if c.isalnum() or c in "._- " else "_" for c in pack.name)
             safe_name = safe_name.strip().replace(" ", "_").lower()
@@ -147,7 +136,6 @@ class PackManager:
         return path
 
     def delete_pack(self, filename: str) -> bool:
-        """Delete a local pack file."""
         path = os.path.join(self.local_dir, filename)
         if os.path.isfile(path):
             os.remove(path)
@@ -155,7 +143,6 @@ class PackManager:
         return False
 
     def load_pack_file(self, path: str) -> Optional[ItemPack]:
-        """Load a pack from any path."""
         try:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -165,7 +152,6 @@ class PackManager:
 
 
     def fetch_remote_index(self) -> tuple[bool, str]:
-        """Fetch the pack index from GitHub. Returns (success, message)."""
         try:
             req = Request(INDEX_URL, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
             with urlopen(req, timeout=15) as resp:
@@ -190,7 +176,6 @@ class PackManager:
         return self._remote_index
 
     def download_pack(self, filename: str) -> tuple[Optional[ItemPack], str]:
-        """Download a specific pack from GitHub. Returns (pack, message)."""
         url = PACK_BASE_URL + filename
         try:
             req = Request(url, headers={"User-Agent": "CrimsonSaveEditor/1.0"})
@@ -206,11 +191,9 @@ class PackManager:
 
 
     def export_pack_json(self, pack: ItemPack) -> str:
-        """Export pack as formatted JSON string (for clipboard/sharing)."""
         return json.dumps(pack.to_dict(), indent=2, ensure_ascii=False)
 
     def generate_index_entry(self, pack: ItemPack) -> dict:
-        """Generate an index.json entry for this pack (for the repo maintainer)."""
         return {
             "filename": pack.filename,
             "name": pack.name,
