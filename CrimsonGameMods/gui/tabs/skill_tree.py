@@ -7,16 +7,20 @@ group 0063.
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import shutil
+import struct
+import sys
 import tempfile
 from typing import Callable, Optional
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (
-    QComboBox, QHBoxLayout, QHeaderView, QLabel, QMessageBox,
-    QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
+from PySide6.QtWidgets import (QSpinBox,
+    QComboBox, QFileDialog, QGroupBox, QHBoxLayout, QHeaderView, QLabel,
+    QMessageBox, QPushButton, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget,
 )
 
 from gui.theme import COLORS
@@ -54,6 +58,13 @@ class SkillTreeTab(QWidget):
         self._original_grp_pabgb: bytes = b""
         self._loaded = False
 
+        # Parser state — skillinfo (skill.pabgb stamina/cooldown editor)
+        self._skill_entries: list[dict] = []
+        self._skill_vanilla_entries: list[dict] = []
+        self._skill_pabgh: bytes = b""
+        self._skill_pabgb: bytes = b""
+        self._skill_loaded = False
+
         self._build_ui()
 
     # -- public --------------------------------------------------------
@@ -83,6 +94,22 @@ class SkillTreeTab(QWidget):
         self._btn_apply.clicked.connect(self._on_apply)
         self._btn_apply.setEnabled(False)
         top_row.addWidget(self._btn_apply)
+
+        # Overlay group number — configurable. Default 64 because 63 is
+        # taken by Stacker's equipslotinfo overlay (applying both would
+        # clobber). User can still pick 63 if they don't use Stacker.
+        top_row.addWidget(QLabel("Overlay:"))
+        self._overlay_spin = QSpinBox()
+        self._overlay_spin.setRange(1, 9999)
+        self._overlay_spin.setValue(self._config.get("skilltree_overlay_dir", 64))
+        self._overlay_spin.setFixedWidth(70)
+        self._overlay_spin.setToolTip(
+            "Overlay group number (0064 = default). 0063 is reserved for\n"
+            "Stacker's equipslotinfo — changing this avoids the clash.\n"
+            "Apply writes to <game>/NNNN/; Restore removes the same NNNN/.")
+        self._overlay_spin.valueChanged.connect(
+            lambda v: self._config.update({"skilltree_overlay_dir": int(v)}))
+        top_row.addWidget(self._overlay_spin)
 
         self._btn_restore = QPushButton("Restore")
         self._btn_restore.clicked.connect(self._on_restore)
@@ -224,6 +251,107 @@ class SkillTreeTab(QWidget):
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._table.setAlternatingRowColors(True)
         root.addWidget(self._table)
+
+        # ═══════════════════════════════════════════════════════════════
+        # Skill Editor — Stamina & Cooldown Mods  (skill.pabgb)
+        # ═══════════════════════════════════════════════════════════════
+        self._skill_group = QGroupBox("Skill Editor — Stamina & Cooldown Mods")
+        self._skill_group.setStyleSheet(
+            f"QGroupBox {{ font-weight: bold; color: {COLORS['accent']}; "
+            f"border: 1px solid {COLORS.get('border', '#555')}; "
+            f"border-radius: 4px; margin-top: 8px; padding-top: 14px; }}"
+            f"QGroupBox::title {{ subcontrol-origin: margin; left: 10px; }}"
+        )
+        sg_layout = QVBoxLayout(self._skill_group)
+
+        # --- buttons row ---
+        skill_btn_row = QHBoxLayout()
+
+        self._btn_skill_load = QPushButton("Load SkillInfo")
+        self._btn_skill_load.setToolTip(
+            "Extract skill.pabgb + skill.pabgh from the game.\n"
+            "Populates the table below with all skill entries.")
+        self._btn_skill_load.clicked.connect(self._on_skill_load)
+        skill_btn_row.addWidget(self._btn_skill_load)
+
+        self._btn_skill_import = QPushButton("Import Legacy Mod")
+        self._btn_skill_import.setToolTip(
+            "Import a CrimsonWings-style Format 2 JSON targeting skill.pabgb.\n"
+            "Automatically finds the right baseline and translates byte patches\n"
+            "into field-level changes.")
+        self._btn_skill_import.clicked.connect(self._on_skill_import_legacy)
+        self._btn_skill_import.setEnabled(False)
+        skill_btn_row.addWidget(self._btn_skill_import)
+
+        self._btn_skill_export = QPushButton("Export Field JSON")
+        self._btn_skill_export.setToolTip(
+            "Export current modifications as Format 3 field-name JSON.\n"
+            "This format survives game updates.")
+        self._btn_skill_export.clicked.connect(self._on_skill_export_json)
+        self._btn_skill_export.setEnabled(False)
+        skill_btn_row.addWidget(self._btn_skill_export)
+
+        skill_btn_row.addStretch()
+        sg_layout.addLayout(skill_btn_row)
+
+        # --- stamina preset row ---
+        preset_row = QHBoxLayout()
+        preset_row.setSpacing(4)
+        preset_lbl = QLabel("Stamina Presets:")
+        preset_lbl.setStyleSheet(f"color: {COLORS['accent']}; font-weight: bold;")
+        preset_row.addWidget(preset_lbl)
+
+        stamina_presets = [
+            ("10%", "CrimsonWings_Stamina_10pct.json",
+             "10% stamina drain — barely noticeable reduction."),
+            ("25%", "CrimsonWings_Stamina_25pct.json",
+             "25% stamina drain — mild reduction."),
+            ("50%", "CrimsonWings_Stamina_50pct.json",
+             "50% stamina drain — half drain rate."),
+            ("75%", "CrimsonWings_Stamina_75pct.json",
+             "75% stamina drain — significant reduction."),
+            ("Infinite", "CrimsonWings_Stamina_infinite.json",
+             "Infinite stamina — near-zero drain, massive recovery."),
+        ]
+        self._stamina_preset_files = {}
+        for label, filename, tip in stamina_presets:
+            btn = QPushButton(label)
+            btn.setToolTip(f"Apply Stamina Preset: {tip}\n\n"
+                           f"Loads SkillInfo if not loaded, imports the preset,\n"
+                           f"then click Apply to Game to deploy.")
+            btn.setStyleSheet(
+                "QPushButton { background-color: #00695C; color: white; "
+                "font-weight: bold; padding: 4px 10px; }")
+            btn.clicked.connect(
+                lambda _c=False, fn=filename: self._on_stamina_preset(fn))
+            preset_row.addWidget(btn)
+            self._stamina_preset_files[filename] = None
+
+        preset_row.addStretch()
+        sg_layout.addLayout(preset_row)
+
+        # --- skill table ---
+        self._skill_table = QTableWidget()
+        self._skill_table.setColumnCount(6)
+        self._skill_table.setHorizontalHeaderLabels([
+            "Name", "Key", "Cooltime", "MaxLevel", "BuffLevels", "Modified",
+        ])
+        sh = self._skill_table.horizontalHeader()
+        sh.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self._skill_table.setEditTriggers(
+            QTableWidget.EditTrigger.DoubleClicked |
+            QTableWidget.EditTrigger.EditKeyPressed)
+        self._skill_table.cellChanged.connect(self._on_skill_cell_changed)
+        self._skill_table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows)
+        self._skill_table.setAlternatingRowColors(True)
+        sg_layout.addWidget(self._skill_table)
+
+        # --- skill status ---
+        self._lbl_skill_status = QLabel("")
+        sg_layout.addWidget(self._lbl_skill_status)
+
+        root.addWidget(self._skill_group)
 
         # --- status ---
         self._lbl_status = QLabel("")
@@ -376,9 +504,9 @@ class SkillTreeTab(QWidget):
     # -- apply to game -------------------------------------------------
 
     def _on_apply(self) -> None:
-        if not self._loaded:
+        if not self._loaded and not self._skill_loaded:
             QMessageBox.warning(self, "Not loaded",
-                                "Extract skill tree data first.")
+                                "Extract skill tree data or load SkillInfo first.")
             return
 
         game_path = self._game_path or self._config.get("game_install_path", "")
@@ -400,18 +528,22 @@ class SkillTreeTab(QWidget):
             parse_all, serialize_all, parse_groups, serialize_groups,
         )
 
-        # Re-parse from originals to get clean state
-        records = parse_all(self._original_pabgh, self._original_pabgb)
-        groups = parse_groups(self._original_grp_pabgh, self._original_grp_pabgb)
-
         any_change = False
         changes: list[str] = []
+        records = []
+        groups = []
+
+        # Re-parse from originals to get clean state (only if skilltree was loaded)
+        if self._loaded and self._original_pabgh:
+            records = parse_all(self._original_pabgh, self._original_pabgb)
+            groups = parse_groups(self._original_grp_pabgh, self._original_grp_pabgb)
 
         # --- Apply root package combo selections (skilltreeinfo) ---
+        root_combos = getattr(self, '_root_combos', {})
         for rec in records:
-            if rec.key not in self._root_combos:
+            if rec.key not in root_combos:
                 continue
-            combo = self._root_combos[rec.key]
+            combo = root_combos[rec.key]
             new_root = combo.currentData()
             native_root = CHAR_MELEE_ROOT.get(rec.key)
             if native_root is None:
@@ -442,7 +574,7 @@ class SkillTreeTab(QWidget):
             "Kliff": 1000007, "Oongka": 1000011, "Damiane": 1000014,
         }
 
-        for rec_key, combo in self._root_combos.items():
+        for rec_key, combo in root_combos.items():
             new_root = combo.currentData()
             native_root = CHAR_MELEE_ROOT.get(rec_key)
             if native_root is None or new_root == native_root:
@@ -489,19 +621,21 @@ class SkillTreeTab(QWidget):
                         )
                     break
 
-        if not any_change:
+        # Check if we have skill.pabgb edits too
+        has_skill_edits = self._has_skill_modifications()
+
+        if not any_change and not has_skill_edits:
             QMessageBox.information(self, "No changes",
-                                    "All trees are at their vanilla values.\n"
+                                    "All trees are at their vanilla values and\n"
+                                    "no skill edits are pending.\n"
                                     "Nothing to deploy.")
             return
 
-        # Serialize both files
-        new_pabgh, new_pabgb = serialize_all(records)
-        new_grp_gh, new_grp_gb = serialize_groups(groups)
+        overlay_group = f"{self._overlay_spin.value():04d}"
 
         # Build overlay with PackGroupBuilder(NONE)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            group_dir = os.path.join(tmp_dir, OVERLAY_GROUP)
+            group_dir = os.path.join(tmp_dir, overlay_group)
             os.makedirs(group_dir, exist_ok=True)
 
             builder = crimson_rs.PackGroupBuilder(
@@ -509,10 +643,25 @@ class SkillTreeTab(QWidget):
                 crimson_rs.Compression.NONE,
                 crimson_rs.Crypto.NONE,
             )
-            builder.add_file(INTERNAL_DIR, "skilltreeinfo.pabgb", new_pabgb)
-            builder.add_file(INTERNAL_DIR, "skilltreeinfo.pabgh", new_pabgh)
-            builder.add_file(INTERNAL_DIR, "skilltreegroupinfo.pabgb", new_grp_gb)
-            builder.add_file(INTERNAL_DIR, "skilltreegroupinfo.pabgh", new_grp_gh)
+
+            # Pack skilltreeinfo + skilltreegroupinfo if tree swaps changed
+            if any_change:
+                new_pabgh, new_pabgb = serialize_all(records)
+                new_grp_gh, new_grp_gb = serialize_groups(groups)
+                builder.add_file(INTERNAL_DIR, "skilltreeinfo.pabgb", new_pabgb)
+                builder.add_file(INTERNAL_DIR, "skilltreeinfo.pabgh", new_pabgh)
+                builder.add_file(INTERNAL_DIR, "skilltreegroupinfo.pabgb", new_grp_gb)
+                builder.add_file(INTERNAL_DIR, "skilltreegroupinfo.pabgh", new_grp_gh)
+
+            # Pack skill.pabgb + skill.pabgh if skill edits are active
+            if has_skill_edits:
+                import skillinfo_parser as sip
+                skill_pabgh, skill_pabgb = sip.serialize_all(self._skill_entries)
+                builder.add_file(INTERNAL_DIR, "skill.pabgb", skill_pabgb)
+                builder.add_file(INTERNAL_DIR, "skill.pabgh", skill_pabgh)
+                mod_count = self._count_skill_modifications()
+                changes.append(f"skill.pabgb: {mod_count} skill(s) modified")
+
             pamt_bytes = bytes(builder.finish())
 
             # Get PAMT self-reported checksum
@@ -521,7 +670,7 @@ class SkillTreeTab(QWidget):
             ]
 
             # Deploy files to game directory
-            game_mod = os.path.join(game_path, OVERLAY_GROUP)
+            game_mod = os.path.join(game_path, overlay_group)
             if os.path.isdir(game_mod):
                 shutil.rmtree(game_mod)
             os.makedirs(game_mod, exist_ok=True)
@@ -540,12 +689,27 @@ class SkillTreeTab(QWidget):
         papgt = crimson_rs.parse_papgt_file(papgt_path)
         papgt["entries"] = [
             e for e in papgt["entries"]
-            if e.get("group_name") != OVERLAY_GROUP
+            if e.get("group_name") != overlay_group
         ]
         papgt = crimson_rs.add_papgt_entry(
-            papgt, OVERLAY_GROUP, pamt_checksum, 0, 16383
+            papgt, overlay_group, pamt_checksum, 0, 16383
         )
         crimson_rs.write_papgt_file(papgt, papgt_path)
+
+        try:
+            from shared_state import record_overlay
+            overlay_files = []
+            if any_change:
+                overlay_files.extend([
+                    "skilltreeinfo.pabgb", "skilltreeinfo.pabgh",
+                    "skilltreegroupinfo.pabgb", "skilltreegroupinfo.pabgh",
+                ])
+            if has_skill_edits:
+                overlay_files.extend(["skill.pabgb", "skill.pabgh"])
+            record_overlay(game_path, overlay_group, "SkillTree swaps",
+                           overlay_files)
+        except Exception:
+            pass
 
         # Write marker file
         with open(os.path.join(game_mod, ".se_skilltree"), "w") as f:
@@ -554,14 +718,14 @@ class SkillTreeTab(QWidget):
                 f.write(f"  {c}\n")
 
         summary = "\n".join(changes)
-        self._lbl_status.setText(f"Deployed to {OVERLAY_GROUP}/")
+        self._lbl_status.setText(f"Deployed to {overlay_group}/")
         self.status_message.emit(
-            f"SkillTree overlay deployed to {OVERLAY_GROUP}/ "
+            f"SkillTree overlay deployed to {overlay_group}/ "
             f"({len(changes)} swap(s))"
         )
         QMessageBox.information(
             self, "Deployed",
-            f"Skill tree overlay deployed to {OVERLAY_GROUP}/\n\n"
+            f"Skill tree overlay deployed to {overlay_group}/\n\n"
             f"{summary}\n\n"
             f"Restart the game to apply changes.",
         )
@@ -575,30 +739,780 @@ class SkillTreeTab(QWidget):
                                 "Set the game install path first.")
             return
 
-        game_mod = os.path.join(game_path, OVERLAY_GROUP)
+        overlay_group = f"{self._overlay_spin.value():04d}"
+        game_mod = os.path.join(game_path, overlay_group)
         if not os.path.isdir(game_mod):
             QMessageBox.information(self, "Nothing to restore",
-                                    f"No {OVERLAY_GROUP}/ overlay found.")
+                                    f"No {overlay_group}/ overlay found.")
             return
 
         try:
             # Remove PAPGT entry first
             if self._rebuild_papgt_fn:
-                msg = self._rebuild_papgt_fn(game_path, OVERLAY_GROUP)
+                msg = self._rebuild_papgt_fn(game_path, overlay_group)
                 log.info("PAPGT restore: %s", msg)
 
             # Remove overlay directory
             shutil.rmtree(game_mod)
+            try:
+                from overlay_coordinator import post_restore
+                post_restore(game_path, overlay_group)
+            except Exception:
+                pass
 
             self._lbl_status.setText("Restored -- overlay removed")
             self.status_message.emit(
-                f"SkillTree overlay {OVERLAY_GROUP}/ removed"
+                f"SkillTree overlay {overlay_group}/ removed"
             )
             QMessageBox.information(
                 self, "Restored",
-                f"Removed {OVERLAY_GROUP}/ overlay.\n"
+                f"Removed {overlay_group}/ overlay.\n"
                 f"Restart the game to revert to vanilla skill trees.",
             )
         except Exception as e:
             log.exception("SkillTree restore failed")
             QMessageBox.critical(self, "Restore failed", str(e))
+
+    # ══════════════════════════════════════════════════════════════════
+    # Skill Editor — skill.pabgb stamina / cooldown mods
+    # ══════════════════════════════════════════════════════════════════
+
+    def _on_skill_load(self) -> None:
+        """Extract skill.pabgb + skill.pabgh from the game."""
+        game_path = self._game_path or self._config.get("game_install_path", "")
+        if not game_path:
+            QMessageBox.warning(self, "No game path",
+                                "Set the game install path in the Patches tab first.")
+            return
+
+        try:
+            import crimson_rs
+            dp = INTERNAL_DIR
+            pabgb = bytes(crimson_rs.extract_file(game_path, "0008", dp,
+                                                   "skill.pabgb"))
+            pabgh = bytes(crimson_rs.extract_file(game_path, "0008", dp,
+                                                   "skill.pabgh"))
+        except Exception as e:
+            QMessageBox.critical(self, "Extract failed", str(e))
+            return
+
+        self._skill_pabgh = pabgh
+        self._skill_pabgb = pabgb
+
+        try:
+            import skillinfo_parser as sip
+            self._skill_entries = sip.parse_all(pabgh, pabgb)
+            # Deep copy vanilla baseline for diffing
+            self._skill_vanilla_entries = sip.parse_all(pabgh, pabgb)
+        except Exception as e:
+            QMessageBox.critical(self, "Parse failed",
+                                 f"skillinfo_parser.parse_all failed:\n{e}")
+            return
+
+        self._skill_loaded = True
+        self._btn_skill_import.setEnabled(True)
+        self._btn_skill_export.setEnabled(True)
+        self._btn_apply.setEnabled(True)
+        self._populate_skill_table()
+        self._lbl_skill_status.setText(
+            f"Loaded {len(self._skill_entries)} skills "
+            f"({len(pabgb):,} bytes)")
+        self.status_message.emit(
+            f"Loaded {len(self._skill_entries)} skill entries from skill.pabgb")
+
+    def _populate_skill_table(self) -> None:
+        """Fill the skill table from self._skill_entries."""
+        import skillinfo_parser as sip
+
+        entries = self._skill_entries
+        self._skill_table.setRowCount(len(entries))
+
+        self._skill_table_updating = True
+        for row, e in enumerate(entries):
+            # Name (read-only)
+            item = QTableWidgetItem(e['name'])
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            dn = e.get('dev_skill_name', b'')
+            if isinstance(dn, bytes):
+                dn = dn.decode('utf-8', 'replace')
+            item.setToolTip(dn if dn else e['name'])
+            self._skill_table.setItem(row, 0, item)
+
+            # Key (read-only)
+            ki = QTableWidgetItem(str(e['key']))
+            ki.setFlags(ki.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            ki.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._skill_table.setItem(row, 1, ki)
+
+            # Cooltime (editable) — field may be named _cooltime or missing in new parser
+            ct_val = e.get('_cooltime', e.get('_learnLevel', 0))
+            ct = QTableWidgetItem(str(ct_val))
+            ct.setTextAlignment(Qt.AlignmentFlag.AlignRight |
+                                Qt.AlignmentFlag.AlignVCenter)
+            self._skill_table.setItem(row, 2, ct)
+
+            # MaxLevel (editable)
+            ml = QTableWidgetItem(str(e.get('max_level', e.get('_maxLevel', 0))))
+            ml.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._skill_table.setItem(row, 3, ml)
+
+            # BuffLevels (read-only)
+            bl = QTableWidgetItem(str(e.get('_buffLevelCount', 0)))
+            bl.setFlags(bl.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            bl.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._skill_table.setItem(row, 4, bl)
+
+            # Modified (read-only)
+            mod = self._is_skill_entry_modified(row)
+            mi = QTableWidgetItem("Yes" if mod else "")
+            mi.setFlags(mi.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            if mod:
+                mi.setForeground(Qt.GlobalColor.yellow)
+            mi.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._skill_table.setItem(row, 5, mi)
+        self._skill_table_updating = False
+
+        self._skill_table.resizeColumnsToContents()
+        sh = self._skill_table.horizontalHeader()
+        sh.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+
+    def _on_skill_cell_changed(self, row: int, col: int) -> None:
+        if getattr(self, '_skill_table_updating', False):
+            return
+        if not self._skill_loaded or row >= len(self._skill_entries):
+            return
+        e = self._skill_entries[row]
+        item = self._skill_table.item(row, col)
+        if not item:
+            return
+        try:
+            val = int(item.text())
+        except ValueError:
+            self._lbl_skill_status.setText(f"Invalid value — must be an integer.")
+            return
+
+        if col == 2:  # Cooltime
+            e['_cooltime'] = val
+            e.pop('_raw', None)
+        elif col == 3:  # MaxLevel
+            e['max_level'] = val
+            e.pop('_raw', None)
+        else:
+            return
+
+        # Update Modified column
+        self._skill_table_updating = True
+        mod = self._is_skill_entry_modified(row)
+        mi = self._skill_table.item(row, 5)
+        if mi:
+            mi.setText("Yes" if mod else "")
+            if mod:
+                mi.setForeground(Qt.GlobalColor.yellow)
+        self._skill_table_updating = False
+        self._lbl_skill_status.setText(
+            f"{e['name']}: {'cooltime' if col == 2 else 'max_level'} = {val}")
+
+    def _is_skill_entry_modified(self, idx: int) -> bool:
+        """Check if skill entry at idx differs from vanilla."""
+        if idx >= len(self._skill_vanilla_entries):
+            return True
+        import skillinfo_parser as sip
+        cur = sip.serialize_entry(self._skill_entries[idx])
+        van = sip.serialize_entry(self._skill_vanilla_entries[idx])
+        return cur != van
+
+    def _has_skill_modifications(self) -> bool:
+        """Return True if any skill entry has been modified."""
+        if not self._skill_loaded or not self._skill_entries:
+            return False
+        import skillinfo_parser as sip
+        for i, e in enumerate(self._skill_entries):
+            if i >= len(self._skill_vanilla_entries):
+                return True
+            if sip.serialize_entry(e) != sip.serialize_entry(
+                    self._skill_vanilla_entries[i]):
+                return True
+        return False
+
+    def _count_skill_modifications(self) -> int:
+        """Count how many skill entries are modified."""
+        if not self._skill_loaded:
+            return 0
+        import skillinfo_parser as sip
+        count = 0
+        for i, e in enumerate(self._skill_entries):
+            if i >= len(self._skill_vanilla_entries):
+                count += 1
+            elif sip.serialize_entry(e) != sip.serialize_entry(
+                    self._skill_vanilla_entries[i]):
+                count += 1
+        return count
+
+    # -- Import Legacy Mod -----------------------------------------------
+
+    def _on_skill_import_legacy(self, preset_path: str = None) -> None:
+        """Import a CrimsonWings-style Format 2 JSON targeting skill.pabgb."""
+        if not self._skill_loaded:
+            QMessageBox.warning(self, "Not loaded",
+                                "Load SkillInfo first.")
+            return
+
+        if preset_path:
+            path = preset_path
+        else:
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Import Legacy skill.pabgb Mod", "",
+                "JSON files (*.json);;All Files (*)")
+        if not path:
+            return
+
+        try:
+            with open(path, encoding='utf-8') as f:
+                doc = json.load(f)
+        except Exception as e:
+            QMessageBox.critical(self, "Import Failed",
+                                 f"Could not read JSON:\n{e}")
+            return
+
+        # Extract changes
+        changes = []
+        for p in doc.get('patches', []):
+            changes.extend(p.get('changes', []))
+        if not changes:
+            QMessageBox.warning(self, "Import Failed",
+                                "No changes found in the JSON file.")
+            return
+
+        # Find best baseline
+        baselines = self._discover_skill_baselines()
+        if not baselines:
+            QMessageBox.critical(self, "Import Failed",
+                                 "No skill.pabgb baselines found in game_baselines/.\n"
+                                 "Place a vanilla skill.pabgb in game_baselines/<version>/")
+            return
+
+        best_ver, best_data, best_pabgh = self._score_skill_baselines(
+            baselines, changes)
+        if best_data is None:
+            QMessageBox.critical(self, "Import Failed",
+                                 "Could not match any baseline to this mod.")
+            return
+
+        # Apply byte patches to baseline (reverse-offset-sorted for inserts)
+        patched_data = bytearray(best_data)
+        applied = 0
+        sorted_changes = sorted(
+            changes,
+            key=lambda c: self._parse_offset(c.get('offset', 0)),
+            reverse=True)
+        for c in sorted_changes:
+            applied += _apply_one_skill_patch(patched_data, best_data, c)
+
+        # Parse both vanilla baseline and patched with skillinfo_parser
+        # Use the baseline's OWN pabgh — different game versions have
+        # different entry counts and offsets.
+        import skillinfo_parser as sip
+        try:
+            vanilla_entries = sip.parse_all(best_pabgh, best_data)
+            patched_entries = sip.parse_all(best_pabgh,
+                                            bytes(patched_data))
+        except Exception as e:
+            QMessageBox.critical(self, "Import Failed",
+                                 f"Failed to parse patched data:\n{e}")
+            return
+
+        # Build name lookup for patched entries
+        patched_by_name = {e['name']: e for e in patched_entries}
+        vanilla_by_name = {e['name']: e for e in vanilla_entries}
+
+        # Diff: find entries where serialized bytes differ
+        modified_names = []
+        for name, van_e in vanilla_by_name.items():
+            pat_e = patched_by_name.get(name)
+            if pat_e is None:
+                continue
+            if sip.serialize_entry(van_e) != sip.serialize_entry(pat_e):
+                modified_names.append(name)
+
+        if not modified_names:
+            QMessageBox.information(self, "Import Complete",
+                                    f"Applied {applied} patches but no skill "
+                                    f"entries changed (mod may be for a different "
+                                    f"game version).")
+            return
+
+        # Transfer changes to current game entries.
+        # Only copy fields that ACTUALLY DIFFER between old vanilla and old
+        # patched — don't blindly overwrite the whole entry, since the new
+        # game version may have different structure in unchanged fields.
+        current_by_name = {e['name']: i for i, e in
+                           enumerate(self._skill_entries)}
+        transferred = 0
+        for name in modified_names:
+            van_e = vanilla_by_name[name]
+            pat_e = patched_by_name[name]
+            idx = current_by_name.get(name)
+            if idx is None:
+                continue
+            cur_e = self._skill_entries[idx]
+            changed_fields = 0
+            for field in pat_e:
+                if field in ('key', 'name', 'name_len', '_raw'):
+                    continue
+                if pat_e.get(field) != van_e.get(field):
+                    cur_e[field] = pat_e[field]
+                    changed_fields += 1
+            cur_e.pop('_raw', None)
+            if changed_fields > 0:
+                transferred += 1
+
+        self._populate_skill_table()
+        self._lbl_skill_status.setText(
+            f"Imported: {transferred} skill(s) modified from {os.path.basename(path)}")
+        self.status_message.emit(
+            f"Imported legacy mod: {transferred}/{len(modified_names)} "
+            f"skills transferred (baseline: {best_ver})")
+        QMessageBox.information(
+            self, "Import Complete",
+            f"Baseline: {best_ver}\n"
+            f"Patches applied: {applied}/{len(changes)}\n"
+            f"Skills modified: {transferred}\n\n"
+            f"Click 'Apply to Game' to deploy.")
+
+    def _discover_skill_baselines(self) -> list[tuple[str, str]]:
+        """Find all available skill.pabgb baselines."""
+        baselines: list[tuple[str, str]] = []
+        for base in [os.path.dirname(os.path.abspath(__file__)),
+                     getattr(sys, '_MEIPASS', ''), os.getcwd()]:
+            for rel in [os.path.join(base, '..', '..', 'game_baselines'),
+                        os.path.join(base, 'game_baselines')]:
+                bd = os.path.normpath(rel)
+                if not os.path.isdir(bd):
+                    continue
+                for ver in sorted(os.listdir(bd)):
+                    candidate = os.path.join(bd, ver, 'skill.pabgb')
+                    if os.path.isfile(candidate):
+                        baselines.append((ver, candidate))
+            if baselines:
+                break
+
+        # Also consider the currently loaded vanilla as a baseline
+        if self._skill_pabgb and not baselines:
+            baselines.append(("current", "__loaded__"))
+
+        return baselines
+
+    def _score_skill_baselines(
+        self, baselines: list[tuple[str, str]], changes: list[dict],
+    ) -> tuple[str, bytes | None, bytes | None]:
+        """Score baselines by how many 'original' hex values match.
+        Returns (version, raw_pabgb, raw_pabgh) of the best match."""
+        best_ver = ""
+        best_score = -1
+        best_data: bytes | None = None
+        best_pabgh: bytes | None = None
+
+        for ver, path in baselines:
+            if path == "__loaded__":
+                data = self._skill_pabgb
+                pabgh = self._skill_pabgh
+            else:
+                try:
+                    with open(path, 'rb') as f:
+                        data = f.read()
+                    pabgh_path = path.replace('.pabgb', '.pabgh')
+                    with open(pabgh_path, 'rb') as f:
+                        pabgh = f.read()
+                except Exception:
+                    continue
+
+            score = 0
+            for c in changes:
+                off = c.get('offset')
+                orig_hex = c.get('original', '')
+                if off is None or not orig_hex:
+                    continue
+                off = self._parse_offset(off)
+                try:
+                    orig_bytes = bytes.fromhex(orig_hex)
+                except ValueError:
+                    continue
+                if off + len(orig_bytes) <= len(data):
+                    if data[off:off + len(orig_bytes)] == orig_bytes:
+                        score += 1
+
+            if score > best_score:
+                best_score = score
+                best_ver = ver
+                best_data = data
+                best_pabgh = pabgh
+
+        return best_ver, best_data, best_pabgh
+
+    @staticmethod
+    def _parse_offset(off) -> int:
+        """Parse an offset value that may be int or hex string."""
+        if isinstance(off, int):
+            return off
+        if isinstance(off, str):
+            s = off.strip()
+            if s.lower().startswith('0x'):
+                return int(s, 16)
+            try:
+                return int(s, 16)
+            except ValueError:
+                return int(s)
+        return int(off)
+
+    # -- Export Field JSON -----------------------------------------------
+
+    def _on_stamina_preset(self, filename: str) -> None:
+        """One-click stamina preset: load skillinfo if needed, find preset, import it."""
+        if not self._skill_loaded:
+            self._on_skill_load()
+        if not self._skill_loaded:
+            return
+
+        preset_path = None
+        for base_dir in [
+            os.path.dirname(os.path.abspath(__file__)),
+            getattr(sys, '_MEIPASS', ''),
+            os.getcwd(),
+        ]:
+            for rel in [
+                os.path.join(base_dir, '..', '..', 'stamina_presets', filename),
+                os.path.join(base_dir, 'stamina_presets', filename),
+                os.path.join(base_dir, '..', '..', filename),
+                os.path.join(base_dir, filename),
+            ]:
+                p = os.path.normpath(rel)
+                if os.path.isfile(p):
+                    preset_path = p
+                    break
+            if preset_path:
+                break
+
+        if not preset_path:
+            from PySide6.QtWidgets import QFileDialog
+            preset_path, _ = QFileDialog.getOpenFileName(
+                self, f"Locate {filename}", "",
+                "JSON Files (*.json);;All Files (*)")
+        if not preset_path:
+            return
+
+        self._apply_skill_value_patches(preset_path)
+
+    def _apply_skill_value_patches(self, path: str) -> None:
+        """Apply a legacy skill JSON mod by patching values in-place.
+
+        Instead of cross-version blob transfer, finds the original byte
+        pattern in each entry's current _buff_data_raw and replaces it.
+        No structural changes — same file size, safe roundtrip.
+        """
+        if not self._skill_loaded:
+            QMessageBox.warning(self, "Not loaded", "Load SkillInfo first.")
+            return
+
+        try:
+            with open(path, encoding='utf-8') as f:
+                doc = json.load(f)
+        except Exception as e:
+            QMessageBox.critical(self, "Import Failed", f"Could not read JSON:\n{e}")
+            return
+
+        changes = []
+        for p in doc.get('patches', []):
+            changes.extend(p.get('changes', []))
+        if not changes:
+            QMessageBox.warning(self, "Import Failed", "No changes found.")
+            return
+
+        by_name = {e['name']: e for e in self._skill_entries}
+        patched = 0
+        skipped = 0
+        missing_entries = set()
+        missing_values = []
+
+        for c in changes:
+            name = c.get('entry', '')
+            orig_hex = c.get('original', '')
+            patch_hex = c.get('patched', '')
+            if not name or not orig_hex or not patch_hex:
+                skipped += 1
+                continue
+            e = by_name.get(name)
+            if not e:
+                missing_entries.add(name)
+                skipped += 1
+                continue
+
+            orig_bytes = bytes.fromhex(orig_hex)
+            patch_bytes = bytes.fromhex(patch_hex)
+
+            # Search the full serialized entry, not just _buff_data_raw
+            # (the new parser splits body into named fields, so the values
+            # may be in _useResourceStatList, _buffLevelList, etc.)
+            import skillinfo_parser as sip
+            full = sip.serialize_entry(e)
+            pos = full.find(orig_bytes)
+            if pos >= 0:
+                patched_full = bytearray(full)
+                patched_full[pos:pos + len(orig_bytes)] = patch_bytes
+                # Re-parse the patched entry to update all named fields
+                idx = [(ek['key'], 0) for ek in [e]]
+                try:
+                    new_e = sip.parse_skill_entry(bytes(patched_full), 0, len(patched_full))
+                    # Preserve key/name from original
+                    new_e['key'] = e['key']
+                    new_e['name'] = e['name']
+                    new_e['name_len'] = e['name_len']
+                    new_e['name_bytes'] = e.get('name_bytes', e['name'].encode('ascii'))
+                    by_name[name] = new_e
+                    # Update in the list
+                    for i, se in enumerate(self._skill_entries):
+                        if se['name'] == name:
+                            self._skill_entries[i] = new_e
+                            break
+                    patched += 1
+                except Exception:
+                    # Fallback: patch _raw directly
+                    e['_raw'] = bytes(patched_full)
+                    e.pop('_buff_data_raw', None)
+                    patched += 1
+            else:
+                missing_values.append(name)
+                skipped += 1
+
+        self._populate_skill_table()
+        title = (doc.get('modinfo') or {}).get('title', os.path.basename(path))
+        self._lbl_skill_status.setText(
+            f"{title}: {patched} values patched, {skipped} skipped.")
+
+        detail = f"Patched {patched}/{len(changes)} values in-place.\n"
+        if missing_entries:
+            detail += f"\n{len(missing_entries)} entries not found in current game:\n"
+            for n in sorted(missing_entries)[:5]:
+                detail += f"  {n}\n"
+        if missing_values:
+            detail += f"\n{len(missing_values)} values not found (game version changed):\n"
+            for n in missing_values[:5]:
+                detail += f"  {n}\n"
+        detail += "\nClick Apply to Game to deploy."
+
+        QMessageBox.information(self, f"{title}", detail)
+
+    def _on_skill_export_json(self) -> None:
+        """Export current skill modifications as Format 3 field-name JSON."""
+        if not self._skill_loaded:
+            QMessageBox.warning(self, "Not loaded", "Load SkillInfo first.")
+            return
+
+        import skillinfo_parser as sip
+        intents = []
+        for i, e in enumerate(self._skill_entries):
+            if i >= len(self._skill_vanilla_entries):
+                continue
+            van = self._skill_vanilla_entries[i]
+            if sip.serialize_entry(e) == sip.serialize_entry(van):
+                continue
+            # Build a field-level diff
+            entry_intents = _diff_skill_entry(van, e)
+            intents.extend(entry_intents)
+
+        if not intents:
+            QMessageBox.information(self, "Export Field JSON",
+                                    "No modifications to export.")
+            return
+
+        default_name = "skill_mod.field.json"
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Skill Field JSON", default_name,
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+
+        doc = {
+            'modinfo': {
+                'title': 'Skill Mod',
+                'version': '1.0',
+                'author': 'CrimsonGameMods SkillTree',
+                'description': f'{len(intents)} field-level intent(s)',
+                'note': 'Format 3 -- uses field names, survives game updates',
+            },
+            'format': 3,
+            'target': 'skill.pabgb',
+            'intents': intents,
+        }
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
+            self._lbl_skill_status.setText(
+                f"Exported {len(intents)} intents to {os.path.basename(path)}")
+            QMessageBox.information(
+                self, "Export Field JSON",
+                f"Exported {len(intents)} field-level intents.\n\n"
+                f"File: {path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Failed", str(e))
+
+
+# ── Module-level helpers ─────────────────────────────────────────────────
+
+def _apply_one_skill_patch(patched: bytearray, vanilla: bytes,
+                           change: dict) -> int:
+    """Apply a single legacy JSON v2 patch to skill.pabgb. Returns 1 if applied."""
+    ptype = change.get('type', 'replace')
+    if ptype == 'replace':
+        entry = change.get('entry')
+        if entry and 'rel_offset' in change:
+            name_bytes = entry.encode('ascii')
+            search = struct.pack('<I', len(name_bytes)) + name_bytes + b'\x00'
+            pos = vanilla.find(search)
+            if pos < 0:
+                return 0
+            entry_start = pos - 4
+            abs_off = entry_start + change['rel_offset']
+        elif 'offset' in change:
+            off_val = change['offset']
+            abs_off = int(off_val, 16) if isinstance(off_val, str) else int(off_val)
+        else:
+            return 0
+        patch_bytes = bytes.fromhex(change.get('patched', ''))
+        orig_bytes = bytes.fromhex(change.get('original', ''))
+        if not patch_bytes:
+            return 0
+        end = abs_off + max(len(orig_bytes), len(patch_bytes))
+        if end > len(patched):
+            return 0
+        patched[abs_off:abs_off + len(orig_bytes)] = patch_bytes
+        return 1
+    elif ptype == 'insert':
+        entry = change.get('entry')
+        if entry and 'rel_offset' in change:
+            name_bytes = entry.encode('ascii')
+            search = struct.pack('<I', len(name_bytes)) + name_bytes + b'\x00'
+            pos = vanilla.find(search)
+            if pos < 0:
+                return 0
+            abs_off = (pos - 4) + change['rel_offset']
+        elif 'offset' in change:
+            off_val = change['offset']
+            abs_off = int(off_val, 16) if isinstance(off_val, str) else int(off_val)
+        else:
+            return 0
+        insert_bytes = bytes.fromhex(change.get('bytes', ''))
+        if not insert_bytes:
+            return 0
+        patched[abs_off:abs_off] = insert_bytes
+        return 1
+    return 0
+
+
+def _diff_skill_entry(vanilla: dict, modified: dict) -> list[dict]:
+    """Produce Format 3 field-level intents for one skill entry diff."""
+    intents = []
+    name = modified['name']
+    key = modified['key']
+
+    SKIP = {'key', 'name_len', 'name_bytes', 'name', '_raw', '_pad_01',
+            '_buffLevelCount', 'max_level', 'dev_skill_name', 'dev_skill_desc',
+            'video_path_hash', 'buff_sustain_flag', 'skill_group_key_list',
+            '_buff_data_raw'}
+
+    for field in modified:
+        if field in SKIP:
+            continue
+        old_val = vanilla.get(field)
+        new_val = modified.get(field)
+        if old_val == new_val:
+            continue
+        if isinstance(new_val, bytes):
+            intents.append({
+                'entry': name, 'key': key, 'field': field, 'op': 'set',
+                'new': new_val.hex(),
+            })
+        elif isinstance(new_val, (list, dict)):
+            if field == '_buffLevelList' and new_val is not None:
+                _diff_buff_levels(intents, name, key, old_val, new_val)
+            else:
+                intents.append({
+                    'entry': name, 'key': key, 'field': field, 'op': 'set',
+                    'new': new_val,
+                })
+        else:
+            intents.append({
+                'entry': name, 'key': key, 'field': field, 'op': 'set',
+                'new': new_val,
+            })
+
+    return intents
+
+
+def _diff_buff_levels(intents: list, name: str, key: int,
+                      old_levels, new_levels) -> None:
+    """Diff _buffLevelList at the per-buff-data field level."""
+    if old_levels is None or new_levels is None:
+        if old_levels != new_levels:
+            intents.append({
+                'entry': name, 'key': key,
+                'field': '_buffLevelList', 'op': 'set',
+                'new': new_levels,
+            })
+        return
+
+    if len(old_levels) != len(new_levels):
+        intents.append({
+            'entry': name, 'key': key,
+            'field': '_buffLevelList', 'op': 'set',
+            'new': new_levels,
+        })
+        return
+
+    for li, (old_lv, new_lv) in enumerate(zip(old_levels, new_levels)):
+        if not isinstance(old_lv, dict) or not isinstance(new_lv, dict):
+            if old_lv != new_lv:
+                intents.append({
+                    'entry': name, 'key': key,
+                    'field': f'_buffLevelList[{li}]', 'op': 'set',
+                    'new': new_lv,
+                })
+            continue
+
+        old_bd = old_lv.get('buff_data', [])
+        new_bd = new_lv.get('buff_data', [])
+        if len(old_bd) != len(new_bd):
+            intents.append({
+                'entry': name, 'key': key,
+                'field': f'_buffLevelList[{li}].buff_data', 'op': 'set',
+                'new': new_bd,
+            })
+            continue
+
+        for bi, (ob, nb) in enumerate(zip(old_bd, new_bd)):
+            if not isinstance(ob, dict) or not isinstance(nb, dict):
+                if ob != nb:
+                    intents.append({
+                        'entry': name, 'key': key,
+                        'field': f'_buffLevelList[{li}].buff_data[{bi}]',
+                        'op': 'set', 'new': nb,
+                    })
+                continue
+            for bf in nb:
+                ov = ob.get(bf)
+                nv = nb.get(bf)
+                if ov == nv:
+                    continue
+                field_path = f'_buffLevelList[{li}].buff_data[{bi}].{bf}'
+                if isinstance(nv, bytes):
+                    intents.append({
+                        'entry': name, 'key': key,
+                        'field': field_path, 'op': 'set',
+                        'new': nv.hex(),
+                    })
+                else:
+                    intents.append({
+                        'entry': name, 'key': key,
+                        'field': field_path, 'op': 'set',
+                        'new': nv,
+                    })

@@ -101,13 +101,35 @@ class MercPetsTab(QWidget):
         apply_btn.clicked.connect(self._apply_to_game)
         top_row.addWidget(apply_btn)
 
-        export_btn = QPushButton("Export as Mod")
-        export_btn.setStyleSheet("background-color: #7B1FA2; color: white; font-weight: bold;")
-        export_btn.setToolTip("ADVANCED — UNSUPPORTED. Contact mod loader dev for help.")
-        export_btn.clicked.connect(self._export_mod)
-        export_btn.setVisible(False)
-        top_row.addWidget(export_btn)
-        self._dev_export_btn = export_btn
+        # Overlay slot — configurable. Default 65 to stay off both Stacker's
+        # 0063 (equipslotinfo) and SkillTree's default 0064.
+        top_row.addWidget(QLabel("Overlay:"))
+        self._overlay_spin = QSpinBox()
+        self._overlay_spin.setRange(1, 9999)
+        self._overlay_spin.setValue(self._config.get("mercpets_overlay_dir", 65))
+        self._overlay_spin.setFixedWidth(70)
+        self._overlay_spin.setToolTip(
+            "Overlay group number (0065 = default). Change if another mod\n"
+            "already owns this slot. Apply writes to <game>/NNNN/;\n"
+            "Restore removes the same NNNN/.")
+        self._overlay_spin.valueChanged.connect(
+            lambda v: self._config.update({"mercpets_overlay_dir": int(v)}))
+        top_row.addWidget(self._overlay_spin)
+
+        export_field_btn = QPushButton("Export Field JSON")
+        export_field_btn.setStyleSheet("background-color: #00695C; color: white; font-weight: bold;")
+        export_field_btn.setToolTip(
+            "Export edits as Format 3 field-name JSON.\n"
+            "Uses field names — survives game updates.")
+        export_field_btn.clicked.connect(self._export_field_json)
+        top_row.addWidget(export_field_btn)
+
+        import_field_btn = QPushButton("Import Field JSON")
+        import_field_btn.setToolTip(
+            "Import a Format 3 field-name JSON and apply its intents\n"
+            "to the currently loaded vanilla data.")
+        import_field_btn.clicked.connect(self._import_field_json)
+        top_row.addWidget(import_field_btn)
 
         restore_btn = QPushButton("Restore")
         restore_btn.setStyleSheet("background-color: #37474F; color: white; font-weight: bold;")
@@ -332,7 +354,7 @@ class MercPetsTab(QWidget):
 
         new_h, new_b = self._serialize()
         INTERNAL_DIR = "gamedata/binary__/client/bin"
-        overlay_group = "0063"
+        overlay_group = f"{self._overlay_spin.value():04d}"
 
         try:
             with tempfile.TemporaryDirectory() as tmp_dir:
@@ -363,6 +385,13 @@ class MercPetsTab(QWidget):
                     cur, overlay_group, pamt_checksum,
                     is_optional=0, language=0x3FFF)
                 crimson_rs.write_papgt_file(cur, papgt_path)
+
+            try:
+                from shared_state import record_overlay
+                record_overlay(game_path, overlay_group, "MercPets",
+                               ["mercenarypetinfo.pabgb", "mercenarypetinfo.pabgh"])
+            except Exception:
+                pass
 
             self._modified = False
             self._status.setText(
@@ -417,13 +446,18 @@ class MercPetsTab(QWidget):
         gp = self._get_game_path()
         if not gp:
             return
-        overlay_group = "0063"
+        overlay_group = f"{self._overlay_spin.value():04d}"
         overlay = os.path.join(gp, overlay_group)
         papgt = os.path.join(gp, "meta", "0.papgt")
         bak = papgt + ".mercpets_bak"
         try:
             if os.path.isdir(overlay):
                 shutil.rmtree(overlay)
+                try:
+                    from overlay_coordinator import post_restore
+                    post_restore(gp, overlay_group)
+                except Exception:
+                    pass
             if os.path.exists(bak):
                 shutil.copy2(bak, papgt)
             self._status.setText(f"Restored — {overlay_group}/ overlay removed.")
@@ -431,3 +465,113 @@ class MercPetsTab(QWidget):
                 "MercPets overlay removed. Restart game to confirm.")
         except Exception as e:
             QMessageBox.critical(self, "Restore", f"Failed:\n{e}")
+
+    _DIFF_FIELDS = (
+        'default_summon_count', 'default_hire_count', 'max_hire_count',
+        'is_blocked', 'is_controllable', 'set_new_mercenary_is_main',
+        'main_mercenary_per_tribe', 'is_force_stackable', 'is_sellable',
+        'use_camp_level', 'apply_equip_item_stat', 'far_from_leader_option',
+        'spawn_position_type',
+    )
+
+    def _export_field_json(self) -> None:
+        if not self._records or not self._vanilla_pabgh:
+            QMessageBox.warning(self, "Export", "Load mercenaryinfo first.")
+            return
+        import json
+        import mercenaryinfo_parser as mip
+
+        self._collect_edits()
+        vanilla = mip.parse_all(self._vanilla_pabgh, self._vanilla_pabgb)
+        van_by_key = {r.key: r for r in vanilla}
+
+        intents = []
+        for rec in self._records:
+            van = van_by_key.get(rec.key)
+            if not van:
+                continue
+            name = rec.string_key if isinstance(rec.string_key, str) else \
+                rec.string_key.decode('utf-8', errors='replace').rstrip('\x00')
+            for f in self._DIFF_FIELDS:
+                cur = getattr(rec, f)
+                orig = getattr(van, f)
+                if cur != orig:
+                    intents.append({
+                        'entry': name, 'key': rec.key,
+                        'field': f, 'op': 'set', 'new': cur,
+                    })
+
+        if not intents:
+            QMessageBox.information(self, "Export", "No changes to export.")
+            return
+
+        from PySide6.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Field JSON", "MercPets.field.json",
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+
+        doc = {
+            'modinfo': {
+                'title': 'MercPets Mod',
+                'version': '1.0',
+                'author': 'CrimsonGameMods MercPets',
+                'description': f'{len(intents)} field-level intent(s)',
+                'note': 'Format 3 — uses field names, survives game updates',
+            },
+            'format': 3,
+            'target': 'mercenaryinfo.pabgb',
+            'intents': intents,
+        }
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
+        self._status.setText(f"Exported {len(intents)} intents to {os.path.basename(path)}")
+        QMessageBox.information(self, "Export Field JSON",
+            f"Exported {len(intents)} field-level intents.\n\nFile: {path}")
+
+    def _import_field_json(self) -> None:
+        if not self._records or not self._vanilla_pabgh:
+            QMessageBox.warning(self, "Import", "Load mercenaryinfo first.")
+            return
+        import json
+        from PySide6.QtWidgets import QFileDialog
+
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Import Field JSON", "",
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+        with open(path, 'r', encoding='utf-8') as f:
+            doc = json.load(f)
+        if doc.get('format') != 3 or not doc.get('intents'):
+            QMessageBox.warning(self, "Import", "Not a valid Format 3 Field JSON file.")
+            return
+
+        rec_by_name = {}
+        for r in self._records:
+            name = r.string_key if isinstance(r.string_key, str) else \
+                r.string_key.decode('utf-8', errors='replace').rstrip('\x00')
+            rec_by_name[name] = r
+        rec_by_key = {r.key: r for r in self._records}
+
+        applied = skipped = 0
+        for intent in doc['intents']:
+            target = rec_by_name.get(intent.get('entry')) or \
+                     rec_by_key.get(intent.get('key'))
+            if not target:
+                skipped += 1
+                continue
+            field = intent.get('field', '')
+            if intent.get('op') == 'set' and field in self._DIFF_FIELDS:
+                setattr(target, field, intent['new'])
+                applied += 1
+            else:
+                skipped += 1
+
+        self._modified = True
+        self._rebuild_rows()
+        self._status.setText(f"Imported {applied} intents, {skipped} skipped.")
+        QMessageBox.information(self, "Import Field JSON",
+            f"Applied {applied} intent(s), skipped {skipped}.\n\n"
+            f"Click Apply to Game to deploy.")

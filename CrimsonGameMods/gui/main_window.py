@@ -115,12 +115,18 @@ def find_save_files() -> List[dict]:
 from gui.tabs.items import DatabaseBrowserTab
 from gui.tabs.buffs_v319 import ItemBuffsTab
 from gui.tabs.stacker import StackerTab
+try:
+    from gui.tabs.dmm_webview import DmmWebViewTab, HAS_WEBENGINE
+except ImportError:
+    DmmWebViewTab = None
+    HAS_WEBENGINE = False
 from iteminfo_reader import ItemInfoCache
 from gui.tabs.world import (
     DropsetTab, SpawnTab, StoreEditorTab,
 )
 from gui.tabs.patches import GamePatchesTab
 from gui.tabs.field_edit import FieldEditTab
+from gui.tabs.bagspace import BagSpaceTab
 from gui.tabs.skill_tree import SkillTreeTab
 from gui.dialogs import (
     _FloatingTabWindow, DetachableTabWidget,
@@ -673,6 +679,11 @@ class MainWindow(QMainWindow):
         self._mods_tabs.setTabPosition(QTabWidget.South)
         self._tabs.addTab(self._mods_tabs, tr("tab.game_mods"))
 
+        # if DmmWebViewTab is not None:
+        #     self._dmm_webview_tab = DmmWebViewTab(config=self._config)
+        #     self._dmm_webview_tab.status_message.connect(self._update_status)
+        #     self._tabs.addTab(self._dmm_webview_tab, "Mod Manager")
+
         self._items_tabs = QTabWidget()
         self._items_tabs.setTabPosition(QTabWidget.South)
         self._tabs.addTab(self._items_tabs, tr("tab.items"))
@@ -767,25 +778,39 @@ class MainWindow(QMainWindow):
                 pass
         self._mods_tabs.addTab(self._stacker_tab, "Stacker Tool")
 
-        self._store_tab = StoreEditorTab(
-            name_db=self._name_db,
-            icon_cache=self._icon_cache,
+        # self._store_tab = StoreEditorTab(
+        #     name_db=self._name_db,
+        #     icon_cache=self._icon_cache,
+        #     config=self._config,
+        #     rebuild_papgt_fn=self._rebuild_papgt_without,
+        #     show_guide_fn=self._show_guide,
+        # )
+        # self._store_tab.status_message.connect(self._update_status)
+        # self._store_tab.config_save_requested.connect(self._save_config)
+        # self._store_tab.paz_refresh_requested.connect(
+        #     lambda: self._patches_tab._paz_refresh_status() if hasattr(self, "_patches_tab") else None
+        # )
+        # _saved_gp = self._config.get("game_install_path", "")
+        # if _saved_gp:
+        #     try:
+        #         self._store_tab.set_game_path(_saved_gp)
+        #     except Exception:
+        #         pass
+        # self._mods_tabs.addTab(self._store_tab, tr("tab.stores"))
+
+        self._bagspace_tab = BagSpaceTab(
             config=self._config,
             rebuild_papgt_fn=self._rebuild_papgt_without,
-            show_guide_fn=self._show_guide,
         )
-        self._store_tab.status_message.connect(self._update_status)
-        self._store_tab.config_save_requested.connect(self._save_config)
-        self._store_tab.paz_refresh_requested.connect(
-            lambda: self._patches_tab._paz_refresh_status() if hasattr(self, "_patches_tab") else None
-        )
-        _saved_gp = self._config.get("game_install_path", "")
-        if _saved_gp:
+        self._bagspace_tab.status_message.connect(self._update_status)
+        self._bagspace_tab.config_save_requested.connect(self._save_config)
+        _saved_gp_bagspace = self._config.get("game_install_path", "")
+        if _saved_gp_bagspace:
             try:
-                self._store_tab.set_game_path(_saved_gp)
+                self._bagspace_tab.set_game_path(_saved_gp_bagspace)
             except Exception:
                 pass
-        self._mods_tabs.addTab(self._store_tab, tr("tab.stores"))
+        self._mods_tabs.addTab(self._bagspace_tab, "BagSpace")
 
         self._dropset_tab = DropsetTab(
             name_db=self._name_db,
@@ -1625,6 +1650,11 @@ class MainWindow(QMainWindow):
         check_update_act.triggered.connect(self._check_for_update)
         update_menu.addAction(check_update_act)
 
+        changelog_act = QAction("Changelog / Releases", self)
+        changelog_act.triggered.connect(lambda: __import__('webbrowser').open(
+            "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases"))
+        update_menu.addAction(changelog_act)
+
         view_menu = menu_bar.addMenu("View")
         self._global_icons_action = QAction("Show Icons", self)
         self._global_icons_action.setCheckable(True)
@@ -2377,6 +2407,8 @@ QCheckBox::indicator {{
             self._buffs_tab.set_game_path(path)
         if hasattr(self, '_field_edit_tab_obj'):
             self._field_edit_tab_obj.set_game_path(path)
+        if hasattr(self, '_bagspace_tab'):
+            self._bagspace_tab.set_game_path(path)
 
     def _validate_game_path(self, path: str) -> bool:
         paz = os.path.join(path, "0008", "0.paz")
@@ -4054,3 +4086,6 @@ QCheckBox::indicator {{
             _enable_drag_drop_under_uipi(int(self.winId()))
         except Exception as exc:
             log.debug("UIPI drop filter not applied: %s", exc)
+
+        # Shared state / overlay coordinator disabled — not used yet.
+        # QTimer.singleShot(2000, self._run_startup_audit)

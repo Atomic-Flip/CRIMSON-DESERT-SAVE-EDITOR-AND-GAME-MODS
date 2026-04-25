@@ -9,9 +9,9 @@ from typing import Dict, List, Optional, Tuple
 
 log = logging.getLogger(__name__)
 
-ITEM_ENTRY_SIZE = 105
-HEADER_OVERHEAD = 51
-TAIL_SIZE = 17
+ITEM_ENTRY_SIZE = 113
+HEADER_OVERHEAD = 55
+TAIL_SIZE = 19
 TOTAL_OVERHEAD = HEADER_OVERHEAD + TAIL_SIZE
 
 
@@ -116,12 +116,27 @@ class StoreinfoParser:
 
             item_count = 0
             is_standard = False
-            if after_name + 0x30 <= len(data):
-                cnt = struct.unpack_from('<I', data, after_name + 0x26)[0]
-                expected = TOTAL_OVERHEAD + cnt * ITEM_ENTRY_SIZE
-                if expected == remaining and cnt < 10000:
-                    is_standard = True
-                    item_count = cnt
+            if after_name + 0x38 <= len(data):
+                for _cnt_off in (0x2F, 0x26, 0x30, 0x2E):
+                    if after_name + _cnt_off + 4 > len(data):
+                        continue
+                    cnt = struct.unpack_from('<I', data, after_name + _cnt_off)[0]
+                    if cnt == 0 or cnt >= 10000:
+                        continue
+                    for _ho_pad in (8, 9, 7, 6, 10, 5, 4, 11):
+                        ho_start = _cnt_off + _ho_pad
+                        items_bytes = remaining - ho_start
+                        if items_bytes <= 0:
+                            continue
+                        tail = items_bytes - cnt * ITEM_ENTRY_SIZE
+                        if 0 <= tail < 25 and items_bytes >= cnt * ITEM_ENTRY_SIZE:
+                            is_standard = True
+                            item_count = cnt
+                            HEADER_OVERHEAD_actual = ho_start
+                            TAIL_SIZE_actual = tail
+                            break
+                    if is_standard:
+                        break
 
             store = StoreRecord(
                 index=idx,
@@ -137,23 +152,23 @@ class StoreinfoParser:
             )
 
             if is_standard:
-                store.header_raw = bytes(data[after_name:after_name + HEADER_OVERHEAD])
-                items_end = after_name + HEADER_OVERHEAD + item_count * ITEM_ENTRY_SIZE
-                store.tail_raw = bytes(data[items_end:items_end + TAIL_SIZE])
+                store.header_raw = bytes(data[after_name:after_name + HEADER_OVERHEAD_actual])
+                items_end = after_name + HEADER_OVERHEAD_actual + item_count * ITEM_ENTRY_SIZE
+                store.tail_raw = bytes(data[items_end:items_end + TAIL_SIZE_actual])
 
                 for i in range(item_count):
-                    entry_off = after_name + HEADER_OVERHEAD + i * ITEM_ENTRY_SIZE
+                    entry_off = after_name + HEADER_OVERHEAD_actual + i * ITEM_ENTRY_SIZE
                     raw = bytes(data[entry_off:entry_off + ITEM_ENTRY_SIZE])
                     if len(raw) < ITEM_ENTRY_SIZE:
                         break
 
                     store_key_ref = struct.unpack_from('<H', raw, 0)[0]
-                    buy_price = struct.unpack_from('<Q', raw, 2)[0]
-                    sell_price = struct.unpack_from('<Q', raw, 0x0A)[0]
-                    trade_flags = struct.unpack_from('<I', raw, 0x12)[0]
-                    item_key = struct.unpack_from('<I', raw, 0x22)[0]
+                    buy_price = struct.unpack_from('<Q', raw, 0x06)[0]
+                    sell_price = struct.unpack_from('<Q', raw, 0x0E)[0]
+                    trade_flags = struct.unpack_from('<I', raw, 0x16)[0]
+                    item_key = struct.unpack_from('<I', raw, 0x1E)[0]
                     item_key_dup = struct.unpack_from('<I', raw, 0x5D)[0]
-                    extra_field = struct.unpack_from('<I', raw, 0x36)[0]
+                    extra_field = struct.unpack_from('<I', raw, 0x3A)[0]
 
                     store.items.append(StoreItemEntry(
                         offset=entry_off,
@@ -231,9 +246,9 @@ class StoreinfoParser:
         struct.pack_into('<I', new_entry, 0x22, new_item_key)
         struct.pack_into('<I', new_entry, 0x5D, new_item_key)
         if buy_price >= 0:
-            struct.pack_into('<Q', new_entry, 0x02, buy_price)
+            struct.pack_into('<Q', new_entry, 0x06, buy_price)
         if sell_price >= 0:
-            struct.pack_into('<Q', new_entry, 0x0A, sell_price)
+            struct.pack_into('<Q', new_entry, 0x0E, sell_price)
 
         items_end = store.after_name + HEADER_OVERHEAD + store.item_count * ITEM_ENTRY_SIZE
         self._body_data[items_end:items_end] = new_entry

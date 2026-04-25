@@ -136,7 +136,7 @@ def _patch_echo_keys(data: bytearray, old_key: int, new_key: int) -> int:
 
 # ── Iteminfo pabgb/pabgh rebuild ─────────────────────────────────────
 
-def build_iteminfo_pabgh(pabgb_bytes: bytes) -> bytes:
+def build_iteminfo_pabgh(pabgb_bytes: bytes, extra_entries: list = None) -> bytes:
     """Rebuild iteminfo.pabgh (key -> offset index) from pabgb bytes.
 
     The game uses pabgh to look items up by key during equip / inventory
@@ -151,12 +151,55 @@ def build_iteminfo_pabgh(pabgb_bytes: bytes) -> bytes:
     spans[i]['start']. Verified to round-trip bit-exact against vanilla.
     """
     import crimson_rs
-    t = crimson_rs.parse_iteminfo_tracked(pabgb_bytes)
-    items = t['items']
-    spans = t['spans']
-    out = bytearray(struct.pack("<H", len(items)))
-    for it, sp in zip(items, spans):
-        out += struct.pack("<II", it['key'], sp['start'])
+
+    # Scan pabgb sequentially: each entry starts with key(u32) + name_len(u32) + name.
+    # We parse each item to find its size, building a key→offset index.
+    entry_list = []
+    _off = 0
+    while _off + 8 < len(pabgb_bytes):
+        _key = struct.unpack_from('<I', pabgb_bytes, _off)[0]
+        if _key == 0 or _key > 0x10000000:
+            break
+        entry_list.append((_key, _off))
+        # Try parsing to find item size
+        try:
+            _slice = pabgb_bytes[_off:min(_off + 20000, len(pabgb_bytes))]
+            _parsed = crimson_rs.parse_iteminfo_from_bytes(_slice)
+            if _parsed:
+                _ser = crimson_rs.serialize_iteminfo([_parsed[0]])
+                _off += len(_ser)
+                continue
+        except Exception:
+            pass
+        # Parse failed — try reading name_len to skip past header, then scan
+        # for next valid entry
+        _nl = struct.unpack_from('<I', pabgb_bytes, _off + 4)[0]
+        if 0 < _nl <= 512:
+            _off += 8 + _nl  # skip past header
+        else:
+            break
+        # Scan for next item key
+        _found_next = False
+        while _off + 8 < len(pabgb_bytes):
+            _nk = struct.unpack_from('<I', pabgb_bytes, _off)[0]
+            _nnl = struct.unpack_from('<I', pabgb_bytes, _off + 4)[0]
+            if 0 < _nk < 0x10000000 and 0 < _nnl <= 512:
+                try:
+                    pabgb_bytes[_off + 8:_off + 8 + _nnl].decode('ascii')
+                    _found_next = True
+                    break
+                except Exception:
+                    pass
+            _off += 1
+        if not _found_next:
+            break
+
+    if extra_entries:
+        entry_list.extend(extra_entries)
+
+    out = bytearray(struct.pack("<H", len(entry_list)))
+    for _key, _start in entry_list:
+        out += struct.pack("<II", _key, _start)
     return bytes(out)
 
 

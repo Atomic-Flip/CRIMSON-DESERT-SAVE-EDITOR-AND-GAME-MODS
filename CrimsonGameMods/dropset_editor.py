@@ -16,6 +16,7 @@ class ItemDrop:
     unk4: int = 0
     unk1_flag: bytes = b'\x00' * 5
     unk_cond_flag: int = 0
+    unk_post_cond: int = 0
     rates: int = 0
     rates_100: int = 0
     unk2: int = 0
@@ -108,6 +109,7 @@ class DropsetEditor:
         unk4 = struct.unpack_from("<I", self.body_bytes, pos)[0]; pos += 4
         unk1_flag = bytes(self.body_bytes[pos:pos+5]); pos += 5
         unk_cond_flag = struct.unpack_from("<I", self.body_bytes, pos)[0]; pos += 4
+        unk_post_cond = struct.unpack_from("<I", self.body_bytes, pos)[0]; pos += 4
         rates = struct.unpack_from("<Q", self.body_bytes, pos)[0]; pos += 8
         rates_100 = struct.unpack_from("<Q", self.body_bytes, pos)[0]; pos += 8
         unk2 = struct.unpack_from("<I", self.body_bytes, pos)[0]; pos += 4
@@ -128,6 +130,7 @@ class DropsetEditor:
         drop = ItemDrop(
             flag=flag, item_key=item_key,
             unk3=unk3, unk4=unk4, unk1_flag=unk1_flag, unk_cond_flag=unk_cond_flag,
+            unk_post_cond=unk_post_cond,
             rates=rates, rates_100=rates_100, unk2=unk2,
             max_amt=max_amt, min_amt=min_amt, unk3_flags=unk3_flags,
             item_key_dup=item_key_dup,
@@ -144,6 +147,7 @@ class DropsetEditor:
         buf += struct.pack("<I", drop.unk4)
         buf += drop.unk1_flag
         buf += struct.pack("<I", drop.unk_cond_flag)
+        buf += struct.pack("<I", drop.unk_post_cond)
         buf += struct.pack("<Q", drop.rates)
         buf += struct.pack("<Q", drop.rates_100)
         buf += struct.pack("<I", drop.unk2)

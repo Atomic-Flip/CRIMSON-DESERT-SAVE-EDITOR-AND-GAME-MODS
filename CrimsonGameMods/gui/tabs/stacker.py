@@ -88,6 +88,41 @@ OVERLAY_EQUIP_GROUP_DEFAULT = "0063"
 
 
 # ============================================================
+#   Per-entry parse fallback (handles housing items)
+# ============================================================
+
+def _parse_with_fallback(crimson_rs, game_path: str,
+                         raw: bytes) -> tuple[list, list]:
+    """Parse iteminfo using PABGH boundaries when bulk parse fails."""
+    pabgh = bytes(crimson_rs.extract_file(
+        game_path, '0008', INTERNAL_DIR, ITEMINFO_PABGH))
+    count = struct.unpack_from('<H', pabgh, 0)[0]
+    rs = (len(pabgh) - 2) // count if count else 8
+    entries = []
+    for i in range(count):
+        rec = 2 + i * rs
+        if rec + rs > len(pabgh):
+            break
+        soff = struct.unpack_from('<I', pabgh, rec + (rs - 4))[0]
+        if soff + 8 <= len(raw):
+            entries.append(soff)
+    entries.sort()
+    items = []
+    unparsed = []
+    for idx, soff in enumerate(entries):
+        nxt = entries[idx + 1] if idx + 1 < len(entries) else len(raw)
+        try:
+            parsed = crimson_rs.parse_iteminfo_from_bytes(raw[soff:nxt])
+            if parsed:
+                items.append(parsed[0])
+            else:
+                unparsed.append(bytes(raw[soff:nxt]))
+        except Exception:
+            unparsed.append(bytes(raw[soff:nxt]))
+    return items, unparsed
+
+
+# ============================================================
 #   Mod classification / ingestion
 # ============================================================
 
@@ -331,6 +366,11 @@ def _classify(path: str) -> ModEntry:
         try:
             with open(path, encoding="utf-8") as f:
                 doc = json.load(f)
+            if doc.get("format") == 3 and doc.get("intents"):
+                n = len(doc["intents"])
+                title = (doc.get("modinfo") or {}).get("title", display)
+                return ModEntry(name=title, path=path, kind="field_json",
+                                note=f"Format 3 field JSON ({n} intents)")
             patches = doc.get("patches") or []
             if any("iteminfo.pabgb" in (pt.get("game_file") or "").lower()
                    for pt in patches):
@@ -352,6 +392,56 @@ def _classify(path: str) -> ModEntry:
 # ============================================================
 #   Legacy JSON apply (resolves entry+rel_offset via BlobStart map)
 # ============================================================
+
+def _apply_one_legacy_patch(patched: bytearray, vanilla: bytes,
+                            change: dict) -> int:
+    """Apply a single legacy JSON v2 patch to a bytearray. Returns 1 if applied."""
+    ptype = change.get('type', 'replace')
+    if ptype == 'replace':
+        entry = change.get('entry')
+        if entry and 'rel_offset' in change:
+            name_bytes = entry.encode('ascii')
+            search = struct.pack('<I', len(name_bytes)) + name_bytes + b'\x00'
+            pos = vanilla.find(search)
+            if pos < 0:
+                return 0
+            entry_start = pos - 4
+            abs_off = entry_start + change['rel_offset']
+        elif 'offset' in change:
+            off_val = change['offset']
+            abs_off = int(off_val, 16) if isinstance(off_val, str) else off_val
+        else:
+            return 0
+        patch_bytes = bytes.fromhex(change.get('patched', ''))
+        orig_bytes = bytes.fromhex(change.get('original', ''))
+        if not patch_bytes:
+            return 0
+        end = abs_off + max(len(orig_bytes), len(patch_bytes))
+        if end > len(patched):
+            return 0
+        patched[abs_off:abs_off + len(orig_bytes)] = patch_bytes
+        return 1
+    elif ptype == 'insert':
+        entry = change.get('entry')
+        if entry and 'rel_offset' in change:
+            name_bytes = entry.encode('ascii')
+            search = struct.pack('<I', len(name_bytes)) + name_bytes + b'\x00'
+            pos = vanilla.find(search)
+            if pos < 0:
+                return 0
+            abs_off = (pos - 4) + change['rel_offset']
+        elif 'offset' in change:
+            off_val = change['offset']
+            abs_off = int(off_val, 16) if isinstance(off_val, str) else off_val
+        else:
+            return 0
+        insert_bytes = bytes.fromhex(change.get('bytes', ''))
+        if not insert_bytes:
+            return 0
+        patched[abs_off:abs_off] = insert_bytes
+        return 1
+    return 0
+
 
 def _apply_legacy_json(vanilla_bytes: bytes, mod_json: dict,
                       entry_blob_start: dict
@@ -531,6 +621,72 @@ def _attach_patch_provenance(conflicts: list[FieldConflict],
     for c in conflicts:
         c.winner_patch_index = lookup(c.winner_mod, c.entry_key, c.field_path)
         c.loser_patch_index = lookup(c.loser_mod, c.entry_key, c.field_path)
+
+
+def _apply_field_set(target: dict, field_path: str, value) -> bool:
+    """Navigate a dot/bracket path and set the value on the target dict."""
+    import re
+    parts = re.split(r'\.(?![^\[]*\])', field_path)
+    obj = target
+    for i, part in enumerate(parts[:-1]):
+        m = re.match(r'^(.+?)\[(\d+)\]$', part)
+        if m:
+            key, idx = m.group(1), int(m.group(2))
+            obj = obj.get(key, [])
+            if not isinstance(obj, list) or idx >= len(obj):
+                return False
+            obj = obj[idx]
+        else:
+            obj = obj.get(part)
+            if obj is None:
+                return False
+    last = parts[-1]
+    m = re.match(r'^(.+?)\[(\d+)\]$', last)
+    if m:
+        key, idx = m.group(1), int(m.group(2))
+        lst = obj.get(key)
+        if isinstance(lst, list):
+            while len(lst) <= idx:
+                lst.append(None)
+            lst[idx] = value
+        return True
+    if isinstance(obj, dict):
+        obj[last] = value
+        return True
+    return False
+
+
+def _strip_meta(d: dict) -> dict:
+    """Remove internal keys from an item dict for export."""
+    return {k: v for k, v in d.items() if k not in ('key', 'string_key')}
+
+
+def _deep_diff_to_intents(entry: str, key: int, a: dict, b: dict,
+                          prefix: str = '') -> list[dict]:
+    """Recursively diff two parsed item dicts and emit Format 3 intents."""
+    intents = []
+    all_keys = set(list(a.keys()) + list(b.keys()))
+    for k in sorted(all_keys):
+        if k in ('key', 'string_key'):
+            continue
+        path = f'{prefix}.{k}' if prefix else k
+        va, vb = a.get(k), b.get(k)
+        if va == vb:
+            continue
+        if isinstance(va, dict) and isinstance(vb, dict):
+            intents.extend(_deep_diff_to_intents(entry, key, va, vb, path))
+        elif isinstance(va, list) and isinstance(vb, list):
+            if len(va) != len(vb) or va != vb:
+                intents.append({
+                    'entry': entry, 'key': key,
+                    'field': path, 'op': 'set', 'new': vb,
+                })
+        else:
+            intents.append({
+                'entry': entry, 'key': key,
+                'field': path, 'op': 'set', 'new': vb,
+            })
+    return intents
 
 
 def _merge_all(vanilla_items: list[dict],
@@ -745,6 +901,15 @@ class StackerTab(QWidget):
         self._install_btn.clicked.connect(lambda: self._run(install=True))
         bl.addWidget(self._install_btn)
 
+        self._install_single_btn = _size_button(QPushButton("✔ APPLY SINGLE"))
+        self._install_single_btn.setObjectName("btnPrimary")
+        self._install_single_btn.setToolTip(
+            "Merge all sources and write to a specific overlay folder #.\n"
+            "Use this to deploy directly into an existing overlay slot\n"
+            "(e.g. 0058) so it replaces instead of conflicting.")
+        self._install_single_btn.clicked.connect(self._apply_single_stack)
+        bl.addWidget(self._install_single_btn)
+
         self._export_btn = _size_button(QPushButton("📦 EXPORT MOD"))
         self._export_btn.setObjectName("btnExport")
         self._export_btn.setToolTip(
@@ -752,6 +917,15 @@ class StackerTab(QWidget):
             "mod to a path you pick. Does NOT touch the game folder.")
         self._export_btn.clicked.connect(lambda: self._run(install=False, export=True))
         bl.addWidget(self._export_btn)
+
+        self._export_field_btn = _size_button(QPushButton("📄 EXPORT FIELD JSON"))
+        self._export_field_btn.setObjectName("btnExport")
+        self._export_field_btn.setToolTip(
+            "Export the merged result as a Format 3 semantic JSON file.\n"
+            "Uses field names instead of byte offsets — survives game updates.\n"
+            "Run PREVIEW first, then click this to export the diff.")
+        self._export_field_btn.clicked.connect(self._export_field_json)
+        bl.addWidget(self._export_field_btn)
 
         bl.addStretch(1)
 
@@ -980,6 +1154,16 @@ class StackerTab(QWidget):
             "files) as a stack source. Clicking again replaces the prior snapshot.")
         pull_btn.clicked.connect(self._pull_from_itembuffs)
         blay.addWidget(pull_btn)
+
+        pull_dmm_btn = _size_button(QPushButton("⇅ Pull DMM"))
+        pull_dmm_btn.setObjectName("flatBtn")
+        pull_dmm_btn.setToolTip(
+            "Import all enabled DMM mods that target iteminfo.pabgb. "
+            "Runs the Stacker Inspector to convert byte patches to "
+            "field-level edits, then adds them as stack sources for "
+            "unified merging.")
+        pull_dmm_btn.clicked.connect(self._pull_from_dmm)
+        blay.addWidget(pull_dmm_btn)
 
         blay.addStretch(1)
 
@@ -1279,6 +1463,74 @@ class StackerTab(QWidget):
         }
 
     # ------------------------------------------------------------
+    def _pull_from_dmm(self):
+        """Import all enabled DMM mods that target iteminfo.pabgb.
+
+        Reads DMM's config.json, finds its mods folder, loads each active
+        JSON mod that patches iteminfo, and adds them as Stacker sources.
+        For legacy byte-patch mods, runs the Inspector for field attribution
+        so semantic merge is possible.
+        """
+        dmm_exe = self._config.get("dmm_exe_path", "")
+        if not dmm_exe or not os.path.isfile(dmm_exe):
+            from PySide6.QtWidgets import QMessageBox
+            QMessageBox.warning(
+                self, "DMM Not Found",
+                "DMM is not configured. Go to the Mod Loader tab and "
+                "set the DMM path first."
+            )
+            return
+
+        from shared_state import get_dmm_iteminfo_mods
+        game = self._game_edit.text().strip() if hasattr(self, "_game_edit") else ""
+        mods = get_dmm_iteminfo_mods(game, dmm_exe)
+        if not mods:
+            from PySide6.QtWidgets import QMessageBox
+            QMessageBox.information(
+                self, "No ItemInfo Mods",
+                "No active DMM mods target iteminfo.pabgb."
+            )
+            return
+
+        # Remove any prior DMM-pulled entries to avoid duplicates
+        self._mods = [m for m in self._mods if not m.name.startswith("[DMM] ")]
+
+        added = 0
+        for file_name, mods_path, doc in mods:
+            json_path = os.path.join(mods_path, file_name)
+            info = doc.get("modinfo") or doc
+            title = info.get("title") or info.get("name") or file_name
+
+            # Classify: if it has format:3 intents, load as field_json;
+            # otherwise as legacy_json
+            if doc.get("format") == 3 and doc.get("intents"):
+                entry = ModEntry(
+                    name=f"[DMM] {title}",
+                    path=json_path,
+                    kind="field_json",
+                    note=f"DMM Format 3 ({len(doc['intents'])} intents)",
+                )
+            else:
+                patches = doc.get("patches", [])
+                n = sum(len(p.get("changes", [])) for p in patches)
+                entry = ModEntry(
+                    name=f"[DMM] {title}",
+                    path=json_path,
+                    kind="legacy_json",
+                    note=f"DMM legacy JSON ({n} byte patches)",
+                )
+
+            self._mods.append(entry)
+            added += 1
+            self._log_line(f"  + [DMM] {title} ({entry.kind})")
+
+        self._refresh_mod_list()
+        self._log_line(
+            f"✓ Pulled {added} iteminfo mod(s) from DMM. "
+            f"Click Preview to inspect, then Install Stack to merge."
+        )
+
+    # ------------------------------------------------------------
     # Type-tag styling for the Sources list row. Keeps the badge visually
     # distinct at a glance: green for itembuffs, blue for folder mods,
     # amber for legacy JSON, grey for loose pabgb.
@@ -1287,6 +1539,8 @@ class StackerTab(QWidget):
         "folder_paz":      ("PAZ MOD",   "#1A2030", "#6A9CE0"),
         "loose_pabgb":     ("PABGB",     "#1F2128", "#9EA4B8"),
         "legacy_json":     ("JSON v2",   "#2A2418", "#DC961E"),
+        "field_json":      ("FIELD v3",  "#1A2A2A", "#26C6DA"),
+        "dmm_json":        ("DMM",       "#1A1A2A", "#7B68EE"),
     }
 
     def _append_mod_row(self, m: ModEntry):
@@ -1447,6 +1701,7 @@ class StackerTab(QWidget):
         self._mods.clear()
         self._mods_list.clear()
         self._merged_items = []
+        self._vanilla_items = []
         self._conflicts = []
         self._refresh_details()
 
@@ -1473,6 +1728,22 @@ class StackerTab(QWidget):
             QMessageBox.information(self, "Stacker Tool", msg)
             return
 
+        # Pre-apply conflict check — warn if other tools have iteminfo overlays
+        if install and not export:
+            try:
+                from overlay_coordinator import check_iteminfo_conflicts_before_apply
+                our_group = f"{self._overlay_spin.value():04d}" if hasattr(self, "_overlay_spin") else "0062"
+                warning = check_iteminfo_conflicts_before_apply(
+                    game, our_group, self._config)
+                if warning:
+                    reply = QMessageBox.warning(
+                        self, "ItemInfo Conflict Detected", warning,
+                        QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
+                    if reply != QMessageBox.Yes:
+                        return
+            except Exception:
+                pass
+
         # If exporting, ask the user where + what name BEFORE doing any work.
         export_target = None
         export_name = None
@@ -1484,7 +1755,8 @@ class StackerTab(QWidget):
         # Lock buttons during the run so double-clicks don't stack up
         try:
             for b in (self._preview_btn, self._install_btn,
-                      self._uninstall_btn, self._export_btn):
+                      self._install_single_btn, self._uninstall_btn,
+                      self._export_btn, self._export_field_btn):
                 b.setEnabled(False)
             if export:
                 self.status_message.emit("Stacker: building folder mod…")
@@ -1500,7 +1772,8 @@ class StackerTab(QWidget):
                                    export_name=export_name)
         finally:
             for b in (self._preview_btn, self._install_btn,
-                      self._uninstall_btn, self._export_btn):
+                      self._install_single_btn, self._uninstall_btn,
+                      self._export_btn, self._export_field_btn):
                 b.setEnabled(True)
 
     def _run_inner(self, install: bool, game: str, ok_mods: list,
@@ -1522,12 +1795,43 @@ class StackerTab(QWidget):
             return
         self._log_line(f"  vanilla iteminfo.pabgb: {len(vanilla_bytes):,} bytes")
 
+        # Check if another tool (DMM) has an active iteminfo overlay.
+        # If so, warn the user — merging from vanilla may conflict with
+        # what DMM already applied.
+        try:
+            from overlay_coordinator import get_active_iteminfo_overlay, load_state
+            state = load_state(game)
+            dmm_overlays = [
+                (g, e) for g, e in state.overlays.items()
+                if e.owner != "CrimsonGameMods"
+                and any("iteminfo" in f.lower() for f in e.files)
+            ]
+            if dmm_overlays:
+                groups_str = ", ".join(f"{g} ({e.owner})" for g, e in dmm_overlays)
+                self._log_line(
+                    f"  ⚠ Other tool(s) have iteminfo overlays active: {groups_str}")
+                self._log_line(
+                    f"    Stacker merges from vanilla (0008/) — the final overlay "
+                    f"will include your mods' changes but NOT the other tool's changes.")
+                self._log_line(
+                    f"    If you want both, use 'Pull DMM' to import their mods "
+                    f"into this merge.")
+        except Exception:
+            pass
+
         try:
             vanilla_items = crimson_rs.parse_iteminfo_from_bytes(vanilla_bytes)
-        except Exception as e:
-            self._log_line(f"✘ Could not parse vanilla iteminfo: {e}")
-            return
-        self._log_line(f"  {len(vanilla_items)} entries parsed")
+            self._stacker_unparsed_raw = []
+        except Exception:
+            vanilla_items, self._stacker_unparsed_raw = (
+                _parse_with_fallback(crimson_rs, game, vanilla_bytes))
+            if not vanilla_items:
+                self._log_line("✘ Could not parse vanilla iteminfo")
+                return
+        self._vanilla_items = vanilla_items
+        self._log_line(f"  {len(vanilla_items)} entries parsed"
+                       + (f" ({len(self._stacker_unparsed_raw)} raw)"
+                          if self._stacker_unparsed_raw else ""))
 
         # Entry BlobStart map for legacy JSON resolve
         entry_blob_start: dict[str, int] = {}
@@ -1554,7 +1858,10 @@ class StackerTab(QWidget):
                     raw = bytes(crimson_rs.extract_file(
                         m.path, m.group, INTERNAL_DIR, ITEMINFO_PABGB))
                     m.effective_pabgb = raw
-                    items = crimson_rs.parse_iteminfo_from_bytes(raw)
+                    try:
+                        items = crimson_rs.parse_iteminfo_from_bytes(raw)
+                    except Exception:
+                        items, _ = _parse_with_fallback(crimson_rs, game, raw)
                     m.parsed_items = items
                     # Pull companion sibling files if this mod ships with
                     # them (UP mods package equipslotinfo; passive-skill
@@ -1586,7 +1893,11 @@ class StackerTab(QWidget):
                 elif m.kind == "loose_pabgb":
                     with open(m.path, "rb") as f:
                         m.effective_pabgb = f.read()
-                    items = crimson_rs.parse_iteminfo_from_bytes(m.effective_pabgb)
+                    try:
+                        items = crimson_rs.parse_iteminfo_from_bytes(m.effective_pabgb)
+                    except Exception:
+                        items, _ = _parse_with_fallback(
+                            crimson_rs, game, m.effective_pabgb)
                     m.parsed_items = items
                     m.apply_stats = "loose pabgb loaded"
                 elif m.kind == "legacy_json":
@@ -1689,7 +2000,11 @@ class StackerTab(QWidget):
                             vanilla_bytes, doc, entry_blob_start)
                         iteminfo_inspector.mark_stale_status(insps, mask)
                         m.effective_pabgb = modded
-                        items = crimson_rs.parse_iteminfo_from_bytes(modded)
+                        try:
+                            items = crimson_rs.parse_iteminfo_from_bytes(modded)
+                        except Exception:
+                            items, _ = _parse_with_fallback(
+                                crimson_rs, game, modded)
                         m.parsed_items = items
                         m.apply_stats = f"{applied} applied, {skipped} skipped"
                         if skipped and not applied:
@@ -1699,6 +2014,64 @@ class StackerTab(QWidget):
                                 f"different game version); contributes no edits. "
                                 f"Try Reparse-Diff mode — recovers intent from "
                                 f"stale patches uniformly.")
+                elif m.kind == "field_json":
+                    with open(m.path, encoding="utf-8") as f:
+                        doc = json.load(f)
+                    intents = doc.get("intents", [])
+                    items = copy.deepcopy(vanilla_items)
+                    items_by_key = {it['string_key']: it for it in items}
+                    applied_count = 0
+                    skipped_count = 0
+                    verified_count = 0
+                    broken_count = 0
+                    broken_entries = []
+                    for intent in intents:
+                        entry = intent.get('entry', '')
+                        target = items_by_key.get(entry)
+                        if not target:
+                            skipped_count += 1
+                            continue
+                        op = intent.get('op', 'set')
+                        field = intent.get('field', '')
+                        if op == 'set' and field:
+                            _apply_field_set(target, field, intent.get('new'))
+                            applied_count += 1
+                        elif op == 'add_entry':
+                            skipped_count += 1
+                        else:
+                            skipped_count += 1
+                    # Validate: try serialize→reparse each modified item.
+                    # If an item breaks, revert it to vanilla so it doesn't
+                    # corrupt the output.
+                    touched = {i.get('entry') for i in intents}
+                    van_by_key = {it['string_key']: it
+                                  for it in vanilla_items}
+                    for idx, it in enumerate(items):
+                        skey = it.get('string_key', '')
+                        if skey not in touched:
+                            continue
+                        try:
+                            rt = crimson_rs.serialize_iteminfo([it])
+                            rp = crimson_rs.parse_iteminfo_from_bytes(rt)
+                            if not rp:
+                                raise ValueError("empty reparse")
+                            verified_count += 1
+                        except Exception as _ve:
+                            broken_count += 1
+                            broken_entries.append(skey)
+                            van = van_by_key.get(skey)
+                            if van:
+                                items[idx] = copy.deepcopy(van)
+                            self._log_line(
+                                f"  ⚠ {skey}: intent broke serialization "
+                                f"({_ve}) — reverted to vanilla")
+                    m.parsed_items = items
+                    m.effective_pabgb = vanilla_bytes
+                    m.apply_stats = (
+                        f"field JSON: {applied_count} applied, "
+                        f"{skipped_count} skipped, "
+                        f"{verified_count} verified, "
+                        f"{broken_count} reverted")
                 else:
                     continue
                 # Attach dict-feature detection to every source so the
@@ -1787,18 +2160,72 @@ class StackerTab(QWidget):
                     n += 1
             self._log_line(f"  Infinite Durability: max_endurance=65535 on {n} items")
 
-        # Serialize the merged dict list back to pabgb bytes
+        # Serialize using vanilla-ordered rebuild (same as ItemBuffs).
+        # This ensures every item lands at the right position with a
+        # matching pabgh, and unparsed housing items stay in place.
         self._log_line("Serializing merged iteminfo…")
         try:
-            merged_bytes = crimson_rs.serialize_iteminfo(merged_items)
+            van_pabgh = bytes(crimson_rs.extract_file(
+                game, '0008', INTERNAL_DIR, ITEMINFO_PABGH))
+            van_count = struct.unpack_from('<H', van_pabgh, 0)[0]
+            van_rs = (len(van_pabgh) - 2) // van_count if van_count else 8
+
+            order = []
+            for _pi in range(van_count):
+                _prec = 2 + _pi * van_rs
+                if _prec + van_rs > len(van_pabgh):
+                    break
+                _psoff = struct.unpack_from('<I', van_pabgh,
+                                           _prec + (van_rs - 4))[0]
+                if _psoff + 4 <= len(vanilla_bytes):
+                    _pk = struct.unpack_from('<I', vanilla_bytes, _psoff)[0]
+                    _pnxt = len(vanilla_bytes)
+                    if _pi + 1 < van_count:
+                        _nrec = 2 + (_pi + 1) * van_rs
+                        if _nrec + van_rs <= len(van_pabgh):
+                            _pnxt = struct.unpack_from(
+                                '<I', van_pabgh, _nrec + (van_rs - 4))[0]
+                    order.append((_pk, _psoff, _pnxt - _psoff))
+
+            for it in merged_items:
+                dcd = it.get('docking_child_data')
+                if isinstance(dcd, dict):
+                    dcd.setdefault('inherit_summoner', 0)
+                    dcd.setdefault('summon_tag_name_hash', [0, 0, 0, 0])
+            merged_by_key = {it['key']: it for it in merged_items}
+            unparsed = getattr(self, '_stacker_unparsed_raw', []) or []
+            unparsed_map = {}
+            for raw in unparsed:
+                uk = struct.unpack_from('<I', raw, 0)[0]
+                unparsed_map[uk] = raw
+
+            final = bytearray()
+            new_entries = []
+            for pk, psoff, psize in order:
+                new_entries.append((pk, len(final)))
+                if pk in merged_by_key:
+                    final.extend(crimson_rs.serialize_iteminfo(
+                        [merged_by_key[pk]]))
+                elif pk in unparsed_map:
+                    final.extend(unparsed_map[pk])
+                else:
+                    final.extend(vanilla_bytes[psoff:psoff + psize])
+
+            rebuilt_pabgh = struct.pack('<H', len(new_entries))
+            for pk, poff in new_entries:
+                rebuilt_pabgh += struct.pack('<II', pk, poff)
+            self._rebuilt_pabgh = rebuilt_pabgh
+            merged_bytes = bytes(final)
         except Exception as e:
-            self._log_line(f"✘ serialize_iteminfo failed: {e}")
+            self._log_line(f"✘ serialize failed: {e}")
+            import traceback; traceback.print_exc()
             QMessageBox.critical(self, "Stacker Tool",
                 f"Serialize failed:\n{e}\n\n"
                 "This usually means one of the merged entries has an invalid "
                 "field type. Nothing was written.")
             return
-        self._log_line(f"  {len(merged_bytes):,} bytes")
+        self._log_line(f"  {len(merged_bytes):,} bytes "
+                       f"({len(new_entries)} entries in pabgh)")
 
         # ─── Bucket C — apply post-serialize byte patches ───
         # Mirrors buffs_v319.py:9845-9879 ordering: VFX → cooldowns → transmog.
@@ -1857,7 +2284,11 @@ class StackerTab(QWidget):
             return
 
         # Direct-install path
-        group = OVERLAY_GROUP_DEFAULT
+        single_grp = getattr(self, '_single_stack_group', None)
+        group = single_grp or OVERLAY_GROUP_DEFAULT
+        equip_group = (f"{int(group)+1:04d}"
+                       if single_grp
+                       else OVERLAY_EQUIP_GROUP_DEFAULT)
         try:
             self._pack_and_install_overlay(game, group, merged_bytes,
                                             sibling_files=sibling_files)
@@ -1867,25 +2298,25 @@ class StackerTab(QWidget):
             return
 
         # If equipslotinfo edits are present, deploy them to the
-        # secondary overlay group (stk2/) -- MUST be separate from stk1/
+        # secondary overlay group -- MUST be separate from iteminfo
         # for UP v2 to actually work in-game.
         if equip_files:
             try:
                 self._pack_and_install_equipslot_overlay(
-                    game, OVERLAY_EQUIP_GROUP_DEFAULT, equip_files)
+                    game, equip_group, equip_files)
             except Exception as e:
                 self._log_line(f"✘ equipslotinfo overlay install failed: {e}")
                 QMessageBox.critical(self, "Stacker Tool",
                     f"Equipslotinfo overlay install failed:\n{e}")
                 return
 
-        self._log_line(f"✔ Installed. Launch Crimson Desert.")
+        self._log_line(f"✔ Installed to {group}/. Launch Crimson Desert.")
         self.status_message.emit(
             f"Stacker: installed ({len(per_mod_parsed)} sources merged, "
             f"{len(conflicts)} conflicts auto-resolved)")
         QMessageBox.information(self, "Stacker Tool",
             f"✔ Installed {len(per_mod_parsed)} source(s) as a single overlay at "
-            f"<game>/{OVERLAY_GROUP_DEFAULT}/.\n"
+            f"<game>/{group}/.\n"
             f"{len(conflicts)} field conflict(s) auto-resolved (install order wins).\n\n"
             "Launch the game to verify. If you see issues, click Remove Stack "
             "to revert and try a smaller subset.")
@@ -2118,18 +2549,15 @@ class StackerTab(QWidget):
             builder = crimson_rs.PackGroupBuilder(
                 group_dir_tmp, crimson_rs.Compression.NONE, crimson_rs.Crypto.NONE)
             builder.add_file(INTERNAL_DIR, ITEMINFO_PABGB, iteminfo_bytes)
-            # Matching pabgh for the merged pabgb: required so the game can
-            # look up items by key against our modified layout. Without it,
-            # vanilla offsets land mid-entry and post-change items are lost.
-            try:
-                from item_creator import build_iteminfo_pabgh
-                _pabgh = build_iteminfo_pabgh(iteminfo_bytes)
+            _pabgh = getattr(self, '_rebuilt_pabgh', None)
+            if not _pabgh:
+                try:
+                    from item_creator import build_iteminfo_pabgh
+                    _pabgh = build_iteminfo_pabgh(iteminfo_bytes)
+                except Exception as _e:
+                    self._log_line(f"  WARN pabgh regen failed ({_e})")
+            if _pabgh:
                 builder.add_file(INTERNAL_DIR, "iteminfo.pabgh", _pabgh)
-            except Exception as _e:
-                self._log_line(f"  WARN iteminfo.pabgh regen failed ({_e}) -- export may be broken in-game")
-            # Sibling files (Bucket D): skill.pabgb/pabgh, equipslotinfo.*
-            # Bundled into the SAME overlay PAZ as iteminfo, same as
-            # ItemBuffs's own Apply does at buffs_v319.py:9965-9977.
             for fname, fdata in sibling_files.items():
                 builder.add_file(INTERNAL_DIR, fname, fdata)
             # finish() writes 0.paz into group_dir_tmp AND returns pamt bytes
@@ -2312,14 +2740,15 @@ class StackerTab(QWidget):
             builder = crimson_rs.PackGroupBuilder(
                 build_dir, crimson_rs.Compression.NONE, crimson_rs.Crypto.NONE)
             builder.add_file(INTERNAL_DIR, ITEMINFO_PABGB, iteminfo_bytes)
-            # Matching pabgh for the merged pabgb (see folder-export site for rationale).
-            try:
-                from item_creator import build_iteminfo_pabgh
-                _pabgh = build_iteminfo_pabgh(iteminfo_bytes)
+            _pabgh = getattr(self, '_rebuilt_pabgh', None)
+            if not _pabgh:
+                try:
+                    from item_creator import build_iteminfo_pabgh
+                    _pabgh = build_iteminfo_pabgh(iteminfo_bytes)
+                except Exception as _e:
+                    self._log_line(f"  WARN pabgh regen failed ({_e})")
+            if _pabgh:
                 builder.add_file(INTERNAL_DIR, "iteminfo.pabgh", _pabgh)
-                self._log_line(f"  wrote iteminfo.pabgh ({len(_pabgh):,} bytes) alongside pabgb")
-            except Exception as _e:
-                self._log_line(f"  WARN iteminfo.pabgh regen failed ({_e}) -- overlay may be broken in-game")
             for fname, fdata in sibling_files.items():
                 builder.add_file(INTERNAL_DIR, fname, fdata)
             pamt_bytes = bytes(builder.finish())
@@ -2346,6 +2775,14 @@ class StackerTab(QWidget):
         if sibling_files:
             bundled_note = f" (+ {len(sibling_files)} sibling file{'s' if len(sibling_files) != 1 else ''}: {', '.join(sorted(sibling_files.keys()))})"
         self._log_line(f"  wrote overlay {group}/ + updated meta/0.papgt{bundled_note}")
+        try:
+            from shared_state import record_overlay
+            files = ["iteminfo.pabgb", "iteminfo.pabgh"]
+            if sibling_files:
+                files.extend(sorted(sibling_files.keys()))
+            record_overlay(game, group, "Stacker merge", files)
+        except Exception:
+            pass
 
     # ------------------------------------------------------------
     def _pack_and_install_equipslot_overlay(self, game: str, group: str,
@@ -2387,6 +2824,12 @@ class StackerTab(QWidget):
         self._log_line(
             f"  wrote equipslotinfo overlay {group}/ + updated meta/0.papgt "
             f"({', '.join(sorted(equip_files.keys()))})")
+        try:
+            from shared_state import record_overlay
+            record_overlay(game, group, "Stacker equipslot",
+                           sorted(equip_files.keys()))
+        except Exception:
+            pass
 
     # ------------------------------------------------------------
     def _refresh_mod_list(self) -> None:
@@ -2557,6 +3000,40 @@ class StackerTab(QWidget):
             "Drop mods above, or use + Add / ⇅ Pull Buffs in the Sources panel.")
 
     # ------------------------------------------------------------
+    def _apply_single_stack(self):
+        """Apply merged result to a user-chosen overlay folder number."""
+        from PySide6.QtWidgets import QInputDialog
+        group, ok = QInputDialog.getText(
+            self, "Apply Single Stack",
+            "Overlay folder number to deploy into:\n\n"
+            "e.g. 0058 = ItemBuffs slot, 0062 = Stacker default\n"
+            "This REPLACES whatever is in that folder.",
+            text="0058")
+        if not ok or not group.strip():
+            return
+        group = group.strip().zfill(4)
+        if not group.isdigit() or len(group) != 4:
+            QMessageBox.warning(self, "Apply Single Stack",
+                f"'{group}' is not a valid 4-digit overlay number.")
+            return
+
+        reply = QMessageBox.question(
+            self, "Apply Single Stack",
+            f"Deploy merged result into <game>/{group}/ ?\n\n"
+            f"This will REPLACE whatever is currently in {group}/.\n"
+            f"PAPGT will be updated for {group}/.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply != QMessageBox.Yes:
+            return
+
+        # Run the normal merge pipeline but override the target group
+        self._single_stack_group = group
+        try:
+            self._run(install=True)
+        finally:
+            self._single_stack_group = None
+
+    # ------------------------------------------------------------
     def _uninstall_stack(self):
         """Remove Stacker's overlay from the game. Deletes <game>/<group>/
         and drops its entry from meta/0.papgt. Other overlays (JMM's or
@@ -2590,11 +3067,12 @@ class StackerTab(QWidget):
                 "don't exist and PAPGT has no entries).")
             return
 
+        dirs_list = '\n'.join(f"  • Delete {d}" for _, d in group_dirs)
         confirm = QMessageBox.question(
             self, "Stacker Tool",
             f"Remove Stacker's overlay?\n\n"
-            f"  • Delete {group_dir}\n"
-            f"  • Drop '{group}' entry from meta/0.papgt\n\n"
+            f"{dirs_list}\n"
+            f"  • Drop PAPGT entries for {', '.join(groups_to_remove)}\n\n"
             "Other overlays (JMM's, ItemBuffs') are not touched.",
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if confirm != QMessageBox.Yes:
@@ -2645,8 +3123,11 @@ class StackerTab(QWidget):
                 game, "0008", INTERNAL_DIR, ITEMINFO_PABGB))
             self._buffs_tab._buff_data = bytearray(vanilla)
             self._buffs_tab._buff_rust_items = self._merged_items
-            self._buffs_tab._buff_rust_items_original = copy.deepcopy(
-                crimson_rs.parse_iteminfo_from_bytes(vanilla))
+            try:
+                _van_items = crimson_rs.parse_iteminfo_from_bytes(vanilla)
+            except Exception:
+                _van_items, _ = _parse_with_fallback(crimson_rs, game, vanilla)
+            self._buffs_tab._buff_rust_items_original = copy.deepcopy(_van_items)
             self._buffs_tab._buff_rust_lookup = {
                 it["key"]: it for it in self._merged_items if "key" in it}
             self._buffs_tab._buff_use_rust = True
@@ -2660,3 +3141,374 @@ class StackerTab(QWidget):
                 "'Apply to Game' to export.")
         except Exception as e:
             self._log_line(f"✘ send-to-buffs failed: {e}")
+
+    # ── Export Field JSON ──────────────────────────────────────
+
+    # Field names that changed between parser versions
+    _FIELD_RENAMES = {'unk_texture_path': 'default_texture_path'}
+    _FIELD_REMOVED = {'usable_alert'}
+
+    def _export_field_json(self):
+        """Export as Format 3 semantic JSON (field names, not bytes).
+
+        Two paths:
+        A) If PREVIEW has been run and merged_items differ from vanilla,
+           diff the merged result.
+        B) If legacy JSON sources are present, use the OLD parser + OLD
+           vanilla to recover what the mod intended, then emit field-name
+           intents compatible with the CURRENT game version.
+        """
+        # Collect legacy JSON sources from the mod list
+        legacy_sources = [
+            m for m in self._mods
+            if m.enabled and m.kind == "legacy_json"
+        ]
+
+        # Path A: diff merged result vs vanilla (for itembuffs_edits, folder_paz, etc.)
+        has_merged = bool(self._merged_items and self._vanilla_items)
+        # Path B: legacy JSON translation via old parser
+        has_legacy = bool(legacy_sources)
+
+        if not has_merged and not has_legacy:
+            QMessageBox.information(self, "Export Field JSON",
+                "Nothing to export.\n\n"
+                "Either run PREVIEW first (for merged edits),\n"
+                "or add a legacy JSON mod to translate.")
+            return
+
+        intents = []
+        mod_title = "Merged Stack"
+
+        # ── Path A: diff merged vs current vanilla (preferred) ──
+        # If PREVIEW has been run, the merged result already incorporates
+        # ALL source types (legacy_json, folder_paz, itembuffs, etc.)
+        # via reparse-diff / semantic / strict modes. Diffing the merged
+        # dicts against vanilla gives correct field-name intents regardless
+        # of whether the source was legacy byte offsets, inserts, or dicts.
+        if has_merged:
+            vanilla_lookup = {
+                it['string_key']: it for it in self._vanilla_items}
+            for merged_item in self._merged_items:
+                skey = merged_item.get('string_key', '')
+                ikey = merged_item.get('key', 0)
+                vanilla = vanilla_lookup.get(skey)
+                if not vanilla:
+                    intents.append({
+                        'entry': skey, 'key': ikey,
+                        'op': 'add_entry',
+                        'data': _strip_meta(merged_item),
+                    })
+                    continue
+                diffs = _deep_diff_to_intents(skey, ikey, vanilla, merged_item)
+                intents.extend(diffs)
+
+        # ── Path B (fallback): legacy JSON → baseline reparse-diff ──
+        # Only used when PREVIEW was NOT run (no merged items) but legacy
+        # JSON sources are present. Applies byte patches to a matching
+        # baseline, reparses, and diffs.
+        if not has_merged and has_legacy:
+            legacy_intents, title = self._translate_legacy_to_field(
+                legacy_sources)
+            if legacy_intents is None:
+                return
+            intents.extend(legacy_intents)
+            if title:
+                mod_title = title
+
+        if not intents:
+            QMessageBox.information(self, "Export Field JSON",
+                "No field-level changes found. Nothing to export.")
+            return
+
+        # Pick save path
+        default_name = mod_title.replace(' ', '_') + ".field.json"
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Field JSON", default_name,
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+
+        doc = {
+            'modinfo': {
+                'title': mod_title,
+                'version': '1.0',
+                'author': 'CrimsonGameMods Stacker',
+                'description': f'{len(intents)} field-level intent(s)',
+                'note': 'Format 3 — uses field names, survives game updates',
+            },
+            'format': 3,
+            'target': 'iteminfo.pabgb',
+            'intents': intents,
+        }
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
+            self._log_line(f"✔ Exported {len(intents)} intents to {path}")
+            QMessageBox.information(self, "Export Field JSON",
+                f"Exported {len(intents)} field-level intents.\n\n"
+                f"This file uses field names — it survives game updates.\n"
+                f"File: {path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Failed", str(e))
+
+    def _translate_legacy_to_field(self, legacy_sources: list
+                                   ) -> tuple[list | None, str]:
+        """Translate legacy JSON mods to field-name intents.
+
+        Supports mods targeting ANY game version we have a baseline for.
+        For each mod, picks the baseline whose vanilla bytes match the
+        mod's 'original' hex values, then diffs parsed dicts to emit
+        field-name intents.
+
+        Returns (intents_list, mod_title) or (None, '') on failure/cancel.
+        """
+        import crimson_rs
+
+        # ── 1) Discover all available baselines ──
+        baselines: list[tuple[str, str]] = []  # (version, path)
+        for base in [os.path.dirname(os.path.abspath(__file__)),
+                     getattr(sys, '_MEIPASS', ''), os.getcwd()]:
+            for rel in [os.path.join(base, '..', '..', 'game_baselines'),
+                        os.path.join(base, 'game_baselines')]:
+                bd = os.path.normpath(rel)
+                if not os.path.isdir(bd):
+                    continue
+                for ver in sorted(os.listdir(bd)):
+                    candidate = os.path.join(bd, ver, 'iteminfo.pabgb')
+                    if os.path.isfile(candidate):
+                        baselines.append((ver, candidate))
+            if baselines:
+                break
+
+        if not baselines:
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Select vanilla iteminfo.pabgb", "",
+                "PABGB files (*.pabgb);;All Files (*)")
+            if not path:
+                return None, ''
+            baselines.append(("unknown", path))
+
+        self._log_line(f"Found {len(baselines)} baseline(s): "
+                       f"{', '.join(v for v, _ in baselines)}")
+
+        # ── 2) Load baseline data + parsers ──
+        # Each cache entry: (raw_data, parsed_items, lookup_dict, parser_fn)
+        # parser_fn is the parse function that successfully parsed this baseline
+        baseline_cache: dict[str, tuple[bytes, list, dict, object]] = {}
+        failed_vers: list[tuple[str, str]] = []
+        for ver, path in baselines:
+            try:
+                data = open(path, 'rb').read()
+                items = crimson_rs.parse_iteminfo_from_bytes(data)
+                lookup = {it['string_key']: it for it in items}
+                baseline_cache[ver] = (data, items, lookup,
+                                       crimson_rs.parse_iteminfo_from_bytes)
+                self._log_line(f"  Baseline {ver}: {len(items)} items, "
+                               f"{len(data):,} bytes (current parser)")
+            except Exception:
+                failed_vers.append((ver, path))
+
+        if failed_vers:
+            legacy_rs = self._load_legacy_parser()
+            if legacy_rs:
+                for ver, path in failed_vers:
+                    try:
+                        data = open(path, 'rb').read()
+                        items = legacy_rs.parse_iteminfo_from_bytes(data)
+                        lookup = {it['string_key']: it for it in items}
+                        baseline_cache[ver] = (data, items, lookup,
+                                               legacy_rs.parse_iteminfo_from_bytes)
+                        self._log_line(f"  Baseline {ver}: {len(items)} items "
+                                       f"(legacy parser)")
+                    except Exception as e:
+                        self._log_line(f"  Baseline {ver}: FAILED ({e})")
+            else:
+                for ver, _ in failed_vers:
+                    self._log_line(f"  Baseline {ver}: current parser failed, "
+                                   f"no legacy parser available")
+
+        if not baseline_cache:
+            QMessageBox.critical(self, "Export Field JSON",
+                "Could not parse any baseline file.")
+            return None, ''
+
+        # ── 3) For each mod, find matching baseline and translate ──
+        all_intents = []
+        mod_title = None
+
+        for m in legacy_sources:
+            try:
+                with open(m.path, encoding='utf-8') as f:
+                    doc = json.load(f)
+            except Exception as e:
+                self._log_line(f"  ✘ {m.name}: could not read ({e})")
+                continue
+
+            if not mod_title:
+                mi = doc.get('modinfo', doc)
+                mod_title = mi.get('title', mi.get('name', m.name))
+
+            patches_list = doc.get('patches', [])
+            if not patches_list:
+                continue
+            changes = []
+            for p in patches_list:
+                changes.extend(p.get('changes', []))
+            if not changes:
+                self._log_line(f"  ✘ {m.name}: no changes found")
+                continue
+
+            # Pick best baseline: the one where most 'original' hex values
+            # match the vanilla bytes at the specified offsets
+            best_ver = None
+            best_score = -1
+            best_data = None
+            best_lookup = None
+            best_parser = None
+            for ver, (data, _items, lookup, parser_fn) in baseline_cache.items():
+                score = 0
+                for c in changes:
+                    off = c.get('offset')
+                    orig_hex = c.get('original', '')
+                    if off is None or not orig_hex:
+                        continue
+                    try:
+                        if isinstance(off, int):
+                            pass
+                        elif isinstance(off, str):
+                            s = off.strip()
+                            if s.lower().startswith('0x'):
+                                off = int(s, 16)
+                            else:
+                                try:
+                                    off = int(s, 16)
+                                except ValueError:
+                                    off = int(s)
+                        else:
+                            off = int(off)
+                    except (TypeError, ValueError):
+                        continue
+                    orig_bytes = bytes.fromhex(orig_hex)
+                    if off + len(orig_bytes) <= len(data):
+                        if data[off:off + len(orig_bytes)] == orig_bytes:
+                            score += 1
+                if score > best_score:
+                    best_score = score
+                    best_ver = ver
+                    best_data = data
+                    best_lookup = lookup
+                    best_parser = parser_fn
+
+            if best_data is None or best_lookup is None:
+                self._log_line(f"  ✘ {m.name}: no matching baseline found")
+                continue
+
+            match_pct = (best_score / len(changes) * 100) if changes else 0
+            self._log_line(f"  {m.name}: matched baseline {best_ver} "
+                           f"({best_score}/{len(changes)} = {match_pct:.0f}%)")
+
+            # Apply byte patches to matched baseline.
+            # Sort by offset descending so inserts don't shift later offsets.
+            def _change_off(c):
+                v = c.get('offset', c.get('rel_offset', 0))
+                try:
+                    return int(v, 16) if isinstance(v, str) else int(v)
+                except (TypeError, ValueError):
+                    return 0
+            sorted_changes = sorted(changes, key=_change_off, reverse=True)
+            patched_data = bytearray(best_data)
+            applied = 0
+            for c in sorted_changes:
+                try:
+                    applied += _apply_one_legacy_patch(
+                        patched_data, best_data, c)
+                except Exception:
+                    pass
+
+            self._log_line(f"  {m.name}: applied {applied}/{len(changes)} "
+                           f"patches")
+
+            # Reparse patched data with the SAME parser that loaded this baseline
+            try:
+                patched_items = best_parser(bytes(patched_data))
+            except Exception as e:
+                self._log_line(f"  ✘ {m.name}: reparse failed ({e})")
+                continue
+            patched_lookup = {it['string_key']: it for it in patched_items}
+
+            # Diff old vs patched → field-name intents
+            mod_intents = 0
+            for skey, orig in best_lookup.items():
+                patched = patched_lookup.get(skey)
+                if not patched:
+                    continue
+                diffs = _deep_diff_to_intents(
+                    skey, orig.get('key', 0), orig, patched)
+                for intent in diffs:
+                    field = intent.get('field', '')
+                    for old_name, new_name in self._FIELD_RENAMES.items():
+                        if field == old_name or field.startswith(
+                                old_name + '.'):
+                            intent['field'] = field.replace(
+                                old_name, new_name, 1)
+                    top_field = field.split('.')[0].split('[')[0]
+                    if top_field in self._FIELD_REMOVED:
+                        continue
+                    all_intents.append(intent)
+                    mod_intents += 1
+
+            for skey in patched_lookup:
+                if skey not in best_lookup:
+                    pi = patched_lookup[skey]
+                    all_intents.append({
+                        'entry': skey,
+                        'key': pi.get('key', 0),
+                        'op': 'add_entry',
+                        'data': _strip_meta(pi),
+                    })
+                    mod_intents += 1
+
+            self._log_line(f"  ✓ {m.name}: {mod_intents} field-level intents "
+                           f"recovered")
+
+        return all_intents, mod_title or "Translated Legacy Mod"
+
+    def _load_legacy_parser(self):
+        """Load the legacy crimson_rs parser from _legacy/ dir. Returns module or None."""
+        try:
+            import importlib.util
+            legacy_pyd = None
+            for base in [os.path.dirname(os.path.abspath(__file__)),
+                         getattr(sys, '_MEIPASS', ''), os.getcwd()]:
+                for rel in [
+                    os.path.join(base, '..', '..', 'crimson_rs',
+                                 '_legacy', 'crimson_rs.pyd'),
+                    os.path.join(base, 'crimson_rs', '_legacy',
+                                 'crimson_rs.pyd'),
+                ]:
+                    p = os.path.normpath(rel)
+                    if os.path.isfile(p):
+                        legacy_pyd = p
+                        break
+                if legacy_pyd:
+                    break
+            if not legacy_pyd:
+                return None
+            saved_modules = {}
+            for k in list(sys.modules):
+                if k == 'crimson_rs' or k.startswith('crimson_rs.'):
+                    saved_modules[k] = sys.modules.pop(k)
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    "crimson_rs", legacy_pyd)
+                legacy_rs = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(legacy_rs)
+                return legacy_rs
+            finally:
+                for k in list(sys.modules):
+                    if k == 'crimson_rs' or k.startswith('crimson_rs.'):
+                        sys.modules.pop(k, None)
+                sys.modules.update(saved_modules)
+        except Exception:
+            return None

@@ -91,55 +91,76 @@ def parse_entry(data, offset, end):
         p += 4 + 2
 
         p += 4
+
+        result['_factionInfo_offset'] = p - 4
+        result['_factionInfo_key'] = struct.unpack_from('<I', data, p - 4)[0]
+        result['_upperActionChartPackageGroupName_offset'] = p
+        result['_upperActionChartPackageGroupName_key'] = struct.unpack_from('<I', data, p)[0]
+        result['_lowerActionChartPackageGroupName_offset'] = p + 4
+        result['_lowerActionChartPackageGroupName_key'] = struct.unpack_from('<I', data, p + 4)[0]
+        result['_characterGamePlayDataName_offset'] = p + 8
+        result['_characterGamePlayDataName_key'] = struct.unpack_from('<I', data, p + 8)[0]
         result['_appearanceName_stream_offset'] = p + 12
+        result['_appearanceName_offset'] = p + 12
         result['_appearanceName_key'] = struct.unpack_from('<I', data, p + 12)[0]
         result['_characterPrefabPath_stream_offset'] = p + 16
+        result['_characterPrefabPath_offset'] = p + 16
         result['_characterPrefabPath_key'] = struct.unpack_from('<I', data, p + 16)[0]
+        result['_skeletonName_offset'] = p + 20
+        result['_skeletonName_key'] = struct.unpack_from('<I', data, p + 20)[0]
+        result['_skeletonVariationName_offset'] = p + 24
+        result['_skeletonVariationName_key'] = struct.unpack_from('<I', data, p + 24)[0]
         p += 28
-        p += 4
-        p += 8
-        p += 4
-        p += 4
-        p += 4
-        p += 4
-        p += 4
-        p += 1
-        p += 1
 
-        p += 1
+        try:
+            p += 4
+            p += 8
+            p += 4
+            p += 4
+            p += 4
+            p += 4
+            p += 4
+            p += 1
+            p += 1
 
-        p += 1
+            p += 1
 
-        p = _read_locstr(data, p)
+            p += 1
 
-        p += 4
+            p = _read_locstr(data, p)
 
-        p += 1
-        p += 2
+            p += 4
 
-        bool_start = p
-        bool_fields = {}
-        for bi in range(40):
-            bool_fields[bi] = data[p + bi]
+            p += 1
+            p += 2
 
-        result['_isAttackable_offset'] = bool_start + 3
-        result['_isAttackable'] = data[bool_start + 3]
+            bool_start = p
+            bool_fields = {}
+            for bi in range(40):
+                bool_fields[bi] = data[p + bi]
 
-        result['_isAggroTargetable_offset'] = bool_start + 4
-        result['_isAggroTargetable'] = data[bool_start + 4]
+            result['_isAttackable_offset'] = bool_start + 3
+            result['_isAttackable'] = data[bool_start + 3]
 
-        result['_sendKillEventOnDead_offset'] = bool_start + 17
-        result['_sendKillEventOnDead'] = data[bool_start + 17]
+            result['_isAggroTargetable_offset'] = bool_start + 4
+            result['_isAggroTargetable'] = data[bool_start + 4]
 
-        result['_invincibility_offset'] = bool_start + 20
-        result['_invincibility'] = data[bool_start + 20]
+            result['_sendKillEventOnDead_offset'] = bool_start + 17
+            result['_sendKillEventOnDead'] = data[bool_start + 17]
 
-        result['_boolBlock'] = bool_fields
+            result['_invincibility_offset'] = bool_start + 20
+            result['_invincibility'] = data[bool_start + 20]
 
-        p += 40
+            result['_boolBlock'] = bool_fields
 
-        result['_parsed_bytes'] = p - offset
-        result['_entry_size'] = end - offset
+            p += 40
+
+            result['_parsed_bytes'] = p - offset
+            result['_entry_size'] = end - offset
+        except (struct.error, IndexError) as e:
+            log.debug("Partial parse for %s (post-name fields skipped): %s", result.get('name', '?'), e)
+            result['_partial_parse'] = True
+            result['_entry_size'] = end - offset
 
     except (struct.error, IndexError) as e:
         log.debug("Parse error for %s at offset %d: %s", result.get('name', '?'), p, e)

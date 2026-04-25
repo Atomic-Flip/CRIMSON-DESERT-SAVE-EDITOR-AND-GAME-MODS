@@ -1360,6 +1360,13 @@ class StoreEditorTab(QWidget):
             self._store_changes_label.setText("")
             self._store_status.setText(f"Success: packed to {store_dir}/ ({paz_size:,} bytes)")
 
+            try:
+                from shared_state import record_overlay
+                record_overlay(game_path, store_dir, "Store edits",
+                               ["storeinfo.pabgb", "storeinfo.pabgh"])
+            except Exception:
+                pass
+
             QMessageBox.information(self, tr("Applied Successfully"),
                 f"Packed to {store_dir}/ via pack_mod ({paz_size:,} bytes)\n"
                 f"Original 0008/0.paz untouched{papgt_verify}\n\n"
@@ -1422,6 +1429,11 @@ class StoreEditorTab(QWidget):
         try:
             shutil.rmtree(game_mod)
             messages.append(f"Removed {store_dir}/ override directory")
+            try:
+                from overlay_coordinator import post_restore
+                post_restore(game_path, store_dir)
+            except Exception:
+                pass
         except Exception as e:
             messages.append(f"Failed to remove {store_dir}/: {e}")
 
@@ -1470,6 +1482,19 @@ class SpawnTab(QWidget):
         load_btn.setToolTip(tr("Extract spawn tables from game PAZ files"))
         load_btn.clicked.connect(self._spawn_extract)
         header.addWidget(load_btn)
+
+        header.addWidget(QLabel("Mod#:"))
+        self._spawn_overlay_spin = QSpinBox()
+        self._spawn_overlay_spin.setRange(1, 9999)
+        self._spawn_overlay_spin.setValue(self._config.get("spawn_overlay_dir", 37))
+        self._spawn_overlay_spin.setFixedWidth(70)
+        self._spawn_overlay_spin.setToolTip(
+            "Overlay folder number for spawn mods.\n"
+            "Each tab should use a different number to avoid conflicts.\n"
+            "Default: 0037")
+        self._spawn_overlay_spin.valueChanged.connect(
+            lambda v: self._config.update({"spawn_overlay_dir": int(v)}))
+        header.addWidget(self._spawn_overlay_spin)
 
         apply_btn = QPushButton(tr("Apply to Game"))
         apply_btn.setStyleSheet("background-color: #1B5E20; color: white; font-weight: bold;")
@@ -2799,7 +2824,7 @@ class SpawnTab(QWidget):
                 pack_out = os.path.join(tmp_dir, "output")
                 os.makedirs(pack_out, exist_ok=True)
 
-                mod_group = "0037"
+                mod_group = f"{self._spawn_overlay_spin.value():04d}"
                 crimson_rs.pack_mod.pack_mod(
                     game_dir=game_path,
                     mod_folder=tmp_dir,
@@ -2856,10 +2881,11 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Game Path"), tr("Game install path not set."))
             return
 
+        mod_group = f"{self._spawn_overlay_spin.value():04d}"
         reply = QMessageBox.question(
             self, tr("Apply Spawn Changes"),
             f"Deploy modified spawn data to the game?\n\n"
-            f"Creates 0037/ overlay. Restart game to take effect.\n"
+            f"Creates {mod_group}/ overlay. Restart game to take effect.\n"
             f"Original files are NOT modified. Use Restore to undo.",
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply != QMessageBox.Yes:
@@ -2875,7 +2901,6 @@ class SpawnTab(QWidget):
             from pathlib import Path
 
             gp = Path(game_path)
-            mod_group = "0037"
 
             with tempfile.TemporaryDirectory() as tmp_dir:
                 mod_dir = os.path.join(tmp_dir, "gamedata", "binary__", "client", "bin")
@@ -2932,7 +2957,7 @@ class SpawnTab(QWidget):
             QMessageBox.warning(self, tr("Game Path"), tr("Game path not set."))
             return
 
-        mod_group = "0037"
+        mod_group = f"{self._spawn_overlay_spin.value():04d}"
         game_mod = os.path.join(game_path, mod_group)
         if not os.path.isdir(game_mod):
             QMessageBox.information(self, tr("Restore"), f"No {mod_group}/ overlay found.")
@@ -3018,14 +3043,45 @@ class DropsetTab(QWidget):
         apply_btn.setObjectName("accentBtn")
         apply_btn.setToolTip(
             "Deploy modified drop tables directly to the game.\n"
-            "Creates 0036/ overlay. Restart game to take effect.")
+            "Creates an overlay group (default 0036/). Restart game to take effect.")
         apply_btn.clicked.connect(self._dropset_apply)
         top_row.addWidget(apply_btn)
+
+        # Overlay group number — user-configurable so they can avoid
+        # colliding with whichever slot another mod owns.
+        top_row.addWidget(QLabel(tr("Overlay:")))
+        self._dropset_overlay_spin = QSpinBox()
+        self._dropset_overlay_spin.setRange(1, 9999)
+        self._dropset_overlay_spin.setValue(
+            self._config.get("dropset_overlay_dir", 36))
+        self._dropset_overlay_spin.setFixedWidth(70)
+        self._dropset_overlay_spin.setToolTip(
+            "Overlay group number (0036 = default). Change if another mod\n"
+            "already uses this slot. Apply to Game writes to <game>/NNNN/;\n"
+            "Restore removes the same NNNN/.")
+        self._dropset_overlay_spin.valueChanged.connect(
+            lambda v: self._config.update({"dropset_overlay_dir": int(v)}))
+        top_row.addWidget(self._dropset_overlay_spin)
 
         restore_btn = QPushButton(tr("Restore"))
         restore_btn.setToolTip(tr("Remove drop table mod and restore vanilla"))
         restore_btn.clicked.connect(self._dropset_restore)
         top_row.addWidget(restore_btn)
+
+        export_field_btn = QPushButton("Export Field JSON")
+        export_field_btn.setStyleSheet("background-color: #00695C; color: white; font-weight: bold;")
+        export_field_btn.setToolTip(
+            "Export edits as Format 3 field-name JSON.\n"
+            "Uses field names — survives game updates.")
+        export_field_btn.clicked.connect(self._dropset_export_field_json)
+        top_row.addWidget(export_field_btn)
+
+        import_field_btn = QPushButton("Import Field JSON")
+        import_field_btn.setToolTip(
+            "Import a Format 3 field-name JSON and apply its intents\n"
+            "to the currently loaded vanilla data.")
+        import_field_btn.clicked.connect(self._dropset_import_field_json)
+        top_row.addWidget(import_field_btn)
 
         self._dropset_status = QLabel("")
         self._dropset_status.setStyleSheet(f"color: {COLORS['accent']}; padding: 4px;")
@@ -3858,11 +3914,13 @@ class DropsetTab(QWidget):
         body_data = bytes(self._dropset_editor.body_bytes)
         header_data = self._dropset_editor.header_bytes
 
+        group_name = f"{self._dropset_overlay_spin.value():04d}"
+
         reply = QMessageBox.question(
             self, tr("Apply DropSet Changes"),
             f"Deploy modified drop tables to the game?\n\n"
             f"Data: pabgb ({len(body_data):,} bytes) + pabgh ({len(header_data):,} bytes)\n"
-            f"Overlay: 0036/ (first PAPGT entry)\n\n"
+            f"Overlay: {group_name}/\n\n"
             f"Original game files are NOT modified.\n"
             f"To undo: click Restore.\n"
             f"Restart the game for changes to take effect.",
@@ -3897,7 +3955,7 @@ class DropsetTab(QWidget):
                     game_dir=game_path,
                     mod_folder=tmp_dir,
                     output_dir=out_dir,
-                    group_name="0036",
+                    group_name=group_name,
                     compression=Compression.NONE,
                 )
 
@@ -3906,22 +3964,28 @@ class DropsetTab(QWidget):
                 if papgt_path.exists() and not backup_path.exists():
                     shutil.copy2(papgt_path, backup_path)
 
-                dest = gp / "0036"
+                dest = gp / group_name
                 dest.mkdir(exist_ok=True)
                 shutil.copyfile(
-                    os.path.join(out_dir, "0036", "0.paz"), dest / "0.paz")
+                    os.path.join(out_dir, group_name, "0.paz"), dest / "0.paz")
                 shutil.copyfile(
-                    os.path.join(out_dir, "0036", "0.pamt"), dest / "0.pamt")
+                    os.path.join(out_dir, group_name, "0.pamt"), dest / "0.pamt")
                 shutil.copyfile(
                     os.path.join(out_dir, "meta", "0.papgt"), papgt_path)
 
             paz_size = (dest / "0.paz").stat().st_size
-            self._dropset_status.setText(f"Applied! 0036/ ({paz_size:,} bytes)")
+            try:
+                from shared_state import record_overlay
+                record_overlay(str(gp), group_name, "DropSet edits",
+                               ["dropsetinfo.pabgb", "dropsetinfo.pabgh"])
+            except Exception:
+                pass
+            self._dropset_status.setText(f"Applied! {group_name}/ ({paz_size:,} bytes)")
             QMessageBox.information(self, tr("Success"),
-                f"Deployed to 0036/ ({paz_size:,} bytes)\n"
+                f"Deployed to {group_name}/ ({paz_size:,} bytes)\n"
                 f"Restart the game for changes to take effect.\n\n"
-                f"Note: If another mod also uses 0036/, they will conflict.\n"
-                f"Use Restore to remove before applying other 0036/ mods.")
+                f"Note: If another mod also uses {group_name}/, they will conflict.\n"
+                f"Use Restore to remove before applying other {group_name}/ mods.")
 
         except Exception as e:
             log.exception("Unhandled exception")
@@ -3936,17 +4000,18 @@ class DropsetTab(QWidget):
 
         from pathlib import Path
         gp = Path(game_path)
-        overlay = gp / "0036"
+        group_name = f"{self._dropset_overlay_spin.value():04d}"
+        overlay = gp / group_name
         backup = gp / "meta" / "0.papgt.dropset_bak"
 
         if not overlay.is_dir():
             QMessageBox.information(self, tr("Nothing to Restore"),
-                tr("No dropset mod found in 0036/"))
+                tr(f"No dropset mod found in {group_name}/"))
             return
 
         reply = QMessageBox.question(
             self, tr("Restore Original"),
-            tr("Remove 0036/ overlay and restore PAPGT backup?"),
+            tr(f"Remove {group_name}/ overlay and restore PAPGT backup?"),
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
@@ -3960,11 +4025,16 @@ class DropsetTab(QWidget):
                 backup.unlink()
                 messages.append("Restored PAPGT from backup")
             else:
-                msg = self._rebuild_papgt_fn(game_path, "0036")
+                msg = self._rebuild_papgt_fn(game_path, group_name)
                 messages.append(msg)
 
             shutil.rmtree(overlay)
-            messages.append("Removed 0036/")
+            messages.append(f"Removed {group_name}/")
+            try:
+                from overlay_coordinator import post_restore
+                post_restore(game_path, group_name)
+            except Exception:
+                pass
 
             self._dropset_status.setText(tr("Restored"))
             QMessageBox.information(self, tr("Restored"),
@@ -4215,6 +4285,153 @@ class DropsetTab(QWidget):
         self._dropset_refresh_items(ds)
         self._dropset_status.setText(
             f"Added {added} items from '{pack_name}' to {ds.name or ds.key}")
+
+    def _dropset_export_field_json(self) -> None:
+        if not hasattr(self, '_dropset_editor') or not self._dropset_editor:
+            QMessageBox.warning(self, "Export", "Load DropSets first.")
+            return
+        if not self._dropset_original_body:
+            QMessageBox.warning(self, "Export", "No vanilla baseline — reload.")
+            return
+
+        from dropset_editor import DropsetEditor
+        vanilla_ed = DropsetEditor()
+        vanilla_ed.header_bytes = self._dropset_original_header
+        vanilla_ed.body_bytes = bytearray(self._dropset_original_body)
+        vanilla_ed.records = list(self._dropset_editor.records)
+        vanilla_ed.record_count = self._dropset_editor.record_count
+        vanilla_ed.item_names = self._dropset_editor.item_names
+
+        intents = []
+        for key, _ in self._dropset_editor.records:
+            cur = self._dropset_editor.parse_dropset(key)
+            van = vanilla_ed.parse_dropset(key)
+            if not cur or not van:
+                continue
+            name = cur.name or str(key)
+            for f in ('is_blocked', 'drop_roll_type', 'drop_roll_count'):
+                cv, vv = getattr(cur, f), getattr(van, f)
+                if cv != vv:
+                    intents.append({
+                        'entry': name, 'key': key,
+                        'field': f, 'op': 'set', 'new': cv,
+                    })
+            if len(cur.drops) != len(van.drops) or \
+               any(self._drop_differs(c, v) for c, v in zip(cur.drops, van.drops)):
+                drops_data = []
+                for d in cur.drops:
+                    drops_data.append({
+                        'item_key': d.item_key, 'rates': d.rates,
+                        'rates_100': d.rates_100,
+                        'min_amt': d.min_amt, 'max_amt': d.max_amt,
+                    })
+                intents.append({
+                    'entry': name, 'key': key,
+                    'field': 'drops', 'op': 'set', 'new': drops_data,
+                })
+
+        if not intents:
+            QMessageBox.information(self, "Export", "No changes to export.")
+            return
+
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Field JSON", "DropSets.field.json",
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+
+        doc = {
+            'modinfo': {
+                'title': 'DropSets Mod',
+                'version': '1.0',
+                'author': 'CrimsonGameMods DropSets',
+                'description': f'{len(intents)} field-level intent(s)',
+                'note': 'Format 3 — uses field names, survives game updates',
+            },
+            'format': 3,
+            'target': 'dropsetinfo.pabgb',
+            'intents': intents,
+        }
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
+        self._dropset_status.setText(
+            f"Exported {len(intents)} intents to {os.path.basename(path)}")
+        QMessageBox.information(self, "Export Field JSON",
+            f"Exported {len(intents)} field-level intents.\n\nFile: {path}")
+
+    @staticmethod
+    def _drop_differs(a, b) -> bool:
+        return (a.item_key != b.item_key or a.rates != b.rates or
+                a.rates_100 != b.rates_100 or
+                a.min_amt != b.min_amt or a.max_amt != b.max_amt)
+
+    def _dropset_import_field_json(self) -> None:
+        if not hasattr(self, '_dropset_editor') or not self._dropset_editor:
+            QMessageBox.warning(self, "Import", "Load DropSets first.")
+            return
+
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Import Field JSON", "",
+            "Field JSON (*.field.json *.json);;All Files (*)")
+        if not path:
+            return
+        with open(path, 'r', encoding='utf-8') as f:
+            doc = json.load(f)
+        if doc.get('format') != 3 or not doc.get('intents'):
+            QMessageBox.warning(self, "Import", "Not a valid Format 3 Field JSON file.")
+            return
+
+        sets_by_name = {}
+        sets_by_key = {}
+        for key, _ in self._dropset_editor.records:
+            ds = self._dropset_editor.parse_dropset(key)
+            if ds:
+                sets_by_name[ds.name] = ds
+                sets_by_key[ds.key] = ds
+
+        applied = skipped = 0
+        for intent in doc['intents']:
+            target = sets_by_name.get(intent.get('entry')) or \
+                     sets_by_key.get(intent.get('key'))
+            if not target:
+                skipped += 1
+                continue
+            field = intent.get('field', '')
+            if intent.get('op') != 'set':
+                skipped += 1
+                continue
+            if field in ('is_blocked', 'drop_roll_type', 'drop_roll_count'):
+                setattr(target, field, intent['new'])
+                applied += 1
+            elif field == 'drops':
+                from dropset_editor import ItemDrop
+                new_drops = []
+                for d in intent['new']:
+                    drop = ItemDrop(
+                        flag=1, item_key=d['item_key'],
+                        rates=d.get('rates', 0),
+                        rates_100=d.get('rates_100', 0),
+                        min_amt=d.get('min_amt', 0),
+                        max_amt=d.get('max_amt', 0),
+                        item_key_dup=d['item_key'],
+                    )
+                    new_drops.append(drop)
+                target.drops = new_drops
+                applied += 1
+            else:
+                skipped += 1
+
+        if applied:
+            modified = {k: ds for k, ds in self._dropset_editor._parsed_sets.items()
+                        if ds in sets_by_name.values() or ds in sets_by_key.values()}
+            self._dropset_editor.apply_modifications(modified)
+            self._dropset_mark_modified()
+
+        self._dropset_status.setText(
+            f"Imported {applied} intents, {skipped} skipped.")
+        QMessageBox.information(self, "Import Field JSON",
+            f"Applied {applied} intent(s), skipped {skipped}.\n\n"
+            f"Click Apply to Game to deploy.")
 
 
 class PabgbBrowserTab(QWidget):
