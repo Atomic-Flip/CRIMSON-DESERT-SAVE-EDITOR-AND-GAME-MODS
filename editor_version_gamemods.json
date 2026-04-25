@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
-  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/gamemods-v1.1.0/CrimsonGameMods.exe",
-  "notes": "Crimson Game Mods v1.1.0 - Field JSON v3, Skill Editor with stamina presets, multi-version baseline support"
+  "version": "1.1.1",
+  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/gamemods-v1.1.1/CrimsonGameMods.exe",
+  "notes": "Crimson Game Mods v1.1.1 - Fixed presets (5 Sockets, Max Refine, No Cooldown, Max Charges), crimson_rs UTF-8 fix"
 }
