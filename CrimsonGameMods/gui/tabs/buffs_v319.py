@@ -2501,6 +2501,31 @@ class ItemBuffsTab(QWidget):
             iteminfo = bytes(crimson_rs.extract_file(
                 game_path, buff_dir, "gamedata/binary__/client/bin",
                 "iteminfo.pabgb"))
+
+            # Verify overlay is from the SAME game version — if the size
+            # differs significantly from vanilla, the overlay is stale
+            # (from a prior game update) and will fail to parse. Fall back
+            # to vanilla so the user doesn't get 0 parsed items.
+            size_diff = abs(len(iteminfo) - len(vanilla_raw))
+            if size_diff > 100000:
+                log.warning(
+                    "Overlay %s/ iteminfo (%d bytes) differs from vanilla "
+                    "(%d bytes) by %d bytes — stale overlay from old game "
+                    "version. Falling back to vanilla.",
+                    buff_dir, len(iteminfo), len(vanilla_raw), size_diff)
+                return vanilla_raw, 'vanilla (stale overlay ignored)'
+
+            # Try parsing to verify it's valid
+            try:
+                test_items = crimson_rs.parse_iteminfo_from_bytes(iteminfo)
+                if not test_items:
+                    log.warning("Overlay %s/ iteminfo parsed 0 items, using vanilla", buff_dir)
+                    return vanilla_raw, 'vanilla (overlay parse failed)'
+            except Exception as parse_err:
+                log.warning("Overlay %s/ iteminfo parse failed: %s — using vanilla",
+                            buff_dir, parse_err)
+                return vanilla_raw, 'vanilla (overlay parse failed)'
+
             # Overwrite patcher original so byte-level diff logic references
             # the overlay state instead of vanilla.
             self._buff_patcher._original_data = iteminfo
@@ -8643,7 +8668,7 @@ class ItemBuffsTab(QWidget):
                 if os.path.isfile(vanilla_papgt):
                     cur = crimson_rs.parse_papgt_file(vanilla_papgt)
                 else:
-                    cur = {"entries": []}
+                    cur = {"unknown0": 1610, "checksum": 0, "unknown1": 0, "unknown2": 0, "entries": []}
                 cur["entries"] = [e for e in cur["entries"]
                                   if e.get("group_name") != mod_group]
                 cur = crimson_rs.add_papgt_entry(
@@ -11330,7 +11355,7 @@ class ItemBuffsTab(QWidget):
                              os.path.join(paz_dst, "0.pamt"))
 
                 # Build a standalone PAPGT with just this entry
-                papgt = {"entries": []}
+                papgt = {"unknown0": 1610, "checksum": 0, "unknown1": 0, "unknown2": 0, "entries": []}
                 papgt = crimson_rs.add_papgt_entry(
                     papgt, mod_group, pamt_checksum, 0, 16383)
                 meta_dst = os.path.join(out_path, "meta")
