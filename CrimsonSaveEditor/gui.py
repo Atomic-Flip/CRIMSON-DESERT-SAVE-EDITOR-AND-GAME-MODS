@@ -2427,6 +2427,14 @@ class MainWindow(QMainWindow):
                     self._max_enchant_map = _json.load(_f)
         except Exception:
             pass
+        self._socket_design_limits: dict = {}
+        try:
+            _lim_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'item_limits.json')
+            if os.path.isfile(_lim_path):
+                with open(_lim_path, 'r') as _f:
+                    self._socket_design_limits = _json.load(_f)
+        except Exception:
+            pass
         self._icon_ready.connect(self._apply_icon_to_table)
         self._undo_stack: List[UndoEntry] = []
         self._loaded_path: str = ""
@@ -4910,6 +4918,14 @@ QCheckBox::indicator {{
             self._sock_item_combo.setCurrentIndex(0)
             self._on_socket_item_changed(0)
 
+    def _get_socket_design_limit(self, item_key: int) -> int:
+        """Return the max fillable socket count for this item from iteminfo.pabgb.
+
+        Falls back to 5 (the structural array size) when the lookup table
+        is missing or the item is not found.
+        """
+        return self._socket_design_limits.get(str(item_key), 5)
+
     def _on_socket_item_changed(self, index: int) -> None:
         if not self._save_data or index < 0:
             return
@@ -4926,6 +4942,7 @@ QCheckBox::indicator {{
         self._sock_current_item = item
         blob = self._save_data.decompressed_blob
         max_s, valid_s = self._read_max_valid_sockets(blob, item)
+        design_limit = self._get_socket_design_limit(item.item_key)
 
         name = self._name_db.get_name(item.item_key)
         bitmask = self._read_item_bitmask(blob, item)
@@ -4935,7 +4952,7 @@ QCheckBox::indicator {{
         end_high = (end_raw >> 8) & 0xFF
         self._sock_info.setText(
             f"{name} +{item.enchant_level}  |  "
-            f"Sockets: {valid_s} filled / {max_s} max  |  "
+            f"Sockets: {valid_s} filled / {design_limit} design limit ({max_s} structural)  |  "
             f"Endurance raw=0x{end_raw:04X} (endurance={end_low}, sockets={end_high})  |  "
             f"Offset=0x{item.offset:06X}"
         )
@@ -4946,7 +4963,7 @@ QCheckBox::indicator {{
 
         for i in range(6):
             row = self._sock_rows[i]
-            if i < max_s:
+            if i < design_limit:
                 row["container"].setVisible(True)
                 self._populate_gem_combo(row["combo"], row["filter"].currentText())
 
@@ -5006,6 +5023,7 @@ QCheckBox::indicator {{
         item = self._sock_current_item
         blob = self._save_data.decompressed_blob
         max_s, _ = self._read_max_valid_sockets(blob, item)
+        design_limit = self._get_socket_design_limit(item.item_key)
         socket_data = self._read_socket_gems(blob, item)
 
         new_gems = []
@@ -5035,6 +5053,18 @@ QCheckBox::indicator {{
 
         bitmask_pre = self._read_item_bitmask(blob, item)
         sock_abs_pre = item.offset + self._compute_socket_list_offset(bitmask_pre)
+
+        # Validate against design limit
+        existing_filled = sum(1 for sd in socket_data if sd['has_gem'])
+        new_filled = existing_filled + len(fills) - len(clears)
+        if new_filled > design_limit:
+            QMessageBox.warning(
+                self, "Sockets",
+                f"Cannot fill {len(fills)} slot(s): would exceed the design limit of "
+                f"{design_limit} for this item (currently {existing_filled} filled).\n\n"
+                f"The game will crash if more than {design_limit} slots are filled."
+            )
+            return
 
         if fills:
             from parc_inserter3 import fill_socket_slots
