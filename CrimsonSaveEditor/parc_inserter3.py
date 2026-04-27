@@ -3053,7 +3053,7 @@ def _splice_socket_elements(
     struct.pack_into('<I', new_blob, schema_end + 8, old_ss + delta)
 
     equip_idx = next(
-        (e.index for e in toc_entries_cached if e.class_name == 'EquipmentSaveData'),
+        (e.index for e in toc_entries_cached if e.data_offset <= item.offset < e.data_offset + e.data_size),
         None,
     )
     fixed_toc = 0
