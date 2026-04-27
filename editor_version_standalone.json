@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
-  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/standalone-v1.0.0/CrimsonSaveEditorStandalone.exe",
-  "notes": "Crimson Save Editor — Standalone (save-editing only). First 1.0 release: Game Mods tabs removed for lower RAM usage and tighter stability. Use the full build if you need ItemBuffs / Stores / PAZ mods."
+  "version": "1.0.4",
+  "url": "https://github.com/Atomic-Flip/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/v1.0.4/CrimsonSaveEditorStandalone.exe",
+  "notes": "Socket design limit validation now actually works. Fixes a NameError that silently disabled the design-limit and max-enchant lookups since v1.0.3, and overhauls the Sockets tab to show only the slots an item can hold, gray out locked slots, cap the Unlock spinner per item, and filter cloaks/accessories from the dropdown."
 }
