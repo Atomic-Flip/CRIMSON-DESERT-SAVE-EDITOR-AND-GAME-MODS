@@ -3114,7 +3114,7 @@ def fill_socket_slots(
         target_slots=slot_gem_map,
         expected_mask=0x00,
         build_target_elem=_build_filled,
-        valid_count_fn=lambda old, n: min(old + n, 0xFF),
+        valid_count_fn=lambda old, n: old,  # filling does not unlock slots
         fn_name="fill_socket_slots",
         verb="Filled",
     )
@@ -3142,7 +3142,7 @@ def clear_socket_slots(
         target_slots={idx: None for idx in slot_indices},
         expected_mask=0x03,
         build_target_elem=_build_empty,
-        valid_count_fn=lambda old, n: max(old - n, 0),
+        valid_count_fn=lambda old, n: old,  # clearing does not lock slots
         fn_name="clear_socket_slots",
         verb="Cleared",
     )
