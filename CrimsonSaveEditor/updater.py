@@ -16,7 +16,7 @@ APP_VERSION = "1.0.4"
 
 APP_VARIANT = "standalone"
 
-UPDATE_REPO = "NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS"
+UPDATE_REPO = "Atomic-Flip/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS"
 _MANIFEST_BY_VARIANT = {
     "standalone": "editor_version_standalone.json",
     "full": "editor_version.json",
