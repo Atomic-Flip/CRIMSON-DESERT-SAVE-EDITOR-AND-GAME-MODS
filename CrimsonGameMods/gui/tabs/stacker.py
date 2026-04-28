@@ -702,6 +702,77 @@ def _deep_diff_to_intents(entry: str, key: int, a: dict, b: dict,
     return intents
 
 
+def _diff_equipslot_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                                modded_pabgh: bytes, modded_pabgb: bytes
+                                ) -> list[dict]:
+    """Diff modded equipslotinfo against vanilla, emit Field JSON v3 intents.
+
+    Each EquipSlotRecord is keyed by class id (1, 4, 6, 7, 201, 203, 211,
+    701, 708, 712, 730, 750, 801 in vanilla 1.04). Per record, walk every
+    EquipInfoData entry and compare every editable field. Most universal-
+    proficiency-style mods only modify `etl_hashes` (the equip_type_info
+    list), but other field changes (category, slot_index, blob, etc.) are
+    captured the same way for completeness.
+
+    Requires DMM 1.3.3+ on the consumer side -- that release added the
+    equipslotinfo.pabgb v3 target. Earlier DMM versions silently ignore
+    these intents (mounted but no effect).
+    """
+    import equipslotinfo_parser as esp
+
+    vanilla = esp.parse_all(vanilla_pabgh, vanilla_pabgb)
+    modded  = esp.parse_all(modded_pabgh, modded_pabgb)
+    v_by_key = {r.key: r for r in vanilla}
+    m_by_key = {r.key: r for r in modded}
+
+    intents: list[dict] = []
+    for key in sorted(set(v_by_key) | set(m_by_key)):
+        v = v_by_key.get(key)
+        m = m_by_key.get(key)
+        # Skip records present in only one set -- record add/remove not
+        # supported by Field JSON v3 spec yet (would need add_entry op).
+        if not v or not m:
+            continue
+        # Skip records where entries[] grew/shrank -- spec is set-only,
+        # no append/remove. Such mods need to ship as folder overlays.
+        if len(v.entries) != len(m.entries):
+            continue
+
+        for i, (ve, me) in enumerate(zip(v.entries, m.entries)):
+            # etl_hashes -- the unlock vector (universal proficiency etc.)
+            if list(ve.etl_hashes) != list(me.etl_hashes):
+                intents.append({
+                    'entry': '', 'key': int(key),
+                    'field': f'entries[{i}].etl_hashes',
+                    'op': 'set',
+                    'new': [int(h) for h in me.etl_hashes],
+                })
+            # Scalar fields -- only emitted when value changed so we don't
+            # bloat the export with no-op intents.
+            for fname in ('category_a', 'category_b', 'name_hash',
+                          'slot_index', 'field_u64', 'name_hash_2',
+                          'complex_u8', 'complex_u64'):
+                vv = getattr(ve, fname)
+                mv = getattr(me, fname)
+                if vv != mv:
+                    intents.append({
+                        'entry': '', 'key': int(key),
+                        'field': f'entries[{i}].{fname}',
+                        'op': 'set',
+                        'new': int(mv),
+                    })
+            # fields_u32 -- fixed [u32; 4] array
+            if list(ve.fields_u32) != list(me.fields_u32):
+                intents.append({
+                    'entry': '', 'key': int(key),
+                    'field': f'entries[{i}].fields_u32',
+                    'op': 'set',
+                    'new': [int(x) for x in me.fields_u32],
+                })
+
+    return intents
+
+
 def _merge_all(vanilla_items: list[dict],
                mod_lists: list[tuple[str, list[dict]]]
                ) -> tuple[list[dict], list[FieldConflict]]:
@@ -779,6 +850,12 @@ class StackerTab(QWidget):
         self._game_path: str = self._config.get("game_install_path", "")
         self._mods: list[ModEntry] = []
         self._merged_items: list = []
+        # Merged equipslotinfo bytes captured during _run. Keys are
+        # "equipslotinfo.pabgb" / "equipslotinfo.pabgh"; values are raw bytes.
+        # Used by _export_field_json to emit equipslotinfo intents alongside
+        # the iteminfo ones (multi-target Field JSON v3 schema, requires
+        # DMM 1.3.3+ on the consumer side).
+        self._merged_equip_files: dict = {}
         self._conflicts: list[FieldConflict] = []
         self._build_ui()
 
@@ -1730,6 +1807,7 @@ class StackerTab(QWidget):
         self._mods_list.clear()
         self._merged_items = []
         self._vanilla_items = []
+        self._merged_equip_files = {}
         self._conflicts = []
         self._refresh_details()
 
@@ -2275,6 +2353,14 @@ class StackerTab(QWidget):
             self._log_line(
                 f"  Equipslotinfo split into its own overlay group: "
                 f"{{{', '.join(sorted(equip_files.keys()))}}}")
+
+        # Persist the merged equipslotinfo bytes so the field-JSON exporter
+        # can diff them against vanilla and emit equipslotinfo intents in
+        # multi-target shape. Without this hand-off, JSON exports silently
+        # drop the unlock-all-weapons data even when the source mod stack
+        # included it (the bug behind every "SuperMegaMod (1).json doesn't
+        # unlock weapons" report through 1.1.x).
+        self._merged_equip_files = dict(equip_files) if equip_files else {}
 
         # Branch: export as standalone folder mod, OR install directly.
         if export_target:
@@ -3243,7 +3329,44 @@ class StackerTab(QWidget):
             if title:
                 mod_title = title
 
-        if not intents:
+        # ── Equipslotinfo intents (multi-target schema, since 1.1.4) ──
+        # If the merge captured equipslotinfo bytes (universal-proficiency
+        # style mods, tribe edits, etc.), diff them against vanilla and emit
+        # equipslotinfo intents alongside the iteminfo ones. Pre-1.1.4 the
+        # exporter silently dropped this data and weapons-on-all-characters
+        # mods exported as broken iteminfo-only JSONs that "just unlocked
+        # the armor."
+        equipslot_intents: list[dict] = []
+        equip_snap = getattr(self, '_merged_equip_files', None) or {}
+        if (equip_snap.get('equipslotinfo.pabgb')
+                and equip_snap.get('equipslotinfo.pabgh')
+                and self._game_path):
+            try:
+                import crimson_rs
+                vanilla_pabgb = crimson_rs.extract_file(
+                    self._game_path, "0008", INTERNAL_DIR,
+                    "equipslotinfo.pabgb")
+                vanilla_pabgh = crimson_rs.extract_file(
+                    self._game_path, "0008", INTERNAL_DIR,
+                    "equipslotinfo.pabgh")
+                equipslot_intents = _diff_equipslot_to_intents(
+                    vanilla_pabgh, vanilla_pabgb,
+                    equip_snap['equipslotinfo.pabgh'],
+                    equip_snap['equipslotinfo.pabgb'])
+                if equipslot_intents:
+                    self._log_line(
+                        f"  + {len(equipslot_intents)} equipslotinfo "
+                        f"intent(s) (universal weapon proficiency)")
+            except Exception as e:
+                # Don't block the export if equipslot diff fails — the
+                # iteminfo intents are still useful. Surface the failure
+                # in the log so the author knows weapons-unlock didn't ship.
+                self._log_line(
+                    f"  ⚠ equipslotinfo diff failed: {e} — "
+                    f"export will be iteminfo-only")
+                equipslot_intents = []
+
+        if not intents and not equipslot_intents:
             QMessageBox.information(self, "Export Field JSON",
                 "No field-level changes found. Nothing to export.")
             return
@@ -3256,27 +3379,65 @@ class StackerTab(QWidget):
         if not path:
             return
 
-        doc = {
-            'modinfo': {
-                'title': mod_title,
-                'version': '1.0',
-                'author': 'CrimsonGameMods Stacker',
-                'description': f'{len(intents)} field-level intent(s)',
-                'note': 'Format 3 — uses field names, survives game updates',
-            },
-            'format': 3,
-            'target': 'iteminfo.pabgb',
-            'intents': intents,
-        }
+        # Build the doc. If we have equipslot intents we emit multi-target
+        # shape (the 1.1.4 spec extension consumed by DMM 1.3.3+); otherwise
+        # we keep the legacy single-target shape for backward compatibility
+        # with older DMM releases that only understand `target` + `intents`.
+        if equipslot_intents:
+            total = len(intents) + len(equipslot_intents)
+            doc = {
+                'modinfo': {
+                    'title': mod_title,
+                    'version': '1.0',
+                    'author': 'CrimsonGameMods Stacker',
+                    'description': (
+                        f'{total} field-level intent(s) across 2 target(s) — '
+                        f'{len(intents)} iteminfo, '
+                        f'{len(equipslot_intents)} equipslotinfo'),
+                    'note': ('Format 3 multi-target — uses field names, '
+                             'survives game updates. Requires DMM 1.3.3+ '
+                             'for equipslotinfo support; older DMM versions '
+                             'will apply iteminfo intents only.'),
+                },
+                'format': 3,
+                'targets': [
+                    {'file': 'iteminfo.pabgb',      'intents': intents},
+                    {'file': 'equipslotinfo.pabgb', 'intents': equipslot_intents},
+                ],
+            }
+            log_msg = (f"✔ Exported {len(intents)} iteminfo + "
+                       f"{len(equipslot_intents)} equipslotinfo "
+                       f"intents (multi-target) to {path}")
+            ui_msg = (
+                f"Exported {total} field-level intents across 2 targets:\n"
+                f"  • {len(intents)} iteminfo.pabgb intents\n"
+                f"  • {len(equipslot_intents)} equipslotinfo.pabgb intents\n\n"
+                f"This file uses field names — it survives game updates.\n"
+                f"Requires DMM 1.3.3+ for the equipslotinfo half to apply.\n"
+                f"File: {path}")
+        else:
+            doc = {
+                'modinfo': {
+                    'title': mod_title,
+                    'version': '1.0',
+                    'author': 'CrimsonGameMods Stacker',
+                    'description': f'{len(intents)} field-level intent(s)',
+                    'note': 'Format 3 — uses field names, survives game updates',
+                },
+                'format': 3,
+                'target': 'iteminfo.pabgb',
+                'intents': intents,
+            }
+            log_msg = f"✔ Exported {len(intents)} intents to {path}"
+            ui_msg = (f"Exported {len(intents)} field-level intents.\n\n"
+                      f"This file uses field names — it survives game updates.\n"
+                      f"File: {path}")
 
         try:
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
-            self._log_line(f"✔ Exported {len(intents)} intents to {path}")
-            QMessageBox.information(self, "Export Field JSON",
-                f"Exported {len(intents)} field-level intents.\n\n"
-                f"This file uses field names — it survives game updates.\n"
-                f"File: {path}")
+            self._log_line(log_msg)
+            QMessageBox.information(self, "Export Field JSON", ui_msg)
         except Exception as e:
             QMessageBox.critical(self, "Export Failed", str(e))
 
