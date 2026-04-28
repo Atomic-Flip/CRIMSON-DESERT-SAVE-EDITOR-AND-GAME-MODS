@@ -1,0 +1,16 @@
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# PyInstaller build output
+CrimsonSaveEditor/build/
+CrimsonSaveEditor/dist/
+
+# Per-user editor state. Tracked in git as a default; if you keep changing
+# yours and want to stop seeing it as `M` in git status, run once:
+#   git update-index --skip-worktree CrimsonSaveEditor/editor_config.json
+# (Reverse with --no-skip-worktree if you ever need to commit a real change.)
+
+# Claude Code local session data
+.claude/

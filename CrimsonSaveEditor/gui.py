@@ -4794,6 +4794,15 @@ QCheckBox::indicator {{
         self._sock_info.setStyleSheet(f"color: {COLORS['text_dim']}; padding: 4px;")
         self._sock_layout.addWidget(self._sock_info)
 
+        self._sock_locked_hint = QLabel("")
+        self._sock_locked_hint.setWordWrap(True)
+        self._sock_locked_hint.setStyleSheet(
+            f"color: {COLORS['accent']}; padding: 4px 8px; "
+            f"border: 1px solid {COLORS['accent']}; border-radius: 4px;"
+        )
+        self._sock_locked_hint.setVisible(False)
+        self._sock_layout.addWidget(self._sock_locked_hint)
+
         self._sock_rows = []
         for i in range(6):
             row = QHBoxLayout()
@@ -4974,6 +4983,7 @@ QCheckBox::indicator {{
                 f"This item does not support abyss gears."
             )
             self._sock_info.setStyleSheet(f"color: {COLORS['text_dim']}; padding: 4px;")
+            self._sock_locked_hint.setVisible(False)
             for r in self._sock_rows:
                 r["container"].setVisible(False)
             self._sock_unlock_group.setVisible(False)
@@ -4989,6 +4999,17 @@ QCheckBox::indicator {{
             f"Offset=0x{item.offset:06X}"
         )
         self._sock_info.setStyleSheet(f"color: {COLORS['accent']}; padding: 4px; font-weight: bold;")
+
+        locked_count = max(0, design_limit - valid_s)
+        if locked_count > 0:
+            slot_word = "slot" if locked_count == 1 else "slots"
+            self._sock_locked_hint.setText(
+                f"{locked_count} {slot_word} locked. Use the 'Unlock Socket Slots' panel "
+                f"below the slot rows to enable up to {design_limit} slots without visiting the Witch."
+            )
+            self._sock_locked_hint.setVisible(True)
+        else:
+            self._sock_locked_hint.setVisible(False)
 
         self._sock_unlock_group.setVisible(True)
         self._sock_unlock_spin.blockSignals(True)
