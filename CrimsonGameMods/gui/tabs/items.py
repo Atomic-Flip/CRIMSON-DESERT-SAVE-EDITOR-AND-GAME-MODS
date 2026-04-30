@@ -3,6 +3,7 @@ from __future__ import annotations
 import json as _json
 import logging
 import os
+import sys
 import struct
 import threading
 
@@ -361,7 +362,7 @@ class DatabaseBrowserTab(QWidget):
         }
 
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(pack, f, indent=2)
+            _json.dump(pack, f, indent=2)
 
         self.status_message.emit(f"Exported {len(items)} items as DropSet pack: {os.path.basename(path)}")
         QMessageBox.information(self, tr("Pack Exported"),
