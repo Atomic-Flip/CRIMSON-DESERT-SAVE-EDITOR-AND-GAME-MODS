@@ -911,6 +911,132 @@ def _diff_blob_table_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
     return intents
 
 
+def _diff_table_field_level(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                            modded_pabgh: bytes, modded_pabgb: bytes,
+                            target_label: str) -> tuple[list[dict], str]:
+    """Field-level diff using dmm_parser.parse_table (122 supported tables).
+
+    Returns (intents, source) where source is "field" if dmm_parser handled
+    the table, "blob" if it fell back to the blob-level diff, or "" if
+    nothing could be done.
+
+    For tables that dmm_parser knows the typed schema for (gimmick_info,
+    condition_info, drop_set_info, character_info, buff_info, etc.), this
+    walks both vanilla and modded record dicts and emits one intent per
+    changed field — much finer-grained than `_diff_blob_table_to_intents`
+    which replaces entire records via `_blob_b64`.
+
+    The output intent shape matches Field JSON v3:
+        {"entry": str, "key": int, "field": "...", "op": "set", "new": ...}
+
+    Field paths use dot notation for nested dicts and `[N]` for list
+    indices, matching what DMM 1.3.4+ field-resolver consumes.
+
+    Falls back gracefully:
+      - dmm_parser not installed → caller should use blob diff
+      - unknown table_name in dmm_parser → caller should use blob diff
+      - parse fails on either side → caller should use blob diff
+
+    The caller is `_export_field_json`'s catchall loop (~line 3852).
+    """
+    try:
+        import dmm_parser  # type: ignore[import-not-found]
+    except ImportError:
+        return ([], "")
+
+    # Strip ".pabgb" to get table_name. dmm_parser.parse_table expects
+    # snake_case names matching `src/tables/<name>/`.
+    if target_label.endswith(".pabgb"):
+        table_name = target_label[:-len(".pabgb")]
+    else:
+        table_name = target_label
+
+    try:
+        vanilla_items = dmm_parser.parse_table(table_name, vanilla_pabgb, vanilla_pabgh)
+        modded_items  = dmm_parser.parse_table(table_name, modded_pabgb, modded_pabgh)
+    except (ValueError, RuntimeError):
+        # Unknown table or parse failure — caller falls back to blob diff.
+        return ([], "")
+
+    # Index by entry identity. Most tables key by string_key (entry name);
+    # numeric `key` is the stable cross-update fallback. Some tables only
+    # have `key` (no string_key), so prefer key as the identity.
+    def _identity(item: dict) -> tuple:
+        sk = item.get("string_key", "") or ""
+        k  = item.get("key")
+        return (sk, k)
+
+    v_by_id = {_identity(it): it for it in vanilla_items}
+    m_by_id = {_identity(it): it for it in modded_items}
+
+    intents: list[dict] = []
+    # Walk only entries present on both sides — record add/remove not
+    # supported by Field JSON v3 set op (would need add_entry op).
+    for ident in sorted(set(v_by_id) & set(m_by_id), key=lambda x: (x[0] or "", x[1] or 0)):
+        v = v_by_id[ident]
+        m = m_by_id[ident]
+        sk, k = ident
+        for path, new_value in _walk_dict_diff(v, m):
+            # Skip the identity fields themselves; they're how we found
+            # the entry in the first place. Editing string_key/key would
+            # change the identity which the v3 resolver can't follow.
+            if path in ("string_key", "key"):
+                continue
+            intents.append({
+                "entry": sk or "",
+                "key":   int(k) if k is not None else 0,
+                "field": path,
+                "op":    "set",
+                "new":   new_value,
+            })
+
+    return (intents, "field")
+
+
+def _walk_dict_diff(vanilla: dict, modded: dict, prefix: str = ""):
+    """Yield (field_path, new_value) for every leaf that differs.
+
+    Path syntax:
+      - dotted for nested dicts:           "drop_default_data.use_socket"
+      - bracket+index for list elements:   "enchant_data_list[3].level"
+
+    For dict-shaped lists (each element is a dict), recurses element-wise
+    when both lists have the same length. If lengths differ, emits one
+    intent for the whole list (set to the new full list) — caller just
+    replaces the entire list, matching set-op semantics.
+    """
+    if isinstance(vanilla, dict) and isinstance(modded, dict):
+        # Union of keys; vanilla-only or modded-only keys mean field
+        # add/remove which the v3 set op handles by replacing the value.
+        for key in sorted(set(vanilla) | set(modded)):
+            v_val = vanilla.get(key)
+            m_val = modded.get(key)
+            sub = f"{prefix}.{key}" if prefix else key
+            if v_val == m_val:
+                continue
+            yield from _walk_dict_diff(v_val, m_val, sub)
+    elif isinstance(vanilla, list) and isinstance(modded, list):
+        if len(vanilla) != len(modded) or not all(
+            isinstance(x, (dict, list)) for x in modded
+        ):
+            # Length change OR list of primitives → emit whole-list set.
+            if vanilla != modded:
+                yield (prefix, modded)
+        else:
+            # Equal length, recurse element-wise. Useful for fixed-shape
+            # lists like enchant_data_list where each level is its own
+            # dict and we want per-level field intents.
+            for i, (v_el, m_el) in enumerate(zip(vanilla, modded)):
+                if v_el == m_el:
+                    continue
+                sub = f"{prefix}[{i}]"
+                yield from _walk_dict_diff(v_el, m_el, sub)
+    else:
+        # Leaf — primitive or differing types. Emit a set intent.
+        if vanilla != modded:
+            yield (prefix, modded)
+
+
 def _diff_equipslot_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
                                 modded_pabgh: bytes, modded_pabgb: bytes
                                 ) -> list[dict]:
@@ -3849,11 +3975,25 @@ class StackerTab(QWidget):
                     vanilla_pabgh = bytes(crimson_rs.extract_file(
                         self._game_path, '0008',
                         INTERNAL_DIR, pabgh_name))
-                    t_intents = _diff_blob_table_to_intents(
+                    # Try field-level diff first via dmm_parser.parse_table.
+                    # 122 tables supported as of dmm-parser commit f054b5e
+                    # (gimmick_info, condition_info, drop_set_info,
+                    # character_info, buff_info, etc.). Falls back to the
+                    # blob-level diff for tables dmm_parser doesn't know
+                    # or when dmm_parser isn't installed.
+                    t_intents, source = _diff_table_field_level(
                         vanilla_pabgh, vanilla_pabgb,
                         other_snap[pabgh_name],
                         other_snap[pabgb_name],
                         pabgb_name)
+                    if not source:
+                        # Field-level path declined — use blob-level.
+                        t_intents = _diff_blob_table_to_intents(
+                            vanilla_pabgh, vanilla_pabgb,
+                            other_snap[pabgh_name],
+                            other_snap[pabgb_name],
+                            pabgb_name)
+                        source = "blob"
                 except Exception as e:
                     # Don't block the export — iteminfo + registry
                     # targets already gathered are still valid.
@@ -3865,7 +4005,7 @@ class StackerTab(QWidget):
                     extra_targets.append((pabgb_name, t_intents))
                     self._log_line(
                         f"  + {len(t_intents)} {pabgb_name} "
-                        f"intent(s) (generic blob diff)")
+                        f"intent(s) ({source}-level diff)")
 
         if not intents and not extra_targets:
             QMessageBox.information(self, "Export Field JSON",
