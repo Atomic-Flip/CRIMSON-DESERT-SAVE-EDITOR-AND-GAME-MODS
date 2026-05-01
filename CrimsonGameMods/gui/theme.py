@@ -162,14 +162,14 @@ QPushButton#accentBtn {{
 QPushButton#accentBtn:hover {{
     background-color: #e8b85e;
 }}
-QLineEdit, QSpinBox, QComboBox {{
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox {{
     background-color: {c['input_bg']};
     color: {c['text']};
     border: 1px solid {c['border']};
     padding: 5px 8px;
     border-radius: 3px;
 }}
-QLineEdit:focus, QSpinBox:focus, QComboBox:focus {{
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {{
     border-color: {c['accent']};
 }}
 QComboBox::drop-down {{
