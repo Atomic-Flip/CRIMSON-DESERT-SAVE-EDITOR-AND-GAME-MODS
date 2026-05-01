@@ -4047,12 +4047,14 @@ class StackerTab(QWidget):
                     'description': (
                         f'{total} field-level intent(s) across '
                         f'{target_count} target(s) — {target_summary}'),
-                    'note': ('Format 3 multi-target — uses field names, '
-                             'survives game updates. Requires DMM 1.3.3+ '
-                             'for non-iteminfo targets; older DMM versions '
-                             'will apply iteminfo intents only.'),
+                    'note': ('Field JSON v3.1 (multi-target field patching) '
+                             '— uses field names, survives game updates. '
+                             'Requires DMM 1.3.4+ for non-iteminfo targets; '
+                             'older DMM versions will apply iteminfo intents '
+                             'only. See FIELD_JSON_V3_1_SPEC.md.'),
                 },
                 'format': 3,
+                'format_minor': 1,
                 'targets': targets_array,
             }
             ui_lines = []

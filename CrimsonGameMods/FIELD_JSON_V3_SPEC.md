@@ -1,9 +1,16 @@
 # Field JSON v3 — Technical Specification for Mod Managers
 
-**Version**: 3.0  
-**Author**: NattKh (CrimsonGameMods)  
-**Date**: 2026-04-24  
+**Version**: 3.0
+**Author**: NattKh / RicePaddySoftware (CrimsonGameMods)
+**Date**: 2026-04-24
 **Status**: Stable — exported by CrimsonGameMods ItemBuffs and Stacker Tool
+**License**: MPL 2.0 (see LICENSE)
+**Successor**: [FIELD_JSON_V3_1_SPEC.md](FIELD_JSON_V3_1_SPEC.md) — v3.1 multi-target field patching (122 typed tables)
+
+> **Note**: v3.1 (released 2026-05-01) extends this spec with multi-target intent grouping
+> and 122-table coverage. v3.1 is **backward-compatible** with v3.0 — every v3.0 doc applies
+> unchanged in v3.1 loaders. New mods that touch tables beyond `iteminfo.pabgb` should
+> emit v3.1. See FIELD_JSON_V3_1_SPEC.md.
 
 ---
 
