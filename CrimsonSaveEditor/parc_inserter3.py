@@ -2963,10 +2963,21 @@ def _splice_socket_elements(
     toc_entries_cached = list(_result['toc']['entries'])
 
     locator_start = item.offset - 24
+    if locator_start + 5 > len(orig_blob):
+        return False, blob, "Item locator out of range"
+    # Pre-game-v1.0.5 layout: [mbc:2 = 3] [bitmask:3] [pad:3]
+    # Post-game-v1.0.5 layout: [discrim:1 = 0] [bitmask:4] [pad:3]
     mbc = struct.unpack_from('<H', orig_blob, locator_start)[0]
-    if mbc != 3:
-        return False, blob, "Item locator mbc != 3, cannot locate socket list"
-    bitmask = bytes(orig_blob[locator_start + 2: locator_start + 5])
+    if mbc == 3:
+        bitmask = bytes(orig_blob[locator_start + 2: locator_start + 5])
+    elif orig_blob[locator_start] == 0x00:
+        bitmask = bytes(orig_blob[locator_start + 1: locator_start + 5])
+    else:
+        return False, blob, (
+            f"Unrecognised item locator at 0x{locator_start:08X} "
+            f"(leading bytes 0x{orig_blob[locator_start]:02X} 0x{orig_blob[locator_start+1]:02X}). "
+            "Expected old-format mbc=3 or new-format discriminator=0."
+        )
 
     fp = _item_socket_field_present
     sock_rel = sum(_ITEM_SOCKET_FIELD_SIZES[i] for i in range(13) if fp(bitmask, i))

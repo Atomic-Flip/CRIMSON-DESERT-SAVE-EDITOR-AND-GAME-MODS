@@ -1,5 +1,5 @@
 {
-  "version": "1.0.5",
-  "url": "https://github.com/Atomic-Flip/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/v1.0.5/CrimsonSaveEditorStandalone.exe",
-  "notes": "Sockets tab now shows an inline hint above the slot rows when an item has locked slots, pointing at the 'Unlock Socket Slots' panel below. Auto-updater now reads its manifest from Atomic-Flip (the active release channel) instead of NattKh, so future installs auto-discover fork releases. Includes a .gitignore for build artifacts."
+  "version": "1.0.6",
+  "url": "https://github.com/Atomic-Flip/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/download/v1.0.6/CrimsonSaveEditorStandalone.exe",
+  "notes": "Hotfix for the Crimson Desert game v1.0.5 save format. The per-item locator changed from a 2-byte mbc word + 3-byte bitmask to a 1-byte discriminator + 4-byte bitmask, which made every socket on every item appear as locked and unfillable on new saves. The editor now detects and reads both formats (no UI change). Round-trip bit-identical on both old and new saves."
 }

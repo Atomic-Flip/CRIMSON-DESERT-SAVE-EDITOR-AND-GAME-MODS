@@ -12,7 +12,7 @@ from urllib.error import URLError
 log = logging.getLogger(__name__)
 
 
-APP_VERSION = "1.0.5"
+APP_VERSION = "1.0.6"
 
 APP_VARIANT = "standalone"
 

@@ -4577,11 +4577,27 @@ QCheckBox::indicator {{
         return bool(bitmask_bytes[byte_idx] & (1 << bit_idx))
 
     def _read_item_bitmask(self, blob: bytearray, item: 'SaveItem') -> bytes:
+        """Return the per-item bitmask, transparently handling both save formats.
+
+        Pre-game-v1.0.5 layout (8-byte locator at offset-24):
+            [mbc:2 bytes = 3] [bitmask:3 bytes] [pad:3 bytes]
+
+        Post-game-v1.0.5 layout (8-byte locator at offset-24):
+            [discriminator:1 byte = 0] [bitmask:4 bytes] [pad:3 bytes]
+
+        The newer bitmask is 4 bytes wide because game v1.0.5 introduced a
+        new optional field at bit 21. Bits 0..12 — the ones the editor
+        actually walks for socket fields — are the same in both formats.
+        """
         locator_start = item.offset - 24
-        mbc = struct.unpack_from("<H", blob, locator_start)[0]
-        if mbc != 3:
+        if locator_start + 5 > len(blob):
             return b'\x00\x00\x00'
-        return bytes(blob[locator_start + 2: locator_start + 5])
+        mbc = struct.unpack_from("<H", blob, locator_start)[0]
+        if mbc == 3:
+            return bytes(blob[locator_start + 2: locator_start + 5])
+        if blob[locator_start] == 0x00:
+            return bytes(blob[locator_start + 1: locator_start + 5])
+        return b'\x00\x00\x00'
 
     def _compute_socket_list_offset(self, bitmask: bytes) -> int:
         offset = 0
