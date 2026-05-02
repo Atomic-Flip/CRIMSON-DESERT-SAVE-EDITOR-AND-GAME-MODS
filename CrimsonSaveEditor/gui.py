@@ -5107,8 +5107,16 @@ QCheckBox::indicator {{
         design_limit = self._get_socket_design_limit(item.item_key)
         socket_data = self._read_socket_gems(blob, item)
 
+        # Only iterate slots the user can actually see and edit. The combo
+        # widgets are reused across item selections, so rows beyond the
+        # current item's design_limit (which are hidden) still hold whatever
+        # gem keys were left over from a previously-selected higher-slot
+        # item. Iterating range(max_s) — the structural array width, always
+        # 5 — would scoop up that stale data and misclassify it as fills,
+        # tripping the design-limit guard for swaps on 1- or 2-slot items.
+        edit_limit = min(max_s, design_limit) if design_limit > 0 else 0
         new_gems = []
-        for i in range(max_s):
+        for i in range(edit_limit):
             key = self._sock_rows[i]["combo"].currentData() if i < len(self._sock_rows) else 0
             new_gems.append(key if key else 0)
 
