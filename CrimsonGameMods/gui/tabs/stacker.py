@@ -88,6 +88,84 @@ OVERLAY_EQUIP_GROUP_DEFAULT = "0063"
 
 
 # ============================================================
+#   Field JSON v3 export — extensible target registry
+# ============================================================
+#
+# Each entry describes one pabgb table the Stacker can produce intents for.
+# Adding support for a new target = adding one entry to this list and a
+# matching `_diff_<table>_to_intents()` helper above. The exporter
+# (_export_field_json) iterates this registry to assemble the multi-target
+# `targets[]` array, falling back to legacy single-target shape only when
+# nothing but iteminfo is present.
+#
+# Schema per entry:
+#   - name           v3 target string (matches `targets[].file` in output JSON)
+#   - enabled        gate flag — set False for scaffolds awaiting prerequisites
+#   - merged_attr    name of the StackerTab attribute that holds merged bytes
+#                    as `{filename: bytes}` dict (set in _run after the merge)
+#   - pabgb_filename / pabgh_filename
+#                    keys to pull out of the merged_attr dict
+#   - vanilla_group  PAZ group string for crimson_rs.extract_file (almost
+#                    always "0008" for game data tables)
+#   - vanilla_dir    INTERNAL_DIR for game data; constants up top
+#   - diff_fn        callable(vanilla_pabgh, vanilla_pabgb,
+#                             mod_pabgh, mod_pabgb) -> list[intent]
+#   - label          human-readable, used in mount log lines
+#   - todo           one-liner explaining why an entry is disabled (None if
+#                    enabled)
+#
+# Iteminfo is intentionally NOT in this registry — it uses the dict-list
+# diff path (vanilla_items vs merged_items) which is structurally different
+# from the bytes-diff approach used here. The exporter handles it inline.
+_FIELD_JSON_TARGET_REGISTRY: list[dict] = [
+    {
+        'name':            'equipslotinfo.pabgb',
+        'enabled':         True,
+        'merged_attr':     '_merged_equip_files',
+        'pabgb_filename':  'equipslotinfo.pabgb',
+        'pabgh_filename':  'equipslotinfo.pabgh',
+        'vanilla_group':   '0008',
+        'vanilla_dir':     INTERNAL_DIR,
+        'diff_fn':         None,  # set after _diff_equipslot_to_intents is defined
+        'label':           'equipslotinfo (universal weapon proficiency)',
+        'todo':            None,
+    },
+    {
+        'name':            'skill.pabgb',
+        'enabled':         False,
+        'merged_attr':     '_merged_skill_files',
+        'pabgb_filename':  'skill.pabgb',
+        'pabgh_filename':  'skill.pabgh',
+        'vanilla_group':   '0008',
+        'vanilla_dir':     INTERNAL_DIR,
+        'diff_fn':         None,  # set after _diff_skill_to_intents is defined
+        'label':           'skill (cooltimes, learn levels, etc.)',
+        'todo':            ('field name mismatch between skillinfo_parser.py '
+                            '(IDA names) and DMM dmm_parser::tables::skill_info '
+                            '(Mac symbols). Build a name map, then flip enabled.'),
+    },
+    # When a generic blob-table fallback target is needed (e.g. enabling a
+    # "block this buff" / "disable this condition" workflow), copy this
+    # template and set name + merged_attr accordingly. The Stacker doesn't
+    # currently merge non-{item,skill,equipslot}info tables; that's the
+    # blocker, NOT the export pipeline. Wire merge first, then enable here.
+    # Example for a future buff-blocker:
+    # {
+    #     'name':           'buff_info.pabgb',
+    #     'enabled':        False,
+    #     'merged_attr':    '_merged_other_files',
+    #     'pabgb_filename': 'buff_info.pabgb',
+    #     'pabgh_filename': 'buff_info.pabgh',
+    #     'vanilla_group':  '0008',
+    #     'vanilla_dir':    INTERNAL_DIR,
+    #     'diff_fn':        lambda vh, vb, mh, mb: _diff_blob_table_to_intents(vh, vb, mh, mb, 'buff_info.pabgb'),
+    #     'label':          'buff_info (blob fallback)',
+    #     'todo':           'Stacker merge-side support for buff_info pending',
+    # },
+]
+
+
+# ============================================================
 #   Per-entry parse fallback (handles housing items)
 # ============================================================
 
@@ -169,6 +247,13 @@ class ModEntry:
     # "equipslotinfo.pabgh". Values are raw bytes.
     staged_skill_files: dict = field(default_factory=dict)
     staged_equip_files: dict = field(default_factory=dict)
+    # Catch-all bucket for every other .pabgb/.pabgh pair the source mod
+    # ships (buff_info, condition_info, gimmick_info, store_info, etc.).
+    # Pre-1.1.5 these were dropped at folder_paz ingestion (only the four
+    # equipslot+skill names were extracted), making any mod that touched
+    # other tables silently broken in the Stacker pipeline. The Field
+    # JSON exporter consumes this via _merged_other_files.
+    staged_other_files: dict = field(default_factory=dict)
     # Legacy-JSON-only: per-patch field attribution + merge strategy. See
     # iteminfo_inspector.py. `merge_mode` is "strict" (default — apply
     # bytes to vanilla then re-parse) or "semantic" (skip byte apply,
@@ -702,6 +787,471 @@ def _deep_diff_to_intents(entry: str, key: int, a: dict, b: dict,
     return intents
 
 
+def _diff_skill_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                            modded_pabgh: bytes, modded_pabgb: bytes
+                            ) -> list[dict]:
+    """Diff modded skill.pabgb against vanilla, emit Field JSON v3 intents.
+
+    SCAFFOLDING — currently DISABLED in _FIELD_JSON_TARGET_REGISTRY.
+
+    Why: the Stacker's local `skillinfo_parser.py` was reverse-engineered from
+    IDA and uses raw symbol names (`field_12`, `field_16`, `field_88`, etc.)
+    for its struct fields. DMM's apply pipeline reads skill.pabgb via
+    `dmm_parser::tables::skill_info::parse_skill_to_json`, which uses the
+    Mac-binary-derived clean names (`cooltime`, `learn_level`, `apply_type`,
+    `dev_skill_name`, etc.). Intents emitted with `field_12` paths won't
+    resolve in DMM.
+
+    To enable:
+      1. Map skillinfo_parser.py field names → dmm_parser names (one-time
+         work, ~30 fields). Build a `_SKILL_FIELD_NAME_MAP` dict.
+      2. In the diff loop below, translate every emitted `field` path
+         through the map; skip fields with no mapping.
+      3. Flip `enabled: True` in the registry entry.
+      4. Round-trip-test against a real skill mod (e.g. one from
+         https://www.nexusmods.com/crimsondesert tagged "skill").
+
+    Until that's done, skill mods continue shipping as folder overlays
+    (Bucket D of the merger captures skill.pabgb/.pabgh fine; only the
+    JSON export path is missing).
+    """
+    # Stub returns no intents so any accidental call is a no-op rather
+    # than a corrupt-export hazard.
+    return []
+
+
+def _diff_blob_table_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                                 modded_pabgh: bytes, modded_pabgb: bytes,
+                                 target_label: str) -> list[dict]:
+    """Diff a generic pabgh_blob_table file against vanilla.
+
+    BACKEND ONLY — currently DISABLED in _FIELD_JSON_TARGET_REGISTRY because
+    the Stacker doesn't merge non-{item,skill,equipslot}info tables today.
+    Once merge-side support lands for an additional table, register a new
+    entry pointing at this helper and the existing dispatcher handles it.
+
+    The wire format is universal: every pabgh_blob_table-formatted record
+    is `[key:u32][string_key:CString][is_blocked:u8][blob:rest]`. The diff
+    emits intents for `key` / `string_key` / `is_blocked` changes and a
+    base64 `_blob_b64` clone for any record whose blob bytes changed.
+
+    Field paths produced here match exactly what DMM 1.3.3+'s blob fallback
+    (apply_v3_to_blob_table_body) consumes — see
+    `dmm_parser::tables::blob_runtime::BlobTableRecord::to_json_value`.
+    """
+    import base64
+    import struct
+
+    def _parse_blob_table(pabgh: bytes, pabgb: bytes):
+        """Walk a pabgh_blob_table file. Returns {key: (string_key, is_blocked, blob)}."""
+        # pabgh: u16 count + N×(u32 key, u32 offset). Sister file boundaries
+        # determine record sizes.
+        if len(pabgh) < 2:
+            return {}
+        count = struct.unpack_from('<H', pabgh, 0)[0]
+        # Detect 8-byte vs 6-byte entry layout (small minority of tables use u16 keys).
+        if 2 + count * 8 == len(pabgh):
+            entry_size, key_size, key_fmt = 8, 4, '<I'
+        elif 2 + count * 6 == len(pabgh):
+            entry_size, key_size, key_fmt = 6, 2, '<H'
+        else:
+            # Unknown layout. Bail to caller, who'll surface it.
+            raise ValueError(f"unknown pabgh layout: count={count}, file={len(pabgh)}B")
+
+        offsets = []
+        for i in range(count):
+            base = 2 + i * entry_size
+            key = struct.unpack_from(key_fmt, pabgh, base)[0]
+            off = struct.unpack_from('<I', pabgh, base + key_size)[0]
+            offsets.append((key, off))
+        offsets.sort(key=lambda kv: kv[1])
+
+        records = {}
+        for i, (key, off) in enumerate(offsets):
+            end = offsets[i + 1][1] if i + 1 < len(offsets) else len(pabgb)
+            # [key u32][string_key cstring][is_blocked u8][blob ...]
+            p = off
+            _k = struct.unpack_from('<I', pabgb, p)[0]; p += 4
+            slen = struct.unpack_from('<I', pabgb, p)[0]; p += 4
+            sk = pabgb[p:p + slen].decode('utf-8', errors='replace'); p += slen
+            ib = pabgb[p]; p += 1
+            blob = pabgb[p:end]
+            records[key] = (sk, ib, blob)
+        return records
+
+    vanilla = _parse_blob_table(vanilla_pabgh, vanilla_pabgb)
+    modded  = _parse_blob_table(modded_pabgh, modded_pabgb)
+
+    intents: list[dict] = []
+    for key in sorted(set(vanilla) | set(modded)):
+        v = vanilla.get(key)
+        m = modded.get(key)
+        if not v or not m:
+            # Add/remove not yet supported by Field JSON v3 spec.
+            continue
+        v_sk, v_ib, v_blob = v
+        m_sk, m_ib, m_blob = m
+        if v_sk != m_sk:
+            intents.append({
+                'entry': v_sk, 'key': int(key),
+                'field': 'string_key', 'op': 'set', 'new': m_sk,
+            })
+        if v_ib != m_ib:
+            intents.append({
+                'entry': v_sk, 'key': int(key),
+                'field': 'is_blocked', 'op': 'set', 'new': int(m_ib),
+            })
+        if v_blob != m_blob:
+            intents.append({
+                'entry': v_sk, 'key': int(key),
+                'field': '_blob_b64', 'op': 'set',
+                'new': base64.b64encode(m_blob).decode('ascii'),
+            })
+
+    return intents
+
+
+def _diff_table_field_level(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                            modded_pabgh: bytes, modded_pabgb: bytes,
+                            target_label: str) -> tuple[list[dict], str]:
+    """Field-level diff using dmm_parser.parse_table (122 supported tables).
+
+    Returns (intents, source) where source is "field" if dmm_parser handled
+    the table, "blob" if it fell back to the blob-level diff, or "" if
+    nothing could be done.
+
+    For tables that dmm_parser knows the typed schema for (gimmick_info,
+    condition_info, drop_set_info, character_info, buff_info, etc.), this
+    walks both vanilla and modded record dicts and emits one intent per
+    changed field — much finer-grained than `_diff_blob_table_to_intents`
+    which replaces entire records via `_blob_b64`.
+
+    The output intent shape matches Field JSON v3:
+        {"entry": str, "key": int, "field": "...", "op": "set", "new": ...}
+
+    Field paths use dot notation for nested dicts and `[N]` for list
+    indices, matching what DMM 1.3.4+ field-resolver consumes.
+
+    Falls back gracefully:
+      - dmm_parser not installed → caller should use blob diff
+      - unknown table_name in dmm_parser → caller should use blob diff
+      - parse fails on either side → caller should use blob diff
+
+    The caller is `_export_field_json`'s catchall loop (~line 3852).
+    """
+    try:
+        import dmm_parser  # type: ignore[import-not-found]
+    except ImportError:
+        return ([], "")
+
+    # Strip ".pabgb" to get table_name. dmm_parser.parse_table expects
+    # snake_case names matching `src/tables/<name>/`.
+    if target_label.endswith(".pabgb"):
+        table_name = target_label[:-len(".pabgb")]
+    else:
+        table_name = target_label
+
+    try:
+        vanilla_items = dmm_parser.parse_table(table_name, vanilla_pabgb, vanilla_pabgh)
+        modded_items  = dmm_parser.parse_table(table_name, modded_pabgb, modded_pabgh)
+    except (ValueError, RuntimeError):
+        # Unknown table or parse failure — caller falls back to blob diff.
+        return ([], "")
+
+    # Index by entry identity. Most tables key by string_key (entry name);
+    # numeric `key` is the stable cross-update fallback. Some tables only
+    # have `key` (no string_key), so prefer key as the identity.
+    def _identity(item: dict) -> tuple:
+        sk = item.get("string_key", "") or ""
+        k  = item.get("key")
+        return (sk, k)
+
+    v_by_id = {_identity(it): it for it in vanilla_items}
+    m_by_id = {_identity(it): it for it in modded_items}
+
+    intents: list[dict] = []
+    # Walk only entries present on both sides — record add/remove not
+    # supported by Field JSON v3 set op (would need add_entry op).
+    for ident in sorted(set(v_by_id) & set(m_by_id), key=lambda x: (x[0] or "", x[1] or 0)):
+        v = v_by_id[ident]
+        m = m_by_id[ident]
+        sk, k = ident
+        for path, new_value in _walk_dict_diff(v, m):
+            # Skip the identity fields themselves; they're how we found
+            # the entry in the first place. Editing string_key/key would
+            # change the identity which the v3 resolver can't follow.
+            if path in ("string_key", "key"):
+                continue
+            intents.append({
+                "entry": sk or "",
+                "key":   int(k) if k is not None else 0,
+                "field": path,
+                "op":    "set",
+                "new":   new_value,
+            })
+
+    return (intents, "field")
+
+
+def _walk_dict_diff(vanilla: dict, modded: dict, prefix: str = ""):
+    """Yield (field_path, new_value) for every leaf that differs.
+
+    Path syntax:
+      - dotted for nested dicts:           "drop_default_data.use_socket"
+      - bracket+index for list elements:   "enchant_data_list[3].level"
+
+    For dict-shaped lists (each element is a dict), recurses element-wise
+    when both lists have the same length. If lengths differ, emits one
+    intent for the whole list (set to the new full list) — caller just
+    replaces the entire list, matching set-op semantics.
+    """
+    if isinstance(vanilla, dict) and isinstance(modded, dict):
+        # Union of keys; vanilla-only or modded-only keys mean field
+        # add/remove which the v3 set op handles by replacing the value.
+        for key in sorted(set(vanilla) | set(modded)):
+            v_val = vanilla.get(key)
+            m_val = modded.get(key)
+            sub = f"{prefix}.{key}" if prefix else key
+            if v_val == m_val:
+                continue
+            yield from _walk_dict_diff(v_val, m_val, sub)
+    elif isinstance(vanilla, list) and isinstance(modded, list):
+        if len(vanilla) != len(modded) or not all(
+            isinstance(x, (dict, list)) for x in modded
+        ):
+            # Length change OR list of primitives → emit whole-list set.
+            if vanilla != modded:
+                yield (prefix, modded)
+        else:
+            # Equal length, recurse element-wise. Useful for fixed-shape
+            # lists like enchant_data_list where each level is its own
+            # dict and we want per-level field intents.
+            for i, (v_el, m_el) in enumerate(zip(vanilla, modded)):
+                if v_el == m_el:
+                    continue
+                sub = f"{prefix}[{i}]"
+                yield from _walk_dict_diff(v_el, m_el, sub)
+    else:
+        # Leaf — primitive or differing types. Emit a set intent.
+        if vanilla != modded:
+            yield (prefix, modded)
+
+
+def _diff_equipslot_to_intents(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
+                                modded_pabgh: bytes, modded_pabgb: bytes
+                                ) -> list[dict]:
+    """Diff modded equipslotinfo against vanilla, emit Field JSON v3 intents.
+
+    Each EquipSlotRecord is keyed by class id (1, 4, 6, 7, 201, 203, 211,
+    701, 708, 712, 730, 750, 801 in vanilla 1.04). Per record, walk every
+    EquipInfoData entry and compare every editable field. Most universal-
+    proficiency-style mods only modify `etl_hashes` (the equip_type_info
+    list), but other field changes (category, slot_index, blob, etc.) are
+    captured the same way for completeness.
+
+    Requires DMM 1.3.3+ on the consumer side -- that release added the
+    equipslotinfo.pabgb v3 target. Earlier DMM versions silently ignore
+    these intents (mounted but no effect).
+    """
+    import equipslotinfo_parser as esp
+
+    vanilla = esp.parse_all(vanilla_pabgh, vanilla_pabgb)
+    modded  = esp.parse_all(modded_pabgh, modded_pabgb)
+    v_by_key = {r.key: r for r in vanilla}
+    m_by_key = {r.key: r for r in modded}
+
+    intents: list[dict] = []
+    for key in sorted(set(v_by_key) | set(m_by_key)):
+        v = v_by_key.get(key)
+        m = m_by_key.get(key)
+        # Skip records present in only one set -- record add/remove not
+        # supported by Field JSON v3 spec yet (would need add_entry op).
+        if not v or not m:
+            continue
+        # Skip records where entries[] grew/shrank -- spec is set-only,
+        # no append/remove. Such mods need to ship as folder overlays.
+        if len(v.entries) != len(m.entries):
+            continue
+
+        for i, (ve, me) in enumerate(zip(v.entries, m.entries)):
+            # etl_hashes -- the unlock vector (universal proficiency etc.)
+            if list(ve.etl_hashes) != list(me.etl_hashes):
+                intents.append({
+                    'entry': '', 'key': int(key),
+                    'field': f'entries[{i}].etl_hashes',
+                    'op': 'set',
+                    'new': [int(h) for h in me.etl_hashes],
+                })
+            # Scalar fields -- only emitted when value changed so we don't
+            # bloat the export with no-op intents.
+            for fname in ('category_a', 'category_b', 'name_hash',
+                          'slot_index', 'field_u64', 'name_hash_2',
+                          'complex_u8', 'complex_u64'):
+                vv = getattr(ve, fname)
+                mv = getattr(me, fname)
+                if vv != mv:
+                    intents.append({
+                        'entry': '', 'key': int(key),
+                        'field': f'entries[{i}].{fname}',
+                        'op': 'set',
+                        'new': int(mv),
+                    })
+            # fields_u32 -- fixed [u32; 4] array
+            if list(ve.fields_u32) != list(me.fields_u32):
+                intents.append({
+                    'entry': '', 'key': int(key),
+                    'field': f'entries[{i}].fields_u32',
+                    'op': 'set',
+                    'new': [int(x) for x in me.fields_u32],
+                })
+
+    return intents
+
+
+# ── Late-bind diff_fn references in the registry now that the helpers exist.
+# (The registry constant is declared near the top of the module for visibility,
+# but Python doesn't allow forward-referencing names there. This binds the
+# functions in once they're defined.)
+for _entry in _FIELD_JSON_TARGET_REGISTRY:
+    if _entry['name'] == 'equipslotinfo.pabgb':
+        _entry['diff_fn'] = _diff_equipslot_to_intents
+    elif _entry['name'] == 'skill.pabgb':
+        _entry['diff_fn'] = _diff_skill_to_intents
+del _entry
+
+
+# ============================================================
+#   Texture mod export — folder-mod backend
+# ============================================================
+#
+# TODO(frontend): wire this up to a "📦 EXPORT TEXTURE MOD" button in the
+# Stacker GUI. The dialog should let the user:
+#   1. Drag .dds files into a list (or pick from a folder)
+#   2. Per file: edit the destination vpath (auto-suggest from PATHC lookup
+#      against vanilla_dumps/)
+#   3. Edit mod metadata (title / author / version / description)
+#   4. Click "Export" → call _build_texture_mod_folder() → show success
+#      dialog with "Open in Explorer" + "Copy to DMM mods folder" actions
+#
+# The output is a DMM-compatible folder mod (manifest.json + files/<group>/
+# <vpath>). DMM's existing browser/folder-mod pipeline picks it up with no
+# additional changes — the texture injection path (DDS → PAZ overlay via
+# meta/0.pathc lookup) is already production-grade.
+#
+# This backend is intentionally GUI-agnostic so it can also be called from:
+#   - A future DDS batch converter that auto-resizes / reformats textures
+#   - A bulk import-and-export pipeline ("convert this folder of PNGs to DDS
+#     and export as a mod")
+#   - Programmatic callers (CLI, scripted bulk operations)
+
+
+def _build_texture_mod_folder(
+    out_dir: str,
+    mod_name: str,
+    textures: list[tuple[str, str]],
+    *,
+    title: str = "",
+    author: str = "CrimsonGameMods Stacker",
+    version: str = "1.0",
+    description: str = "",
+) -> str:
+    """Produce a DMM-compatible folder texture mod.
+
+    Args:
+        out_dir:   parent directory the mod folder is created under
+        mod_name:  folder name to create (also default title if `title` empty)
+        textures:  list of (source_dds_path, vpath) tuples. `vpath` is the
+                   slash-separated path inside the game's PAZ archive
+                   STARTING with the PAZ group number. Examples:
+                       "0012/ui/texture/cd_icon_common_01.dds"
+                       "0009/character/texture/macduff/diffuse.dds"
+        title:     optional manifest title (defaults to mod_name)
+        author:    manifest author
+        version:   manifest version (SemVer-ish)
+        description: free-form description shown in DMM's mod list
+
+    Returns:
+        Absolute path to the created mod folder.
+
+    Raises:
+        ValueError: if `textures` is empty or any source file is missing
+        OSError:    on filesystem errors during write
+
+    DMM consumption path:
+        manifest-free folder mods are auto-detected by DMM as long as the
+        `files/` tree is present and the first sub-folder is a 4-digit PAZ
+        group number. Including manifest.json gives DMM nicer mod-list
+        metadata (title, version, author, description); leaving it out is
+        also fine. We ALWAYS write the manifest here so authors get a
+        polished mod-list entry without thinking about it.
+
+    Output structure:
+        <out_dir>/<mod_name>/
+            manifest.json
+            files/
+                <vpath of texture #1>
+                <vpath of texture #2>
+                ...
+
+    File writing strategy: copy-not-symlink so the mod folder is
+    self-contained and can be zipped + shipped without follow-up.
+    """
+    import shutil
+
+    if not textures:
+        raise ValueError("textures list is empty — nothing to export")
+
+    # Validate every source up front; partial mods are confusing.
+    for i, (src, vpath) in enumerate(textures):
+        if not os.path.isfile(src):
+            raise ValueError(
+                f"texture[{i}] source file not found: {src}")
+        if not vpath or not vpath.lower().endswith('.dds'):
+            raise ValueError(
+                f"texture[{i}] vpath must end in .dds (got: {vpath!r})")
+        # Quick PAZ-group-prefix sanity. The first segment of vpath should
+        # be a 4-digit numeric group like "0009" / "0012".
+        first_seg = vpath.replace('\\', '/').split('/', 1)[0]
+        if not (first_seg.isdigit() and len(first_seg) == 4):
+            raise ValueError(
+                f"texture[{i}] vpath should START with a 4-digit PAZ group "
+                f"(got first segment {first_seg!r}). Common groups: "
+                f"0009 (character), 0012 (UI), 0014 (level data)")
+
+    mod_dir = os.path.join(out_dir, mod_name)
+    files_dir = os.path.join(mod_dir, "files")
+    os.makedirs(files_dir, exist_ok=True)
+
+    # Write each texture into files/<vpath>
+    written: list[str] = []
+    for src, vpath in textures:
+        norm_vpath = vpath.replace('\\', '/').lstrip('/')
+        dst = os.path.join(files_dir, *norm_vpath.split('/'))
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+        written.append(norm_vpath)
+
+    # Manifest. DMM reads `id`/`name`/`version`/`author`/`description` for
+    # the mod-list display; other fields are optional.
+    manifest = {
+        "id": f"com.crimsongamemods.texture.{mod_name.lower().replace(' ', '_')}",
+        "name": title or mod_name,
+        "version": version,
+        "author": author,
+        "description": description or (
+            f"{len(written)} texture replacement(s) — built by "
+            f"CrimsonGameMods Stacker"),
+        "format": "folder_mod",
+        "_built_by": "CrimsonGameMods Stacker (texture export backend)",
+        "_texture_count": len(written),
+    }
+    with open(os.path.join(mod_dir, "manifest.json"), 'w',
+              encoding='utf-8') as f:
+        json.dump(manifest, f, indent=2, ensure_ascii=False)
+
+    return mod_dir
+
+
 def _merge_all(vanilla_items: list[dict],
                mod_lists: list[tuple[str, list[dict]]]
                ) -> tuple[list[dict], list[FieldConflict]]:
@@ -776,9 +1326,26 @@ class StackerTab(QWidget):
         self._config = config if config is not None else {}
         self._show_guide_fn = show_guide_fn
         self._buffs_tab = buffs_tab  # for shared state + Apply to Game
+        self._mod_tabs: dict = {}  # populated by main_window after all tabs created
         self._game_path: str = self._config.get("game_install_path", "")
         self._mods: list[ModEntry] = []
         self._merged_items: list = []
+        # Per-target merged-bytes captures populated during _run. Each holds
+        # `{filename: bytes}` for the table's pabgb + pabgh sister files.
+        # Read by _export_field_json via the names declared in the
+        # _FIELD_JSON_TARGET_REGISTRY entries' `merged_attr` fields.
+        #
+        # _merged_equip_files: ENABLED in registry (1.1.4+) — universal
+        #     weapon proficiency / Universal Proficiency v2 / tribe edits.
+        # _merged_skill_files: SCAFFOLDED in registry (disabled). Captured
+        #     here so the diff helper has data the moment its registry
+        #     entry flips to enabled (after the field-name map is built).
+        # _merged_other_files: catch-all for future non-{item,equip,skill}
+        #     blob-table targets. Currently empty — Stacker doesn't merge
+        #     non-{iteminfo, skill, equipslot} tables yet.
+        self._merged_equip_files: dict = {}
+        self._merged_skill_files: dict = {}
+        self._merged_other_files: dict = {}
         self._conflicts: list[FieldConflict] = []
         self._build_ui()
 
@@ -1183,6 +1750,17 @@ class StackerTab(QWidget):
         pull_btn.clicked.connect(self._pull_from_itembuffs)
         blay.addWidget(pull_btn)
 
+        pull_all_btn = _size_button(QPushButton("⇅ Pull All Edits"))
+        pull_all_btn.setObjectName("flatBtn")
+        pull_all_btn.setStyleSheet(
+            "QPushButton { background-color: #00695C; color: white; font-weight: bold; }")
+        pull_all_btn.setToolTip(
+            "Pull edits from ALL tabs: ItemBuffs + MercPets + SkillTree + "
+            "BagSpace + ReserveSlot + FieldEdit. Creates one mod entry per "
+            "tab that has modifications.")
+        pull_all_btn.clicked.connect(self._pull_all_edits)
+        blay.addWidget(pull_all_btn)
+
         pull_dmm_btn = _size_button(QPushButton("⇅ Pull DMM"))
         pull_dmm_btn.setObjectName("flatBtn")
         pull_dmm_btn.setToolTip(
@@ -1422,6 +2000,74 @@ class StackerTab(QWidget):
         self._log_line(f"✓ Pulled from ItemBuffs: {summary}.")
 
     # ------------------------------------------------------------
+    def _pull_all_edits(self):
+        """Pull edits from ALL tabs that have modifications."""
+        pulled = []
+
+        if self._buffs_tab is not None:
+            has_items = bool(getattr(self._buffs_tab, "_buff_rust_items", None))
+            if has_items:
+                self._pull_from_itembuffs()
+                pulled.append("ItemBuffs")
+
+        _TAB_LABELS = {
+            "mercpets": "MercPets",
+            "bagspace": "BagSpace",
+            "skilltree": "SkillTree",
+            "reserveslot": "ReserveSlot",
+            "fieldedit": "FieldEdit",
+        }
+
+        for tab_key, tab_obj in self._mod_tabs.items():
+            if tab_obj is None:
+                continue
+            get_fn = getattr(tab_obj, "get_staged_files", None)
+            if get_fn is None:
+                continue
+            try:
+                staged = get_fn()
+            except Exception as e:
+                log.warning("Pull all: %s.get_staged_files() failed: %s", tab_key, e)
+                continue
+            if not staged:
+                continue
+
+            label = _TAB_LABELS.get(tab_key, tab_key)
+            file_names = sorted(staged.keys())
+            summary = f"{label}: {', '.join(file_names)}"
+
+            self._mods = [
+                m for m in self._mods
+                if not (m.kind == "companion_files"
+                        and m.name == f"{label} tab (staged files)")
+            ]
+
+            entry = ModEntry(
+                name=f"{label} tab (staged files)",
+                path="<in-memory>",
+                kind="companion_files",
+                ok=True,
+                note=summary,
+            )
+            entry.staged_companion_files = staged
+            self._mods.append(entry)
+            pulled.append(label)
+            self._log_line(f"  ✓ {summary}")
+
+        self._refresh_mod_list()
+        if pulled:
+            self._log_line(f"✓ Pull All: {', '.join(pulled)}")
+            QMessageBox.information(
+                self, "Pull All Edits",
+                f"Pulled edits from: {', '.join(pulled)}\n\n"
+                f"Run PREVIEW then Export Field JSON to build multi-target mod.")
+        else:
+            QMessageBox.information(
+                self, "Pull All Edits",
+                "No tabs have modifications to pull.\n\n"
+                "Load and edit data in ItemBuffs, MercPets, SkillTree, etc. first.")
+
+    # ------------------------------------------------------------
     def _regenerate_equipslotinfo_for_up_v2(self) -> dict:
         """Re-run the equipslotinfo expansion logic from
         _eb_universal_proficiency_v2 in-process, using the Stacker's
@@ -1563,12 +2209,13 @@ class StackerTab(QWidget):
     # distinct at a glance: green for itembuffs, blue for folder mods,
     # amber for legacy JSON, grey for loose pabgb.
     _TYPE_META = {
-        "itembuffs_edits": ("ITEMBUFFS", "#1E2A1E", "#4CAF50"),
-        "folder_paz":      ("PAZ MOD",   "#1A2030", "#6A9CE0"),
-        "loose_pabgb":     ("PABGB",     "#1F2128", "#9EA4B8"),
-        "legacy_json":     ("JSON v2",   "#2A2418", "#DC961E"),
-        "field_json":      ("FIELD v3",  "#1A2A2A", "#26C6DA"),
-        "dmm_json":        ("DMM",       "#1A1A2A", "#7B68EE"),
+        "itembuffs_edits": ("ITEMBUFFS",  "#1E2A1E", "#4CAF50"),
+        "companion_files": ("STAGED",     "#0D2A1A", "#00E676"),
+        "folder_paz":      ("PAZ MOD",    "#1A2030", "#6A9CE0"),
+        "loose_pabgb":     ("PABGB",      "#1F2128", "#9EA4B8"),
+        "legacy_json":     ("JSON v2",    "#2A2418", "#DC961E"),
+        "field_json":      ("FIELD v3",   "#1A2A2A", "#26C6DA"),
+        "dmm_json":        ("DMM",        "#1A1A2A", "#7B68EE"),
     }
 
     def _append_mod_row(self, m: ModEntry):
@@ -1730,6 +2377,9 @@ class StackerTab(QWidget):
         self._mods_list.clear()
         self._merged_items = []
         self._vanilla_items = []
+        self._merged_equip_files = {}
+        self._merged_skill_files = {}
+        self._merged_other_files = {}
         self._conflicts = []
         self._refresh_details()
 
@@ -1891,18 +2541,47 @@ class StackerTab(QWidget):
                     except Exception:
                         items, _ = _parse_with_fallback(crimson_rs, game, raw)
                     m.parsed_items = items
-                    # Pull companion sibling files if this mod ships with
-                    # them (UP mods package equipslotinfo; passive-skill
-                    # mods package skill.pabgb). Silently ignored when
-                    # the PAZ doesn't contain them — most iteminfo mods
-                    # don't.
+                    # Pull every .pabgb/.pabgh sibling this mod ships.
+                    # Pre-1.1.5 only the four hardcoded equipslotinfo +
+                    # skill names made it through here; mods that
+                    # touched buff_info / condition_info / gimmick_info
+                    # / store_info / etc. silently lost those bytes at
+                    # this layer. Now we enumerate the PAMT directly so
+                    # any pabgb table the modder ships gets picked up.
+                    #
+                    # Routing:
+                    #   equipslotinfo.* → staged_equip_files (registry)
+                    #   skill.*         → staged_skill_files (registry, disabled)
+                    #   anything else   → staged_other_files (catch-all blob diff)
                     companions = []
-                    for fname, target in (
-                        ("equipslotinfo.pabgb", "staged_equip_files"),
-                        ("equipslotinfo.pabgh", "staged_equip_files"),
-                        ("skill.pabgb", "staged_skill_files"),
-                        ("skill.pabgh", "staged_skill_files"),
-                    ):
+                    discovered: list[str] = []
+                    try:
+                        pamt_path = os.path.join(m.path, m.group, "0.pamt")
+                        with open(pamt_path, 'rb') as _pf:
+                            pamt_data = _pf.read()
+                        pamt = crimson_rs.parse_pamt_bytes(pamt_data)
+                        for d in pamt.get('directories', []):
+                            if d.get('path') != INTERNAL_DIR:
+                                continue
+                            for f in d.get('files', []):
+                                fname = f.get('name', '')
+                                # Iteminfo flows through the dict-list
+                                # merge path, not Bucket D.
+                                if fname == ITEMINFO_PABGB or fname == ITEMINFO_PABGH:
+                                    continue
+                                if fname.endswith('.pabgb') or fname.endswith('.pabgh'):
+                                    discovered.append(fname)
+                    except Exception:
+                        # PAMT parse failed — fall back to the legacy
+                        # four hardcoded names so equipslotinfo + skill
+                        # mods still work even if the PAMT decoder hits
+                        # an edge case.
+                        discovered = [
+                            "equipslotinfo.pabgb", "equipslotinfo.pabgh",
+                            "skill.pabgb", "skill.pabgh",
+                        ]
+
+                    for fname in discovered:
                         try:
                             comp_raw = bytes(crimson_rs.extract_file(
                                 m.path, m.group, INTERNAL_DIR, fname))
@@ -1910,7 +2589,12 @@ class StackerTab(QWidget):
                             continue
                         if not comp_raw:
                             continue
-                        getattr(m, target)[fname] = comp_raw
+                        if fname.startswith("equipslotinfo."):
+                            m.staged_equip_files[fname] = comp_raw
+                        elif fname.startswith("skill."):
+                            m.staged_skill_files[fname] = comp_raw
+                        else:
+                            m.staged_other_files[fname] = comp_raw
                         companions.append(fname)
                     m.apply_stats = (
                         f"compiled PAZ unpacked"
@@ -2276,6 +2960,34 @@ class StackerTab(QWidget):
                 f"  Equipslotinfo split into its own overlay group: "
                 f"{{{', '.join(sorted(equip_files.keys()))}}}")
 
+        # Persist the merged equipslotinfo bytes so the field-JSON exporter
+        # can diff them against vanilla and emit equipslotinfo intents in
+        # multi-target shape. Without this hand-off, JSON exports silently
+        # drop the unlock-all-weapons data even when the source mod stack
+        # included it (the bug behind every "SuperMegaMod (1).json doesn't
+        # unlock weapons" report through 1.1.x).
+        self._merged_equip_files = dict(equip_files) if equip_files else {}
+
+        # Same persistence pattern for skill.pabgb/.pabgh siblings — split
+        # them out of the remaining sibling_files so the (currently
+        # disabled) skill registry entry has data ready when its diff helper
+        # gets enabled. Doesn't change deployment behavior because skill
+        # files continue flowing through `sibling_files` to the same
+        # overlay group as before this branch ran.
+        skill_snap = {
+            k: v for k, v in sibling_files.items()
+            if k.startswith("skill.")
+        }
+        self._merged_skill_files = dict(skill_snap) if skill_snap else {}
+
+        # Anything else in Bucket D (rare today; future blob-table additions
+        # land here). Captured for the planned generic-blob registry path.
+        self._merged_other_files = {
+            k: v for k, v in sibling_files.items()
+            if not k.startswith("skill.")
+            and not k.startswith("equipslotinfo.")
+        }
+
         # Branch: export as standalone folder mod, OR install directly.
         if export_target:
             try:
@@ -2472,18 +3184,19 @@ class StackerTab(QWidget):
     def _collect_bucket_d(self, ok_mods: list) -> dict:
         """Gather staged sibling files from all sources.
 
-        Returns a dict of {filename_within_INTERNAL_DIR: bytes}. Files
-        recognized: skill.pabgb, skill.pabgh, equipslotinfo.pabgb,
-        equipslotinfo.pabgh. Last source wins if two contribute the
-        same filename.
+        Returns a dict of {filename_within_INTERNAL_DIR: bytes}. As of
+        1.1.5 every .pabgb/.pabgh pair the source mod ships is in
+        scope — pre-1.1.5 only skill.* and equipslotinfo.* were
+        recognized. Last source wins if two contribute the same
+        filename.
 
         Sources contributing sibling files:
         - itembuffs_edits (Pull from ItemBuffs): staged by UP v2 /
           passive-skill injection / imbue whitelisting.
-        - folder_paz (external mods): captured at parse time when the
-          mod's PAZ ships equipslotinfo/skill alongside iteminfo.
-          Covers community mods like "UP fork by X" or "passive skill
-          pack" that bundle both files.
+        - folder_paz (external mods): every pabgb pair in the mod's
+          PAZ now flows through. Equipslotinfo + skill go to their
+          dedicated buckets; everything else lands in
+          staged_other_files for the catch-all blob diff.
         """
         collected: dict = {}
         conflicts: list[tuple] = []
@@ -2492,7 +3205,9 @@ class StackerTab(QWidget):
             # files now; loose_pabgb / legacy_json never do.
             if m.kind not in ("itembuffs_edits", "folder_paz"):
                 continue
-            for bucket in (m.staged_skill_files, m.staged_equip_files):
+            for bucket in (m.staged_skill_files,
+                           m.staged_equip_files,
+                           m.staged_other_files):
                 for fname, data in bucket.items():
                     if fname in collected and collected[fname] != data:
                         conflicts.append((fname, m.name))
@@ -3243,7 +3958,137 @@ class StackerTab(QWidget):
             if title:
                 mod_title = title
 
-        if not intents:
+        # ── Extra targets via the registry (multi-target schema, since 1.1.4) ──
+        # Walk every enabled entry in _FIELD_JSON_TARGET_REGISTRY (defined
+        # at module top). Each entry knows where its merged bytes live on
+        # `self`, which vanilla file to diff against, and which helper
+        # produces intents. Adding a new target = one registry entry — the
+        # export pipeline below picks it up automatically. Pre-1.1.4 the
+        # exporter only emitted iteminfo and silently dropped everything
+        # else (the SuperMegaMod-doesn't-unlock-weapons class of bug).
+        extra_targets: list[tuple[str, list[dict]]] = []
+        try:
+            import crimson_rs
+        except Exception as _imp_err:
+            crimson_rs = None
+            self._log_line(
+                f"  ⚠ crimson_rs unavailable ({_imp_err}); extra-target "
+                f"diff skipped — export will be iteminfo-only")
+
+        if crimson_rs is not None:
+            for entry in _FIELD_JSON_TARGET_REGISTRY:
+                if not entry.get('enabled'):
+                    if entry.get('todo'):
+                        self._log_line(
+                            f"  ◇ skipping {entry['name']}: {entry['todo']}")
+                    continue
+                merged_snap = getattr(self, entry['merged_attr'], None) or {}
+                pabgb_name = entry['pabgb_filename']
+                pabgh_name = entry['pabgh_filename']
+                if not (merged_snap.get(pabgb_name) and merged_snap.get(pabgh_name)):
+                    # No merged bytes for this target — sources didn't ship
+                    # any modifications to it. Not an error, just nothing
+                    # to emit.
+                    continue
+                if not self._game_path:
+                    self._log_line(
+                        f"  ⚠ {entry['name']} diff skipped: game path not set")
+                    continue
+                try:
+                    vanilla_pabgb = crimson_rs.extract_file(
+                        self._game_path, entry['vanilla_group'],
+                        entry['vanilla_dir'], pabgb_name)
+                    vanilla_pabgh = crimson_rs.extract_file(
+                        self._game_path, entry['vanilla_group'],
+                        entry['vanilla_dir'], pabgh_name)
+                    target_intents = entry['diff_fn'](
+                        vanilla_pabgh, vanilla_pabgb,
+                        merged_snap[pabgh_name],
+                        merged_snap[pabgb_name])
+                except Exception as e:
+                    # Don't block the export — the iteminfo intents are
+                    # still useful even if a side-target diff fails.
+                    # Surface the failure in the log so the author knows
+                    # which half didn't ship.
+                    self._log_line(
+                        f"  ⚠ {entry['name']} diff failed: {e} — "
+                        f"export will skip this target")
+                    continue
+                if target_intents:
+                    extra_targets.append((entry['name'], target_intents))
+                    self._log_line(
+                        f"  + {len(target_intents)} {entry['label']} "
+                        f"intent(s)")
+
+        # ── Catch-all: every .pabgb/.pabgh pair in _merged_other_files
+        # that no registry entry already handled. Uses the generic
+        # blob-table diff (key/string_key/is_blocked + per-record
+        # _blob_b64). DMM 1.3.3+'s apply_v3_to_blob_table_body consumes
+        # this shape directly. Field-level intents for typed-prefix
+        # tables would need per-table parser dispatch on the dmm-parser
+        # side — that's a follow-up. For now, this unblocks every mod
+        # that touches buff_info / condition_info / gimmick_info /
+        # store_info / etc. so their edits actually ship.
+        if crimson_rs is not None:
+            other_snap = getattr(self, "_merged_other_files", None) or {}
+            handled_targets = {e['name'] for e in _FIELD_JSON_TARGET_REGISTRY}
+            pabgb_names = sorted(
+                n for n in other_snap if n.endswith(".pabgb"))
+            for pabgb_name in pabgb_names:
+                if pabgb_name in handled_targets:
+                    # Registry already covered it
+                    continue
+                pabgh_name = pabgb_name[:-len(".pabgb")] + ".pabgh"
+                if pabgh_name not in other_snap:
+                    self._log_line(
+                        f"  ⚠ {pabgb_name} skipped: no sister "
+                        f"{pabgh_name} in mod stack")
+                    continue
+                if not self._game_path:
+                    self._log_line(
+                        f"  ⚠ {pabgb_name} catch-all skipped: "
+                        f"game path not set")
+                    continue
+                try:
+                    vanilla_pabgb = bytes(crimson_rs.extract_file(
+                        self._game_path, '0008',
+                        INTERNAL_DIR, pabgb_name))
+                    vanilla_pabgh = bytes(crimson_rs.extract_file(
+                        self._game_path, '0008',
+                        INTERNAL_DIR, pabgh_name))
+                    # Try field-level diff first via dmm_parser.parse_table.
+                    # 122 tables supported as of dmm-parser commit f054b5e
+                    # (gimmick_info, condition_info, drop_set_info,
+                    # character_info, buff_info, etc.). Falls back to the
+                    # blob-level diff for tables dmm_parser doesn't know
+                    # or when dmm_parser isn't installed.
+                    t_intents, source = _diff_table_field_level(
+                        vanilla_pabgh, vanilla_pabgb,
+                        other_snap[pabgh_name],
+                        other_snap[pabgb_name],
+                        pabgb_name)
+                    if not source:
+                        # Field-level path declined — use blob-level.
+                        t_intents = _diff_blob_table_to_intents(
+                            vanilla_pabgh, vanilla_pabgb,
+                            other_snap[pabgh_name],
+                            other_snap[pabgb_name],
+                            pabgb_name)
+                        source = "blob"
+                except Exception as e:
+                    # Don't block the export — iteminfo + registry
+                    # targets already gathered are still valid.
+                    self._log_line(
+                        f"  ⚠ {pabgb_name} catch-all diff failed: {e}"
+                        f" — export will skip this target")
+                    continue
+                if t_intents:
+                    extra_targets.append((pabgb_name, t_intents))
+                    self._log_line(
+                        f"  + {len(t_intents)} {pabgb_name} "
+                        f"intent(s) ({source}-level diff)")
+
+        if not intents and not extra_targets:
             QMessageBox.information(self, "Export Field JSON",
                 "No field-level changes found. Nothing to export.")
             return
@@ -3256,27 +4101,81 @@ class StackerTab(QWidget):
         if not path:
             return
 
-        doc = {
-            'modinfo': {
-                'title': mod_title,
-                'version': '1.0',
-                'author': 'CrimsonGameMods Stacker',
-                'description': f'{len(intents)} field-level intent(s)',
-                'note': 'Format 3 — uses field names, survives game updates',
-            },
-            'format': 3,
-            'target': 'iteminfo.pabgb',
-            'intents': intents,
-        }
+        # Build the doc. Multi-target shape when ANY non-iteminfo target
+        # has intents (the 1.1.4 spec extension consumed by DMM 1.3.3+).
+        # Single-target legacy shape otherwise — preserves byte-for-byte
+        # compatibility with older DMM releases for the common case.
+        if extra_targets:
+            total = len(intents) + sum(len(it) for _, it in extra_targets)
+            target_count = (1 if intents else 0) + len(extra_targets)
+            target_summary = ', '.join(
+                [f'{len(intents)} iteminfo'] if intents else []
+                + [f'{len(it)} {name.split(".")[0]}' for name, it in extra_targets]
+            )
+            targets_array: list[dict] = []
+            if intents:
+                targets_array.append({
+                    'file': 'iteminfo.pabgb', 'intents': intents,
+                })
+            for tname, t_intents in extra_targets:
+                targets_array.append({'file': tname, 'intents': t_intents})
+
+            doc = {
+                'modinfo': {
+                    'title': mod_title,
+                    'version': '1.0',
+                    'author': 'CrimsonGameMods Stacker',
+                    'description': (
+                        f'{total} field-level intent(s) across '
+                        f'{target_count} target(s) — {target_summary}'),
+                    'note': ('Field JSON v3.1 (multi-target field patching) '
+                             '— uses field names, survives game updates. '
+                             'Requires DMM 1.3.4+ for non-iteminfo targets; '
+                             'older DMM versions will apply iteminfo intents '
+                             'only. See FIELD_JSON_V3_1_SPEC.md.'),
+                },
+                'format': 3,
+                'format_minor': 1,
+                'targets': targets_array,
+            }
+            ui_lines = []
+            if intents:
+                ui_lines.append(f"  • {len(intents)} iteminfo.pabgb intents")
+            for tname, t_intents in extra_targets:
+                ui_lines.append(f"  • {len(t_intents)} {tname} intents")
+            log_msg = (
+                f"✔ Exported {total} field-level intents across "
+                f"{target_count} target(s) (multi-target) to {path}")
+            ui_msg = (
+                f"Exported {total} field-level intents across "
+                f"{target_count} targets:\n"
+                + '\n'.join(ui_lines)
+                + f"\n\nThis file uses field names — survives game updates.\n"
+                + f"Requires DMM 1.3.3+ for the non-iteminfo target(s) to apply.\n"
+                + f"File: {path}")
+        else:
+            doc = {
+                'modinfo': {
+                    'title': mod_title,
+                    'version': '1.0',
+                    'author': 'CrimsonGameMods Stacker',
+                    'description': f'{len(intents)} field-level intent(s)',
+                    'note': 'Format 3 — uses field names, survives game updates',
+                },
+                'format': 3,
+                'target': 'iteminfo.pabgb',
+                'intents': intents,
+            }
+            log_msg = f"✔ Exported {len(intents)} intents to {path}"
+            ui_msg = (f"Exported {len(intents)} field-level intents.\n\n"
+                      f"This file uses field names — it survives game updates.\n"
+                      f"File: {path}")
 
         try:
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(doc, f, indent=2, ensure_ascii=False, default=str)
-            self._log_line(f"✔ Exported {len(intents)} intents to {path}")
-            QMessageBox.information(self, "Export Field JSON",
-                f"Exported {len(intents)} field-level intents.\n\n"
-                f"This file uses field names — it survives game updates.\n"
-                f"File: {path}")
+            self._log_line(log_msg)
+            QMessageBox.information(self, "Export Field JSON", ui_msg)
         except Exception as e:
             QMessageBox.critical(self, "Export Failed", str(e))
 

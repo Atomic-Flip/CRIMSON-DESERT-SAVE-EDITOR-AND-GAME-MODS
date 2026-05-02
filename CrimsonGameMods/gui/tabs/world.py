@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QHeaderView,
     QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem,
     QMessageBox, QPushButton,
-    QScrollArea, QSizePolicy, QSpinBox, QSplitter,
-    QTableWidget, QTableWidgetItem, QTextEdit,
+    QScrollArea, QSizePolicy, QSpinBox, QDoubleSpinBox, QSplitter,
+    QStyledItemDelegate, QTableWidget, QTableWidgetItem, QTextEdit,
     QVBoxLayout, QWidget,
 )
 from gui.theme import COLORS, CATEGORY_COLORS
@@ -2982,6 +2982,20 @@ class SpawnTab(QWidget):
             QMessageBox.critical(self, tr("Restore Failed"), str(e))
 
 
+class PrecisionItemDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        editor = QDoubleSpinBox(parent)
+        editor.setDecimals(4)
+        editor.setRange(0.0000, 100.0000)
+        return editor
+
+    def displayText(self, value, locale):
+        try:
+            return f"{float(value):.4f}"
+        except (ValueError, TypeError):
+            return str(value)
+
+
 class DropsetTab(QWidget):
 
     status_message = Signal(str)
@@ -3147,17 +3161,19 @@ class DropsetTab(QWidget):
         self._dropset_items.setSelectionBehavior(QTableWidget.SelectRows)
         self._dropset_items.setSelectionMode(QTableWidget.ExtendedSelection)
         self._dropset_items.setSortingEnabled(False)
-        self._dropset_items.horizontalHeader().setStretchLastSection(True)
+        self._dropset_items.horizontalHeader().setStretchLastSection(False)
+        self._dropset_items.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         self._dropset_show_icons = False
         self._dropset_items.setColumnWidth(0, 0)
         self._dropset_items.setColumnWidth(1, 30)
-        self._dropset_items.setColumnWidth(2, 70)
+        self._dropset_items.setColumnWidth(2, 80)
         self._dropset_items.setColumnWidth(3, 180)
         self._dropset_items.setColumnWidth(4, 100)
-        self._dropset_items.setColumnWidth(5, 65)
-        self._dropset_items.setColumnWidth(6, 60)
-        self._dropset_items.setColumnWidth(7, 60)
+        self._dropset_items.setColumnWidth(5, 75)
+        self._dropset_items.setColumnWidth(6, 80)
+        self._dropset_items.setColumnWidth(7, 80)
         self._dropset_items.cellChanged.connect(self._dropset_cell_edited)
+        self._dropset_items.setItemDelegateForColumn(5, PrecisionItemDelegate(self._dropset_items))
         right_layout.addWidget(self._dropset_items)
 
         edit_row = QHBoxLayout()
@@ -3192,9 +3208,10 @@ class DropsetTab(QWidget):
         edit_row.addStretch()
 
         edit_row.addWidget(QLabel(tr("All Rates:")))
-        self._dropset_bulk_rate = QSpinBox()
-        self._dropset_bulk_rate.setRange(0, 100)
-        self._dropset_bulk_rate.setValue(100)
+        self._dropset_bulk_rate = QDoubleSpinBox()
+        self._dropset_bulk_rate.setDecimals(4)
+        self._dropset_bulk_rate.setRange(0.0000, 100.0000)
+        self._dropset_bulk_rate.setValue(100.0000)
         self._dropset_bulk_rate.setSuffix("%")
         self._dropset_bulk_rate.setMinimumWidth(85)
         edit_row.addWidget(self._dropset_bulk_rate)

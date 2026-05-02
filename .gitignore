@@ -7,6 +7,9 @@ __pycache__/
 CrimsonSaveEditor/build/
 CrimsonSaveEditor/dist/
 
+# Rust artifacts (CrimsonGameMods bundled module)
+crimson-rs/
+
 # Per-user editor state. Tracked in git as a default; if you keep changing
 # yours and want to stop seeing it as `M` in git status, run once:
 #   git update-index --skip-worktree CrimsonSaveEditor/editor_config.json
