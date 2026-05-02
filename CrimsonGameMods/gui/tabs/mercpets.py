@@ -266,9 +266,12 @@ class MercPetsTab(QWidget):
                 "Behavior when far from leader (recall, despawn, etc.)")
             spawn_cb = _check("SpawnPos Type", rec.spawn_position_type,
                 "Spawn-position behavior flag.")
+            playable_cb = _check("Playable", rec.is_playable,
+                "Player can switch to this mercenary as a playable character.")
 
-            for cb in (is_blocked_cb, is_ctrl_cb, new_main_cb, per_tribe_cb,
-                       stack_cb, sell_cb, camp_cb, apply_stat_cb, far_cb, spawn_cb):
+            for cb in (is_blocked_cb, is_ctrl_cb, playable_cb, new_main_cb,
+                       per_tribe_cb, stack_cb, sell_cb, camp_cb,
+                       apply_stat_cb, far_cb, spawn_cb):
                 flag_row.addWidget(cb)
             flag_row.addStretch()
             vbox.addLayout(flag_row)
@@ -277,6 +280,7 @@ class MercPetsTab(QWidget):
                 'rec': rec,
                 'summon': summon_spin, 'hire': hire_spin, 'max': max_spin,
                 'blocked': is_blocked_cb, 'ctrl': is_ctrl_cb,
+                'playable': playable_cb,
                 'new_main': new_main_cb, 'per_tribe': per_tribe_cb,
                 'stack': stack_cb, 'sell': sell_cb,
                 'camp': camp_cb, 'apply_stat': apply_stat_cb,
@@ -335,6 +339,7 @@ class MercPetsTab(QWidget):
             r.apply_equip_item_stat = int(row['apply_stat'].isChecked())
             r.far_from_leader_option = int(row['far'].isChecked())
             r.spawn_position_type = int(row['spawn'].isChecked())
+            r.is_playable = int(row['playable'].isChecked())
 
     def _serialize(self) -> tuple[bytes, bytes]:
         import mercenaryinfo_parser as mip
