@@ -2209,12 +2209,13 @@ class StackerTab(QWidget):
     # distinct at a glance: green for itembuffs, blue for folder mods,
     # amber for legacy JSON, grey for loose pabgb.
     _TYPE_META = {
-        "itembuffs_edits": ("ITEMBUFFS", "#1E2A1E", "#4CAF50"),
-        "folder_paz":      ("PAZ MOD",   "#1A2030", "#6A9CE0"),
-        "loose_pabgb":     ("PABGB",     "#1F2128", "#9EA4B8"),
-        "legacy_json":     ("JSON v2",   "#2A2418", "#DC961E"),
-        "field_json":      ("FIELD v3",  "#1A2A2A", "#26C6DA"),
-        "dmm_json":        ("DMM",       "#1A1A2A", "#7B68EE"),
+        "itembuffs_edits": ("ITEMBUFFS",  "#1E2A1E", "#4CAF50"),
+        "companion_files": ("STAGED",     "#0D2A1A", "#00E676"),
+        "folder_paz":      ("PAZ MOD",    "#1A2030", "#6A9CE0"),
+        "loose_pabgb":     ("PABGB",      "#1F2128", "#9EA4B8"),
+        "legacy_json":     ("JSON v2",    "#2A2418", "#DC961E"),
+        "field_json":      ("FIELD v3",   "#1A2A2A", "#26C6DA"),
+        "dmm_json":        ("DMM",        "#1A1A2A", "#7B68EE"),
     }
 
     def _append_mod_row(self, m: ModEntry):
