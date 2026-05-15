@@ -43,59 +43,82 @@ def parse_pabgh(G):
     return idx
 
 
+CATEGORY_NAMES = {
+    0: "Side", 12: "Regional", 13: "Main Story",
+}
+
+CHARACTER_NAMES = {
+    1: "Kliff", 4: "Damiane", 6: "Oongka",
+}
+
+
 def parse_quest_entry(D, eoff, end):
     p = eoff
     try:
-        key, p = _u32(D, p)
+        key, p = _u32(D, p)                          # 1. key
 
-        slen, _ = _u32(D, p)
+        slen, _ = _u32(D, p)                          # 2. string_key
         if slen > 500: return None
         name = D[p+4:p+4+slen].decode('utf-8', errors='replace')
         p = p + 4 + slen
 
-        is_blocked = D[p]; p += 1
-        p += 1
-        p += 1
+        is_blocked = D[p]; p += 1                     # 3. is_blocked
+        quest_type = D[p]; p += 1                     # 4. quest_type
+        quest_category = D[p]; p += 1                 # 5. quest_category
 
-        p = _skip_locstr(D, p)
+        p = _skip_locstr(D, p)                        # 6. name (localized)
+        if p < 0: return None
+        p = _skip_locstr(D, p)                        # 7. desc (localized)
         if p < 0: return None
 
-        p = _skip_locstr(D, p)
+        quest_group = struct.unpack_from('<H', D, p)[0]; p += 2  # 8. quest_group_info
+
+        p += 4                                        # 9. faction_info
+
+        fsd_count, p = _u32(D, p)                    # 10. faction_state_data
+        if fsd_count > 10000: return None
+        p += fsd_count
+        p += 4 + 4 + 1
+
+        p += 18                                       # 11. branch_data (fixed)
+
+        start_player_list, p = _read_array_4B(D, p)  # 12. start_player_list
         if p < 0: return None
 
-        p += 2
+        bdl_count, p = _u32(D, p)                    # 13. branch_data_list
+        if bdl_count > 10000: return None
+        p += bdl_count * 18
 
-        p += 4
-
-        pl_count, p = _u32(D, p)
-        if pl_count > 10000: return None
-        p += pl_count
-        p += 4
-        p += 4
-        p += 1
-
-        p += 4 + 4 + 1 + 1 + 4 + 4
-
-        missions, p = _read_array_4B(D, p)
+        executor_list, p = _read_array_4B(D, p)      # 14. executor_quest_list
         if p < 0: return None
 
-        f13_count, p = _u32(D, p)
-        if f13_count > 10000: return None
-        p += f13_count * 18
-
-        f14_count, p = _u32(D, p)
-        if f14_count > 10000: return None
-        p += f14_count * 4
-
-        stages, p = _read_array_4B(D, p)
+        gauge_list, p = _read_array_4B(D, p)         # 15. gauge_list
         if p < 0: return None
+
+        missions, p = _read_array_4B(D, p)           # 16. mission_list
+        if p < 0: return None
+
+        stages, p = _read_array_4B(D, p)             # 17. stage_list
+        if p < 0: return None
+
+        start_mission, p = _u32(D, p)                # 18. start_mission
+        start_stage, p = _u32(D, p)                  # 19. start_stage
 
         return {
             'key': key,
             'name': name,
             'is_blocked': is_blocked,
+            'quest_type': quest_type,
+            'quest_category': quest_category,
+            'category_name': CATEGORY_NAMES.get(quest_category, f"Cat_{quest_category}"),
+            'quest_group': quest_group,
+            'start_player_list': start_player_list,
+            'character_names': [CHARACTER_NAMES.get(c, f"Char_{c}") for c in (start_player_list or [])],
             'missions': missions,
             'stages': stages,
+            'executor_list': executor_list,
+            'start_mission': start_mission,
+            'start_stage': start_stage,
         }
 
     except (struct.error, IndexError):

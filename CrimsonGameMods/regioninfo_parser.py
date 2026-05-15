@@ -1,8 +1,34 @@
 
 import struct
 import json
+import logging
 import os
 import sys
+
+log = logging.getLogger(__name__)
+
+DMM_TABLE_NAME = 'region_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes):
+    """Parse regioninfo using dmm_parser. Returns list of dicts or None on failure."""
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_TABLE_NAME, pabgb, pabgh)
+    except Exception as e:
+        log.debug("dmm_parser regioninfo failed: %s", e)
+        return None
+
+
+def serialize_all_dmm(items: list) -> bytes | None:
+    """Serialize regioninfo using dmm_parser. Returns bytes or None on failure."""
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_TABLE_NAME, items))
+    except Exception as e:
+        log.debug("dmm_parser regioninfo serialize failed: %s", e)
+        return None
+
 
 def parse_pabgh_index(pabgh_data):
     count = struct.unpack_from('<H', pabgh_data, 0)[0]

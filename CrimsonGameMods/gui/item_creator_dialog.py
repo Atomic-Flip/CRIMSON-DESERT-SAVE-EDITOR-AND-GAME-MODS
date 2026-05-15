@@ -364,20 +364,6 @@ class ItemCreatorDialog(QDialog):
         self._export_single_btn.clicked.connect(lambda: self._on_finish('export_single'))
         bottom.addWidget(self._export_single_btn)
 
-        self._export_single_btn = QPushButton("Export as Single-Item Mod")
-        self._export_single_btn.setStyleSheet(
-            "background-color:#2E7D32;color:white;font-weight:bold;"
-            "font-size:14px;padding:10px 24px;")
-        self._export_single_btn.setToolTip(
-            "Export a clean standalone folder mod containing ONLY this item.\n"
-            "Built against vanilla iteminfo (not your current modded state),\n"
-            "so the mod is shareable and doesn't include your other edits.\n\n"
-            "Output folder can be imported by any mod loader (JMM, CDUMM)\n"
-            "or re-imported back into this tool via Import Mod.")
-        self._export_single_btn.setEnabled(False)
-        self._export_single_btn.clicked.connect(lambda: self._on_finish('export_single'))
-        bottom.addWidget(self._export_single_btn)
-
         # Separator
         bottom.addWidget(QLabel("  |  "))
 

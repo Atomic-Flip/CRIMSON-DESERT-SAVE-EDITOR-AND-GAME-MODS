@@ -884,13 +884,59 @@ def _skip_inline_payload(blob: bytes, payload_start: int) -> int:
     return cursor
 
 
-_BAG_KEY_NAMES = {
-    1: "Equipment",
-    2: "General",
-    5: "Materials",
-    8: "Consumables",
-    14: "Housing",
+BAG_KEY_NAMES = {
+    1: "Money",
+    2: "Character",
+    3: "PearlUser",
+    4: "PearlCharacter",
+    5: "Quest",
+    6: "Wagon",
+    7: "PetAndVehicle",
+    8: "CampWarehouse",
+    9: "Warehouse",
+    10: "Bank",
+    11: "CampStraw",
+    12: "Recovery",
+    13: "Kuku",
+    14: "Invisible",
 }
+
+
+def _extract_bag_ranges(data: bytes | bytearray) -> List[Tuple[int, int, str]]:
+    bag_ranges: List[Tuple[int, int, str]] = []
+    try:
+        _ensure = 'Communitydump/desktopeditor'
+        if _ensure not in __import__('sys').path:
+            __import__('sys').path.insert(0, _ensure)
+        from save_parser import build_result_from_raw
+        result = build_result_from_raw(bytes(data), {'input_kind': 'raw_blob'})
+        for obj in result['objects']:
+            if obj.class_name != 'InventorySaveData':
+                continue
+            for f in obj.fields:
+                if f.name != '_inventorylist' or not f.list_elements:
+                    continue
+                for bag in f.list_elements:
+                    if not bag.child_fields:
+                        continue
+                    inv_key = -1
+                    item_start = 0
+                    item_end = 0
+                    for cf in bag.child_fields:
+                        if cf.name == '_inventoryKey' and cf.present:
+                            try:
+                                inv_key = int(cf.value_repr or -1)
+                            except (ValueError, TypeError):
+                                inv_key = -1
+                        elif cf.name == '_itemList' and cf.list_elements:
+                            item_start = cf.list_elements[0].start_offset
+                            item_end = cf.list_elements[-1].end_offset
+                    if inv_key >= 0 and item_start > 0 and item_end > item_start:
+                        bag_name = BAG_KEY_NAMES.get(inv_key, f"Bag_{inv_key}")
+                        bag_ranges.append((item_start, item_end, bag_name))
+    except Exception:
+        pass
+    return bag_ranges
 
 
 def enrich_items_with_parc(
@@ -905,24 +951,7 @@ def enrich_items_with_parc(
     for pi in parc_items:
         parc_by_no[pi.item_no] = pi
 
-    bag_ranges: List[Tuple[int, int, str]] = []
-    try:
-        parc_mod, _ = _try_import_parc()
-        if parc_mod:
-            parc_blob = parc_mod.parse_parc_blob(bytes(data))
-            for e in parc_blob.toc_entries:
-                td = parc_blob.type_by_index.get(e.class_index)
-                if td and td.name == "InventorySaveData":
-                    cats = parc_mod.walk_inventory_categories(parc_blob, e.index)
-                    for cat in cats:
-                        inv_key = cat.get("inventory_key", -1)
-                        start = cat.get("item_list_abs", 0)
-                        end = cat.get("items_end_abs", 0)
-                        bag_name = _BAG_KEY_NAMES.get(inv_key, f"Bag_{inv_key}")
-                        if start > 0 and end > start:
-                            bag_ranges.append((start, end, bag_name))
-    except Exception:
-        pass
+    bag_ranges = _extract_bag_ranges(data)
 
     enriched = 0
     for item in items:

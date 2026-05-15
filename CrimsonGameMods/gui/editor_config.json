@@ -1,0 +1,41 @@
+{
+  "favorite_items": [
+    {
+      "key": 1000992
+    },
+    {
+      "key": 200021
+    },
+    {
+      "key": 101
+    }
+  ],
+  "game_install_path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Crimson Desert",
+  "default_lang": "en",
+  "language": "en",
+  "last_save_path": "C:\\Users\\Coding\\AppData\\Local\\Pearl Abyss/CD/save\\57173764\\slot100\\save.save",
+  "last_slot": "Save Slot 1",
+  "mesh_swap_queue": [
+    {
+      "src": 2,
+      "tgt": 1,
+      "scale": 1.0,
+      "rideable": false,
+      "rider_y": 8.0
+    },
+    {
+      "src": 1002059,
+      "tgt": 31378,
+      "scale": 1.0,
+      "rideable": false,
+      "rider_y": 8.0
+    },
+    {
+      "src": 1002059,
+      "tgt": 1003915,
+      "scale": 1.0,
+      "rideable": false,
+      "rider_y": 8.0
+    }
+  ]
+}

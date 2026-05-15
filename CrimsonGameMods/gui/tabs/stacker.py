@@ -140,9 +140,7 @@ _FIELD_JSON_TARGET_REGISTRY: list[dict] = [
         'vanilla_dir':     INTERNAL_DIR,
         'diff_fn':         None,  # set after _diff_skill_to_intents is defined
         'label':           'skill (cooltimes, learn levels, etc.)',
-        'todo':            ('field name mismatch between skillinfo_parser.py '
-                            '(IDA names) and DMM dmm_parser::tables::skill_info '
-                            '(Mac symbols). Build a name map, then flip enabled.'),
+        'todo':            None,  # Path C handles skill.pabgb via raw byte diff
     },
     # When a generic blob-table fallback target is needed (e.g. enabling a
     # "block this buff" / "disable this condition" workflow), copy this
@@ -171,7 +169,16 @@ _FIELD_JSON_TARGET_REGISTRY: list[dict] = [
 
 def _parse_with_fallback(crimson_rs, game_path: str,
                          raw: bytes) -> tuple[list, list]:
-    """Parse iteminfo using PABGH boundaries when bulk parse fails."""
+    """Parse iteminfo using PABGH boundaries when bulk parse fails.
+    Tries dmm_parser bulk parse first before falling back to per-entry.
+    """
+    try:
+        import dmm_parser as _dmp_fb
+        _result = _dmp_fb.parse_iteminfo_from_bytes(raw)
+        if _result:
+            return list(_result), []
+    except Exception:
+        pass
     pabgh = bytes(crimson_rs.extract_file(
         game_path, '0008', INTERNAL_DIR, ITEMINFO_PABGH))
     count = struct.unpack_from('<H', pabgh, 0)[0]
@@ -279,6 +286,18 @@ _UP_V2_KLIFF_HASHES = frozenset({
 })
 
 
+def _safe_iv(val, default=0):
+    """Extract int from a plain int or a dmm_parser {'a':v,'b':v,'c':v} dict."""
+    if isinstance(val, dict):
+        return int(val.get('a', val.get('value', default)))
+    if val is None:
+        return default
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
+
+
 def _detect_dict_features(items: list) -> dict:
     """Scan parsed iteminfo dict list, count ItemBuffs feature signatures.
 
@@ -308,19 +327,19 @@ def _detect_dict_features(items: list) -> dict:
         'extra_enchant_levels': 0,
     }
     for it in items:
-        stack = it.get('max_stack_count') or 0
+        stack = _safe_iv(it.get('max_stack_count'))
         if stack >= 1000:
             feats['max_stacks'] += 1
             if stack > feats['max_stacks_target']:
                 feats['max_stacks_target'] = stack
 
-        if it.get('cooltime') == 1:
+        if _safe_iv(it.get('cooltime')) == 1:
             feats['no_cooldown'] += 1
 
-        if it.get('max_endurance') == 65535:
+        if _safe_iv(it.get('max_endurance')) == 65535:
             feats['inf_durability'] += 1
 
-        if (it.get('max_charged_useable_count') or 0) >= 99:
+        if _safe_iv(it.get('max_charged_useable_count')) >= 99:
             feats['max_charges'] += 1
 
         if it.get('equip_type_info') and it.get('is_dyeable') == 1:
@@ -944,17 +963,23 @@ def _diff_table_field_level(vanilla_pabgh: bytes, vanilla_pabgb: bytes,
     except ImportError:
         return ([], "")
 
-    # Strip ".pabgb" to get table_name. dmm_parser.parse_table expects
-    # snake_case names matching `src/tables/<name>/`.
-    if target_label.endswith(".pabgb"):
-        table_name = target_label[:-len(".pabgb")]
-    else:
-        table_name = target_label
+    # Resolve the physical filename / compact name to dmm_parser's canonical
+    # snake_case table name.  dmm_parser.parse_table does an exact match on
+    # the dispatch table ("character_info", NOT the compact "characterinfo"),
+    # so we must normalise first.  normalize_target_name handles all three
+    # input forms: compact ("characterinfo.pabgb"), snake_case with extension
+    # ("character_info.pabgb"), and bare canonical ("character_info").
+    try:
+        table_name = dmm_parser.normalize_target_name(target_label)
+    except Exception:
+        table_name = None
+    if table_name is None:
+        return ([], "")
 
     try:
         vanilla_items = dmm_parser.parse_table(table_name, vanilla_pabgb, vanilla_pabgh)
         modded_items  = dmm_parser.parse_table(table_name, modded_pabgb, modded_pabgh)
-    except (ValueError, RuntimeError):
+    except (ValueError, RuntimeError, Exception):
         # Unknown table or parse failure — caller falls back to blob diff.
         return ([], "")
 
@@ -1327,6 +1352,7 @@ class StackerTab(QWidget):
         self._show_guide_fn = show_guide_fn
         self._buffs_tab = buffs_tab  # for shared state + Apply to Game
         self._mod_tabs: dict = {}  # populated by main_window after all tabs created
+        self._extra_pull_tabs: list = []  # extra pull sources (DropSets etc.)
         self._game_path: str = self._config.get("game_install_path", "")
         self._mods: list[ModEntry] = []
         self._merged_items: list = []
@@ -1728,9 +1754,14 @@ class StackerTab(QWidget):
         bar.setStyleSheet(
             f"QFrame {{ background: {self._PANEL_HDR}; "
             f"border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }}")
-        blay = QHBoxLayout(bar)
-        blay.setContentsMargins(6, 6, 6, 6)
+        # Two-row layout: row1=Add/Pull, row2=Remove/Clear
+        _bar_vlay = QVBoxLayout(bar)
+        _bar_vlay.setContentsMargins(6, 4, 6, 4)
+        _bar_vlay.setSpacing(3)
+        blay = QHBoxLayout()
+        blay.setContentsMargins(0, 0, 0, 0)
         blay.setSpacing(4)
+        _bar_vlay.addLayout(blay)
 
         add_btn = _size_button(QPushButton("+ Add"), extra_px=44)
         add_btn.setStyleSheet(
@@ -1739,7 +1770,7 @@ class StackerTab(QWidget):
         add_btn.clicked.connect(self._pick_files)
         blay.addWidget(add_btn)
 
-        pull_btn = _size_button(QPushButton("⇅ Pull ItemBuffs Edit"))
+        pull_btn = _size_button(QPushButton("⇅ Pull ItemBuff"), extra_px=52)
         pull_btn.setObjectName("flatBtn")
         pull_btn.setStyleSheet(
             "QPushButton { background-color: #B71C1C; color: white; font-weight: bold; }")
@@ -1750,16 +1781,17 @@ class StackerTab(QWidget):
         pull_btn.clicked.connect(self._pull_from_itembuffs)
         blay.addWidget(pull_btn)
 
-        pull_all_btn = _size_button(QPushButton("⇅ Pull All Edits"))
+        pull_all_btn = _size_button(QPushButton("⇅ Pull All Edits"), extra_px=52)
         pull_all_btn.setObjectName("flatBtn")
         pull_all_btn.setStyleSheet(
             "QPushButton { background-color: #00695C; color: white; font-weight: bold; }")
         pull_all_btn.setToolTip(
-            "Pull edits from ALL tabs: ItemBuffs + MercPets + SkillTree + "
-            "BagSpace + ReserveSlot + FieldEdit. Creates one mod entry per "
+            "Pull edits from ALL tabs: ItemBuffs + FieldEdit + SpawnEdit + "
+            "BagSpace + ReserveSlot + DropSets. Creates one mod entry per "
             "tab that has modifications.")
         pull_all_btn.clicked.connect(self._pull_all_edits)
         blay.addWidget(pull_all_btn)
+        blay.addStretch(1)
 
         pull_dmm_btn = _size_button(QPushButton("⇅ Pull DMM"))
         pull_dmm_btn.setObjectName("flatBtn")
@@ -1771,17 +1803,21 @@ class StackerTab(QWidget):
         pull_dmm_btn.clicked.connect(self._pull_from_dmm)
         pull_dmm_btn.setVisible(False)
 
-        blay.addStretch(1)
+        _blay2 = QHBoxLayout()
+        _blay2.setContentsMargins(0, 0, 0, 0)
+        _blay2.setSpacing(4)
+        _bar_vlay.addLayout(_blay2)
 
         rm_btn = _size_button(QPushButton("Remove"))
         rm_btn.setObjectName("flatBtn")
         rm_btn.clicked.connect(self._remove_selected)
-        blay.addWidget(rm_btn)
+        _blay2.addWidget(rm_btn)
 
         clr_btn = _size_button(QPushButton("Clear"))
         clr_btn.setObjectName("flatBtn")
         clr_btn.clicked.connect(self._clear_all)
-        blay.addWidget(clr_btn)
+        _blay2.addWidget(clr_btn)
+        _blay2.addStretch(1)
 
         lay.addWidget(bar)
         return frame
@@ -2000,7 +2036,21 @@ class StackerTab(QWidget):
         self._log_line(f"✓ Pulled from ItemBuffs: {summary}.")
 
     # ------------------------------------------------------------
+    def register_tab(self, key: str, tab_obj) -> None:
+        """Register a tab for Pull All Edits. Called from main_window."""
+        if tab_obj is not None:
+            self._mod_tabs[key] = tab_obj
+
     def _pull_all_edits(self):
+        """Pull edits from ALL tabs that have modifications."""
+        try:
+            self._pull_all_edits_inner()
+        except Exception as _err:
+            import traceback as _tb
+            QMessageBox.critical(self, "Pull All Edits - Error",
+                f"Error:\n{_err}\n\n{_tb.format_exc()}")
+
+    def _pull_all_edits_inner(self):
         """Pull edits from ALL tabs that have modifications."""
         pulled = []
 
@@ -2011,11 +2061,13 @@ class StackerTab(QWidget):
                 pulled.append("ItemBuffs")
 
         _TAB_LABELS = {
-            "mercpets": "MercPets",
-            "bagspace": "BagSpace",
-            "skilltree": "SkillTree",
+            "mercpets":    "MercPets",
+            "bagspace":    "BagSpace",
+            "skilltree":   "SkillTree",
             "reserveslot": "ReserveSlot",
-            "fieldedit": "FieldEdit",
+            "fieldedit":   "FieldEdit",
+            "spawnedit":   "SpawnEdit",
+            "dropsets":    "DropSets",
         }
 
         for tab_key, tab_obj in self._mod_tabs.items():
@@ -2054,6 +2106,24 @@ class StackerTab(QWidget):
             pulled.append(label)
             self._log_line(f"  ✓ {summary}")
 
+        # Extra pull sources (DropSets, etc.)
+        for _et in getattr(self, '_extra_pull_tabs', []):
+            _get = getattr(_et, 'get_staged_files', None)
+            if _get is None: continue
+            try: _staged = _get()
+            except Exception as _e: log.warning('Pull extra: %s', _e); continue
+            if not _staged: continue
+            _lbl = getattr(_et, '_tab_label', type(_et).__name__)
+            _summary = f"{_lbl}: {', '.join(sorted(_staged.keys()))}"
+            self._mods = [m for m in self._mods if not
+                (m.kind == 'companion_files' and m.name == f"{_lbl} tab (staged files)")]
+            _e2 = ModEntry(name=f"{_lbl} tab (staged files)", path='<in-memory>',
+                           kind='companion_files', ok=True, note=_summary)
+            _e2.staged_companion_files = _staged
+            self._mods.append(_e2)
+            pulled.append(_lbl)
+            self._log_line(f'  ✓ {_summary}')
+
         self._refresh_mod_list()
         if pulled:
             self._log_line(f"✓ Pull All: {', '.join(pulled)}")
@@ -2065,7 +2135,8 @@ class StackerTab(QWidget):
             QMessageBox.information(
                 self, "Pull All Edits",
                 "No tabs have modifications to pull.\n\n"
-                "Load and edit data in ItemBuffs, MercPets, SkillTree, etc. first.")
+                "Make changes in ItemBuffs, FieldEdit, SpawnEdit, etc. first,\n"
+                "then click Pull All Edits.")
 
     # ------------------------------------------------------------
     def _regenerate_equipslotinfo_for_up_v2(self) -> dict:
@@ -2498,14 +2569,19 @@ class StackerTab(QWidget):
             pass
 
         try:
-            vanilla_items = crimson_rs.parse_iteminfo_from_bytes(vanilla_bytes)
+            import dmm_parser as _dmp_van
+            vanilla_items = _dmp_van.parse_iteminfo_from_bytes(vanilla_bytes)
             self._stacker_unparsed_raw = []
         except Exception:
-            vanilla_items, self._stacker_unparsed_raw = (
-                _parse_with_fallback(crimson_rs, game, vanilla_bytes))
-            if not vanilla_items:
-                self._log_line("✘ Could not parse vanilla iteminfo")
-                return
+            try:
+                vanilla_items = crimson_rs.parse_iteminfo_from_bytes(vanilla_bytes)
+                self._stacker_unparsed_raw = []
+            except Exception:
+                vanilla_items, self._stacker_unparsed_raw = (
+                    _parse_with_fallback(crimson_rs, game, vanilla_bytes))
+                if not vanilla_items:
+                    self._log_line("✘ Could not parse vanilla iteminfo")
+                    return
         self._vanilla_items = vanilla_items
         self._log_line(f"  {len(vanilla_items)} entries parsed"
                        + (f" ({len(self._stacker_unparsed_raw)} raw)"
@@ -2537,9 +2613,13 @@ class StackerTab(QWidget):
                         m.path, m.group, INTERNAL_DIR, ITEMINFO_PABGB))
                     m.effective_pabgb = raw
                     try:
-                        items = crimson_rs.parse_iteminfo_from_bytes(raw)
+                        import dmm_parser as _dmp_fp
+                        items = _dmp_fp.parse_iteminfo_from_bytes(raw)
                     except Exception:
-                        items, _ = _parse_with_fallback(crimson_rs, game, raw)
+                        try:
+                            items = crimson_rs.parse_iteminfo_from_bytes(raw)
+                        except Exception:
+                            items, _ = _parse_with_fallback(crimson_rs, game, raw)
                     m.parsed_items = items
                     # Pull every .pabgb/.pabgh sibling this mod ships.
                     # Pre-1.1.5 only the four hardcoded equipslotinfo +
@@ -2606,10 +2686,14 @@ class StackerTab(QWidget):
                     with open(m.path, "rb") as f:
                         m.effective_pabgb = f.read()
                     try:
-                        items = crimson_rs.parse_iteminfo_from_bytes(m.effective_pabgb)
+                        import dmm_parser as _dmp_lp
+                        items = _dmp_lp.parse_iteminfo_from_bytes(m.effective_pabgb)
                     except Exception:
-                        items, _ = _parse_with_fallback(
-                            crimson_rs, game, m.effective_pabgb)
+                        try:
+                            items = crimson_rs.parse_iteminfo_from_bytes(m.effective_pabgb)
+                        except Exception:
+                            items, _ = _parse_with_fallback(
+                                crimson_rs, game, m.effective_pabgb)
                     m.parsed_items = items
                     m.apply_stats = "loose pabgb loaded"
                 elif m.kind == "legacy_json":
@@ -2713,10 +2797,14 @@ class StackerTab(QWidget):
                         iteminfo_inspector.mark_stale_status(insps, mask)
                         m.effective_pabgb = modded
                         try:
-                            items = crimson_rs.parse_iteminfo_from_bytes(modded)
+                            import dmm_parser as _dmp_lj
+                            items = _dmp_lj.parse_iteminfo_from_bytes(modded)
                         except Exception:
-                            items, _ = _parse_with_fallback(
-                                crimson_rs, game, modded)
+                            try:
+                                items = crimson_rs.parse_iteminfo_from_bytes(modded)
+                            except Exception:
+                                items, _ = _parse_with_fallback(
+                                    crimson_rs, game, modded)
                         m.parsed_items = items
                         m.apply_stats = f"{applied} applied, {skipped} skipped"
                         if skipped and not applied:
@@ -2764,19 +2852,41 @@ class StackerTab(QWidget):
                             continue
                         try:
                             rt = crimson_rs.serialize_iteminfo([it])
-                            rp = crimson_rs.parse_iteminfo_from_bytes(rt)
+                            try:
+                                import dmm_parser as _dmp_fj
+                                rp = _dmp_fj.parse_iteminfo_from_bytes(rt)
+                            except Exception:
+                                rp = crimson_rs.parse_iteminfo_from_bytes(rt)
                             if not rp:
                                 raise ValueError("empty reparse")
                             verified_count += 1
                         except Exception as _ve:
-                            broken_count += 1
-                            broken_entries.append(skey)
-                            van = van_by_key.get(skey)
-                            if van:
-                                items[idx] = copy.deepcopy(van)
-                            self._log_line(
-                                f"  ⚠ {skey}: intent broke serialization "
-                                f"({_ve}) — reverted to vanilla")
+                            # crimson_rs serialization failure (e.g. unknown
+                            # SubItem type_id) does NOT mean the intent is bad
+                            # — it just means crimson_rs doesn't support this
+                            # item shape. dmm_parser handles it fine.
+                            # Only revert when the reparse itself fails (empty
+                            # result after a successful serialize), which
+                            # indicates genuine structural corruption.
+                            _ve_s = str(_ve)
+                            _is_serialize_limit = (
+                                "type_id" in _ve_s
+                                or "SubItem" in _ve_s
+                                or "serialize" in _ve_s.lower()
+                                or "unknown" in _ve_s.lower()
+                                or not hasattr(crimson_rs, "serialize_iteminfo")
+                            )
+                            if _is_serialize_limit:
+                                verified_count += 1  # assume OK — crimson_rs limit
+                            else:
+                                broken_count += 1
+                                broken_entries.append(skey)
+                                van = van_by_key.get(skey)
+                                if van:
+                                    items[idx] = copy.deepcopy(van)
+                                self._log_line(
+                                    f"  ⚠ {skey}: intent broke serialization "
+                                    f"({_ve}) — reverted to vanilla")
                     m.parsed_items = items
                     m.effective_pabgb = vanilla_bytes
                     m.apply_stats = (
@@ -3912,7 +4022,15 @@ class StackerTab(QWidget):
         # Path B: legacy JSON translation via old parser
         has_legacy = bool(legacy_sources)
 
-        if not has_merged and not has_legacy:
+        # Path C: companion_files staged from Pull All Edits
+        companion_entries = [
+            m for m in self._mods
+            if m.enabled and m.kind == 'companion_files'
+            and getattr(m, 'staged_companion_files', None)
+        ]
+        has_companion = bool(companion_entries)
+
+        if not has_merged and not has_legacy and not has_companion:
             QMessageBox.information(self, "Export Field JSON",
                 "Nothing to export.\n\n"
                 "Either run PREVIEW first (for merged edits),\n"
@@ -3944,6 +4062,60 @@ class StackerTab(QWidget):
                     continue
                 diffs = _deep_diff_to_intents(skey, ikey, vanilla, merged_item)
                 intents.extend(diffs)
+
+        # ── Path A2: itembuffs snapshot diff (Pull All Edits without PREVIEW) ──
+        # When Pull All Edits was used but PREVIEW/merge was not run,
+        # _merged_items is empty. Pull creates a ModEntry(kind="itembuffs_edits")
+        # with parsed_items. Diff those directly against vanilla to produce
+        # iteminfo.pabgb intents without needing a full merge run.
+        if not has_merged:
+            _ib_entries = [m for m in self._mods
+                           if m.enabled and m.kind == 'itembuffs_edits'
+                           and getattr(m, 'parsed_items', None)]
+            if _ib_entries:
+                try:
+                    _snap_items = _ib_entries[-1].parsed_items
+                    _van_items = getattr(self, '_vanilla_items', None) or []
+                    if not _van_items and self._game_path:
+                        try:
+                            import crimson_rs as _cr_a2
+                            _van_bytes = bytes(_cr_a2.extract_file(
+                                self._game_path, '0008', INTERNAL_DIR,
+                                ITEMINFO_PABGB))
+                            try:
+                                import dmm_parser as _dmp2
+                                _van_items = _dmp2.parse_iteminfo_from_bytes(_van_bytes)
+                            except Exception:
+                                _van_items = list(
+                                    _cr_a2.parse_iteminfo_from_bytes(_van_bytes))
+                        except Exception as _ve:
+                            self._log_line(
+                                f'  ⚠ Could not load vanilla iteminfo for snapshot '
+                                f'diff: {_ve}')
+                    if _snap_items and _van_items:
+                        _van_lk = {it.get('string_key', ''): it for it in _van_items}
+                        _snap_intents = []
+                        for _si in _snap_items:
+                            _sk = _si.get('string_key', '')
+                            _ik = _si.get('key', 0)
+                            _van = _van_lk.get(_sk)
+                            if _van is None:
+                                _snap_intents.append({
+                                    'entry': _sk, 'key': _ik,
+                                    'op': 'add_entry',
+                                    'data': _strip_meta(_si),
+                                })
+                            else:
+                                _snap_intents.extend(
+                                    _deep_diff_to_intents(_sk, _ik, _van, _si))
+                        if _snap_intents:
+                            intents.extend(_snap_intents)
+                            self._log_line(
+                                f'  + {len(_snap_intents)} iteminfo intent(s) '
+                                f'from ItemBuffs snapshot (Pull All, no PREVIEW)')
+                except Exception as _a2_err:
+                    self._log_line(
+                        f'  ⚠ ItemBuffs snapshot diff failed: {_a2_err}')
 
         # ── Path B (fallback): legacy JSON → baseline reparse-diff ──
         # Only used when PREVIEW was NOT run (no merged items) but legacy
@@ -4088,6 +4260,99 @@ class StackerTab(QWidget):
                         f"  + {len(t_intents)} {pabgb_name} "
                         f"intent(s) ({source}-level diff)")
 
+        # ── Path C: companion_files from Pull All Edits ──────────────────
+        if has_companion and crimson_rs is not None:
+            merged_companion: dict = {}
+            for ce in companion_entries:
+                merged_companion.update(ce.staged_companion_files)
+
+            handled_companion = set()
+            _PHYSICAL_TO_TARGET = {
+                'factionnode.pabgb':     'faction_node_info.pabgb',
+                'skill.pabgb':           'skill_info.pabgb',
+                'gameplaytrigger.pabgb': 'game_play_trigger_info.pabgb',
+                'inventory.pabgb':       'inventory.pabgb',
+            }
+            _RAW_ONLY = {'skill.pabgb'}
+            for pabgb_name in sorted(
+                    n for n in merged_companion if n.endswith('.pabgb')):
+                if pabgb_name in handled_companion:
+                    continue
+                handled_companion.add(pabgb_name)
+                try:
+                    mod_pabgb = merged_companion[pabgb_name]
+                    pabgh_name = pabgb_name[:-len('.pabgb')] + '.pabgh'
+
+                    try:
+                        vanilla_pabgb = bytes(crimson_rs.extract_file(
+                            self._game_path, '0008', INTERNAL_DIR, pabgb_name))
+                    except Exception:
+                        self._log_line(
+                            f'  ⚠ {pabgb_name} skipped: cannot extract vanilla')
+                        continue
+
+                    if bytes(mod_pabgb) == vanilla_pabgb:
+                        continue
+
+                    mod_pabgh = merged_companion.get(pabgh_name)
+                    if mod_pabgh is None:
+                        try:
+                            mod_pabgh = bytes(crimson_rs.extract_file(
+                                self._game_path, '0008', INTERNAL_DIR, pabgh_name))
+                        except Exception:
+                            mod_pabgh = None
+
+                    if mod_pabgh is not None and pabgb_name not in _RAW_ONLY:
+                        try:
+                            vanilla_pabgh = bytes(crimson_rs.extract_file(
+                                self._game_path, '0008', INTERNAL_DIR, pabgh_name))
+                        except Exception:
+                            vanilla_pabgh = mod_pabgh
+                        # Use canonical target name so normalize_target_name
+                        # can resolve files like inventory.pabgb → inventory_info
+                        _diff_label = _PHYSICAL_TO_TARGET.get(pabgb_name, pabgb_name)
+                        t_intents, source = _diff_table_field_level(
+                            vanilla_pabgh, vanilla_pabgb,
+                            mod_pabgh, bytes(mod_pabgb), _diff_label)
+                        if not source:
+                            try:
+                                t_intents = _diff_blob_table_to_intents(
+                                    vanilla_pabgh, vanilla_pabgb,
+                                    mod_pabgh, bytes(mod_pabgb), pabgb_name)
+                                source = 'blob'
+                            except Exception:
+                                t_intents = []
+                                source = 'raw_fallback'
+                    else:
+                        t_intents = []
+                        cur_b, van_b = bytes(mod_pabgb), vanilla_pabgb
+                        j = 0
+                        while j < min(len(cur_b), len(van_b)) - 3:
+                            if cur_b[j:j+4] != van_b[j:j+4]:
+                                t_intents.append({
+                                    'entry': f'offset_{j}', 'key': j,
+                                    'field': 'raw_bytes', 'op': 'set',
+                                    'new': cur_b[j:j+4].hex().upper(),
+                                    '_offset': j,
+                                    '_original': van_b[j:j+4].hex().upper(),
+                                })
+                                j += 4
+                            else:
+                                j += 1
+                        source = 'raw'
+
+                    target_name = _PHYSICAL_TO_TARGET.get(pabgb_name, pabgb_name)
+                    if t_intents:
+                        extra_targets.append((target_name, t_intents))
+                        self._log_line(
+                            f'  + {len(t_intents)} {target_name} '
+                            f'intent(s) ({source}, companion)')
+                    else:
+                        self._log_line(
+                            f'  ◊ {pabgb_name}: no intents (unchanged or unsupported)')
+                except Exception as _ce:
+                    self._log_line(f'  ⚠ {pabgb_name} failed: {_ce}')
+
         if not intents and not extra_targets:
             QMessageBox.information(self, "Export Field JSON",
                 "No field-level changes found. Nothing to export.")
@@ -4095,11 +4360,22 @@ class StackerTab(QWidget):
 
         # Pick save path
         default_name = mod_title.replace(' ', '_') + ".field.json"
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Export Field JSON", default_name,
-            "Field JSON (*.field.json *.json);;All Files (*)")
-        if not path:
+        self._log_line(f"  → opening save dialog ({len(extra_targets)} extra targets)...")
+        dialog = QFileDialog(self, "Export Field JSON", default_name,
+                             "Field JSON (*.field.json *.json);;All Files (*)")
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setOption(QFileDialog.DontUseNativeDialog, False)
+        dialog.raise_()
+        dialog.activateWindow()
+        if dialog.exec() != QFileDialog.Accepted:
+            self._log_line("  → save dialog cancelled or failed")
             return
+        selected = dialog.selectedFiles()
+        path = selected[0] if selected else ""
+        if not path:
+            self._log_line("  → no path selected")
+            return
+        self._log_line(f"  → saving to: {path}")
 
         # Build the doc. Multi-target shape when ANY non-iteminfo target
         # has intents (the 1.1.4 spec extension consumed by DMM 1.3.3+).

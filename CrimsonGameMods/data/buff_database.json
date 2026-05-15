@@ -1923,5 +1923,61 @@
     "entry_size": 589,
     "level_count": 4,
     "payload_hex": "010000000011000000000000000000020000000000000000000000000000000000000000000000001c000000eb8f8520ebb3b4eb9dbcec8389202d20ec9db4ed"
+  },
+  "1000276": {
+    "key": 1000276,
+    "name": "BuffLevel_Difficulty",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000277": {
+    "key": 1000277,
+    "name": "BuffLevel_Difficulty_Boss",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000278": {
+    "key": 1000278,
+    "name": "BuffLevel_Difficulty_PC",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000280": {
+    "key": 1000280,
+    "name": "BuffLevel_Equipment_FireResistance",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000281": {
+    "key": 1000281,
+    "name": "BuffLevel_Equipment_IceResistance",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000282": {
+    "key": 1000282,
+    "name": "BuffLevel_Equipment_ElectricityResistance",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000275": {
+    "key": 1000275,
+    "name": "BuffLevel_Equip_Set_Stealth_Faction_Flame_Knights",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
+  },
+  "1000279": {
+    "key": 1000279,
+    "name": "BuffLevel_WildSpirit_Boar_Angry",
+    "entry_size": 0,
+    "level_count": 0,
+    "payload_hex": ""
   }
 }

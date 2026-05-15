@@ -1,6 +1,44 @@
+import logging
 import struct
 import sys
 import json
+
+log = logging.getLogger(__name__)
+
+DMM_NODE_TABLE = 'faction_node_info'
+DMM_SPAWN_TABLE = 'faction_node_spawn_info'
+
+
+def parse_node_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_NODE_TABLE, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_node_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_NODE_TABLE, items))
+    except Exception:
+        return None
+
+
+def parse_spawn_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_SPAWN_TABLE, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_spawn_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_SPAWN_TABLE, items))
+    except Exception:
+        return None
 
 
 def _read_u32(D, p):

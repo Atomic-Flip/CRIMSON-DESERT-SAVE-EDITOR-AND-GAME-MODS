@@ -194,6 +194,22 @@ class BagSpaceTab(QWidget):
         spec.loader.exec_module(module)
         return module
 
+    def _parse_dmm(self, pabgb: bytes, pabgh: bytes) -> Optional[list]:
+        """Parse inventory.pabgb using dmm_parser (field-level, no byte offsets)."""
+        try:
+            import dmm_parser
+            return dmm_parser.parse_table('inventory_info', pabgb, pabgh)
+        except Exception:
+            return None
+
+    def _serialize_dmm(self, items: list) -> Optional[bytes]:
+        """Serialize inventory items back to pabgb using dmm_parser."""
+        try:
+            import dmm_parser
+            return bytes(dmm_parser.serialize_table('inventory_info', items))
+        except Exception:
+            return None
+
     def _load_from_game(self) -> None:
         self._load_group(prefer_overlay=True)
 
@@ -242,16 +258,39 @@ class BagSpaceTab(QWidget):
     def _parse_and_show(self, source_group: str) -> None:
         if self._inventory_data is None:
             return
-        parser = self._load_parser()
-        self._records = parser.parse_inventory_pabgb(
-            bytes(self._inventory_data), self._inventory_pabgh
-        )
+        pabgb_bytes = bytes(self._inventory_data)
+        pabgh_bytes = self._inventory_pabgh
+
+        dmm_items = self._parse_dmm(pabgb_bytes, pabgh_bytes)
+        if dmm_items:
+            self._dmm_items = dmm_items
+            self._records = []
+            for it in dmm_items:
+                ds = it.get('default_slot_count')
+                ms = it.get('max_slot_count')
+                if ds is None and ms is None:
+                    continue
+                self._records.append({
+                    "key": it.get('key', 0),
+                    "name": it.get('string_key', ''),
+                    "default_slots": int(ds) if ds is not None else 0,
+                    "max_slots": int(ms) if ms is not None else 0,
+                })
+            parser_name = "dmm_parser"
+        else:
+            self._dmm_items = None
+            parser = self._load_parser()
+            self._records = parser.parse_inventory_pabgb(
+                pabgb_bytes, pabgh_bytes
+            )
+            parser_name = "PABGEditor"
+
         self._refresh_table()
         shown = sum(1 for r in self._records if "default_slots" in r)
         self._dirty = False
         self._status.setText(
             f"Loaded {shown} slot fields from {source_group}/inventory.pabgb "
-            f"using PABGEditor parser."
+            f"using {parser_name}."
         )
 
     def _refresh_table(self) -> None:
@@ -262,13 +301,15 @@ class BagSpaceTab(QWidget):
         for rec in self._records:
             if "default_slots" not in rec or "max_slots" not in rec:
                 continue
+            default_off = rec.get("default_offset", -1)
+            max_off = rec.get("max_offset", -1)
             rows.append(
                 (
                     rec["key"],
                     rec["name"],
-                    "_defaultSlotCount",
+                    "default_slot_count",
                     rec["default_slots"],
-                    rec["default_offset"],
+                    default_off,
                     "u16",
                 )
             )
@@ -276,21 +317,22 @@ class BagSpaceTab(QWidget):
                 (
                     rec["key"],
                     rec["name"],
-                    "_maxSlotCount",
+                    "max_slot_count",
                     rec["max_slots"],
-                    rec["max_offset"],
+                    max_off,
                     "u16",
                 )
             )
 
         table.setRowCount(len(rows))
         for row, (key, name, field, value, offset, field_type) in enumerate(rows):
+            offset_str = f"0x{offset:06X}" if offset >= 0 else "dmm"
             values = [
                 str(key),
                 str(name),
                 str(field),
                 str(value),
-                f"0x{offset:06X}",
+                offset_str,
                 str(field_type),
             ]
             for col, text in enumerate(values):
@@ -298,7 +340,7 @@ class BagSpaceTab(QWidget):
                 if col in (0, 3, 4):
                     item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 if col == 3:
-                    item.setData(Qt.UserRole, int(offset))
+                    item.setData(Qt.UserRole, int(key))
                     item.setData(Qt.UserRole + 1, str(name))
                     item.setData(Qt.UserRole + 2, str(field))
                 else:
@@ -315,10 +357,10 @@ class BagSpaceTab(QWidget):
         if self._inventory_data is None:
             return
 
-        offset = item.data(Qt.UserRole)
+        rec_key = item.data(Qt.UserRole)
         record_name = item.data(Qt.UserRole + 1) or "record"
         field_name = item.data(Qt.UserRole + 2) or "field"
-        if offset is None:
+        if rec_key is None:
             return
 
         try:
@@ -328,18 +370,46 @@ class BagSpaceTab(QWidget):
         except Exception:
             self._updating_table = True
             try:
-                old_value = struct.unpack_from("<H", self._inventory_data, int(offset))[0]
-                item.setText(str(old_value))
+                rec = next((r for r in self._records if r["key"] == rec_key), None)
+                if rec and field_name in ("default_slot_count", "default_slots"):
+                    item.setText(str(rec["default_slots"]))
+                elif rec:
+                    item.setText(str(rec["max_slots"]))
             finally:
                 self._updating_table = False
             self._status.setText("Invalid slot value. Use a number from 0 to 65535.")
             return
 
-        old_value = struct.unpack_from("<H", self._inventory_data, int(offset))[0]
-        struct.pack_into("<H", self._inventory_data, int(offset), value)
-        self._records = self._load_parser().parse_inventory_pabgb(
-            bytes(self._inventory_data), self._inventory_pabgh
-        )
+        if self._dmm_items is not None:
+            dmm_field = "default_slot_count" if "default" in field_name else "max_slot_count"
+            for it in self._dmm_items:
+                if it.get('key') == rec_key:
+                    old_value = int(it.get(dmm_field, 0))
+                    it[dmm_field] = value
+                    break
+            else:
+                old_value = 0
+            new_pabgb = self._serialize_dmm(self._dmm_items)
+            if new_pabgb:
+                self._inventory_data = bytearray(new_pabgb)
+        else:
+            rec = next((r for r in self._records if r["key"] == rec_key), None)
+            if not rec:
+                return
+            offset_key = "default_offset" if "default" in field_name else "max_offset"
+            offset = rec.get(offset_key)
+            if offset is None:
+                return
+            old_value = struct.unpack_from("<H", self._inventory_data, int(offset))[0]
+            struct.pack_into("<H", self._inventory_data, int(offset), value)
+
+        for r in self._records:
+            if r["key"] == rec_key:
+                if "default" in field_name:
+                    r["default_slots"] = value
+                else:
+                    r["max_slots"] = value
+                break
         self._dirty = True
         self._refresh_table()
         self._status.setText(
@@ -356,21 +426,35 @@ class BagSpaceTab(QWidget):
                 return
 
         char = next((r for r in self._records if r.get("name") == "Character"), None)
-        if not char or "default_offset" not in char or "max_offset" not in char:
+        if not char:
             QMessageBox.warning(
                 self,
                 "Character Record Missing",
-                "Could not find Character slot offsets in inventory.pabgb.",
+                "Could not find Character record in inventory.pabgb.",
             )
             return
 
         old_default = int(char["default_slots"])
         old_max = int(char["max_slots"])
-        struct.pack_into("<H", self._inventory_data, int(char["default_offset"]), default_slots)
-        struct.pack_into("<H", self._inventory_data, int(char["max_offset"]), max_slots)
-        self._records = self._load_parser().parse_inventory_pabgb(
-            bytes(self._inventory_data), self._inventory_pabgh
-        )
+
+        if self._dmm_items is not None:
+            for it in self._dmm_items:
+                if it.get('string_key') == 'Character':
+                    it['default_slot_count'] = default_slots
+                    it['max_slot_count'] = max_slots
+                    break
+            new_pabgb = self._serialize_dmm(self._dmm_items)
+            if new_pabgb:
+                self._inventory_data = bytearray(new_pabgb)
+        elif "default_offset" in char and "max_offset" in char:
+            struct.pack_into("<H", self._inventory_data, int(char["default_offset"]), default_slots)
+            struct.pack_into("<H", self._inventory_data, int(char["max_offset"]), max_slots)
+        else:
+            QMessageBox.warning(self, "Error", "Cannot write: no byte offsets and dmm_parser unavailable.")
+            return
+
+        char["default_slots"] = default_slots
+        char["max_slots"] = max_slots
         self._dirty = True
         self._refresh_table()
         self._status.setText(
@@ -395,10 +479,12 @@ class BagSpaceTab(QWidget):
             self._load_from_game()
         if self._inventory_data is None:
             raise RuntimeError("inventory.pabgb is not loaded.")
-        if self._inventory_data is None:
-            raise RuntimeError("inventory.pabgb is not loaded.")
         if self._inventory_pabgh is None:
             raise RuntimeError("inventory.pabgh is not loaded.")
+        if self._dmm_items is not None:
+            final = self._serialize_dmm(self._dmm_items)
+            if final:
+                return final, bytes(self._inventory_pabgh)
         return bytes(self._inventory_data), bytes(self._inventory_pabgh)
 
     def _apply_to_game(self) -> None:
@@ -407,7 +493,14 @@ class BagSpaceTab(QWidget):
             QMessageBox.warning(self, "No Game Path", "Set the game install path first.")
             return
 
-        grp = self._overlay_group
+        from gui.utils import resolve_overlay_group
+        requested = self._overlay_spin.value() if hasattr(self, '_overlay_spin') else 61
+        group_num = resolve_overlay_group(game_path, requested, "BagSpace", parent=self)
+        if group_num is None:
+            return
+        if group_num != requested and hasattr(self, '_overlay_spin'):
+            self._overlay_spin.setValue(group_num)
+        grp = f"{group_num:04d}"
         reply = QMessageBox.question(
             self,
             "Apply BagSpace",

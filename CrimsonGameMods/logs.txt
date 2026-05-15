@@ -1,0 +1,1107 @@
+=== Session start 2026-05-13T16:45:24.221146 ===
+2026-05-13 16:45:24,371 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 16:45:24,375 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 16:45:24,375 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 16:45:24,430 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:45:24,440 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:45:24,591 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 16:45:24,592 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 16:45:24,593 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 16:45:30,759 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 16:45:30,778 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 16:45:30,795 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 16:45:30,795 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 16:45:32,595 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 16:45:32,811 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 16:45:32,844 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 16:45:32,845 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 16:45:32,846 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 16:45:32,858 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 16:45:37,689 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 16:45:37,691 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 16:45:37,805 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 16:45:38,129 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 16:45:38,146 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 16:45:38,260 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 16:45:38,262 [WARNING] gui.tabs.buffs_v319: _build_effect_catalog failed: '>' not supported between instances of 'int' and 'dict'
+2026-05-13 16:45:39,172 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 16:45:39,198 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 16:45:41,940 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 16:45:58,374 [INFO] gui.tabs.world: Loaded 863 terrain spawn entries via dmm_parser
+2026-05-13 16:45:59,086 [INFO] gui.tabs.world: Loaded 7027 character names via dmm_parser
+2026-05-13 16:45:59,087 [INFO] gui.tabs.world: Loaded 822 spawn rates via dmm_parser (spline.raw_g)
+2026-05-13 16:45:59,400 [INFO] gui.tabs.world: Loaded 914 factionnode operator schedules via dmm_parser
+=== Session start 2026-05-13T16:52:14.505595 ===
+2026-05-13 16:52:14,651 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 16:52:14,653 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 16:52:14,654 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 16:52:14,708 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:52:14,717 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:52:14,907 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 16:52:14,907 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 16:52:14,908 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 16:52:19,893 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 16:52:19,913 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 16:52:19,929 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 16:52:19,930 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 16:52:21,667 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 16:52:21,899 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 16:52:21,936 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 16:52:21,936 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 16:52:21,938 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 16:52:21,951 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 16:52:29,534 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 16:52:36,004 [INFO] gui.tabs.world: Loaded 863 terrain spawn entries via dmm_parser
+2026-05-13 16:52:36,725 [INFO] gui.tabs.world: Loaded 7027 character names via dmm_parser
+2026-05-13 16:52:36,726 [INFO] gui.tabs.world: Loaded 822 spawn rates via dmm_parser (spline.raw_g)
+2026-05-13 16:52:36,988 [INFO] gui.tabs.world: Loaded 914 factionnode operator schedules via dmm_parser
+2026-05-13 16:52:37,306 [INFO] gui.tabs.world: Loaded 863 terrain spawn entries via dmm_parser
+2026-05-13 16:52:37,957 [INFO] gui.tabs.world: Loaded 7027 character names via dmm_parser
+2026-05-13 16:52:37,958 [INFO] gui.tabs.world: Loaded 822 spawn rates via dmm_parser (spline.raw_g)
+2026-05-13 16:52:38,037 [INFO] gui.tabs.world: Loaded 914 factionnode operator schedules via dmm_parser
+=== Session start 2026-05-13T16:55:22.959785 ===
+2026-05-13 16:55:23,585 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 16:55:23,587 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 16:55:23,588 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 16:55:23,639 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:55:23,651 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 16:55:23,865 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 16:55:23,872 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 16:55:23,873 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 16:55:44,081 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 16:55:44,099 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 16:55:44,122 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 16:55:44,123 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 16:55:45,851 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 16:55:46,021 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 16:55:46,054 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 16:55:46,054 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 16:55:46,055 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 16:55:46,067 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 16:55:46,114 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 16:55:46,155 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 16:55:46,201 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 16:55:46,204 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 16:55:48,066 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 16:55:48,254 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 16:55:48,287 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 16:55:48,287 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 16:55:48,288 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 16:55:48,300 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+=== Session start 2026-05-13T17:26:04.658659 ===
+2026-05-13 17:26:04,805 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 17:26:04,807 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 17:26:04,808 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 17:26:04,864 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:26:04,874 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:26:05,022 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 17:26:05,023 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 17:26:05,024 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 17:26:09,092 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 17:26:09,094 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 17:26:09,188 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 17:26:09,506 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 17:26:09,526 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 17:26:09,653 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 17:26:09,657 [INFO] gui.tabs.buffs_v319: Effect catalog built: 0 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 17:26:10,632 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 17:26:10,638 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 17:26:15,034 [INFO] parc_inserter2: Parsing full save structure (2322291 bytes)...
+2026-05-13 17:26:17,100 [INFO] parc_inserter2: Parsed: 74 types, 192 TOC entries, 192 object blocks
+2026-05-13 17:26:17,281 [INFO] parc_inserter2: Offset positions: 61941 collected, 61941 verified, 0 bad; trailing sizes: 61941 collected
+2026-05-13 17:26:17,283 [INFO] gui.main_window: PARC parse cache warmed
+2026-05-13 17:27:00,272 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+=== Session start 2026-05-13T17:34:25.978914 ===
+2026-05-13 17:34:26,170 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 17:34:26,172 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 17:34:26,172 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 17:34:26,225 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:34:26,234 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:34:26,457 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 17:34:26,459 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 17:34:26,460 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 17:34:38,412 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 17:34:38,414 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 17:34:38,449 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 17:34:43,187 [INFO] parc_inserter2: Parsing full save structure (2322291 bytes)...
+2026-05-13 17:34:45,301 [INFO] parc_inserter2: Parsed: 74 types, 192 TOC entries, 192 object blocks
+2026-05-13 17:34:45,453 [INFO] parc_inserter2: Offset positions: 61941 collected, 61941 verified, 0 bad; trailing sizes: 61941 collected
+2026-05-13 17:34:45,454 [INFO] gui.main_window: PARC parse cache warmed
+2026-05-13 17:34:49,958 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 17:34:50,218 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 17:34:50,236 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 17:34:50,348 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 17:34:50,348 [WARNING] gui.tabs.buffs_v319: Effect catalog skip item 2200: int() argument must be a string, a bytes-like object or a real number, not 'dict'
+2026-05-13 17:34:50,348 [WARNING] gui.tabs.buffs_v319: Effect catalog skip item 50001: int() argument must be a string, a bytes-like object or a real number, not 'dict'
+2026-05-13 17:34:50,348 [WARNING] gui.tabs.buffs_v319: Effect catalog skip item 1002557: int() argument must be a string, a bytes-like object or a real number, not 'dict'
+2026-05-13 17:34:50,348 [WARNING] gui.tabs.buffs_v319: Effect catalog skip item 50003: int() argument must be a string, a bytes-like object or a real number, not 'dict'
+2026-05-13 17:34:50,348 [WARNING] gui.tabs.buffs_v319: Effect catalog skip item 1000070: int() argument must be a string, a bytes-like object or a real number, not 'dict'
+2026-05-13 17:34:50,354 [WARNING] gui.tabs.buffs_v319: Effect catalog: 2328 more items skipped
+2026-05-13 17:34:50,354 [INFO] gui.tabs.buffs_v319: Effect catalog built: 0 effects from 6253 items (scanned 0 gimmicks)
+2026-05-13 17:34:51,273 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 17:34:51,280 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 17:40:29,521 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 17:40:29,540 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 17:40:29,557 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 17:40:29,557 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 17:40:32,109 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 17:40:32,312 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 17:40:32,346 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 17:40:32,346 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 17:40:32,348 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 17:40:32,360 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 17:41:46,768 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 17:41:46,787 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 17:41:46,806 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 17:41:46,809 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 17:41:48,526 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 17:41:48,738 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 17:41:48,774 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 17:41:48,775 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 17:41:48,776 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 17:41:48,792 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 17:41:49,891 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:41:50,151 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=15 mount=89 edits applied (75/439 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 17:41:53,823 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 17:41:53,823 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 17:41:53,823 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 17:41:53,823 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 17:41:53,823 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 17:41:53,831 [INFO] gui.tabs.field_edit:   characterinfo    : clean (24200530 B, no changes)
+2026-05-13 17:41:53,831 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 17:41:53,831 [INFO] gui.tabs.field_edit:   allygroupinfo    : NOT LOADED
+2026-05-13 17:41:53,831 [INFO] gui.tabs.field_edit:   relationinfo     : NOT LOADED
+2026-05-13 17:41:53,831 [INFO] gui.tabs.field_edit:   factionrelationgroup : NOT LOADED
+2026-05-13 17:41:53,832 [WARNING] gui.tabs.field_edit: field_edit apply: NO buffers are dirty — pack_mod will produce an empty overlay!
+2026-05-13 17:41:53,832 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 17:41:53,840 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 17:41:55,040 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 17:41:55,053 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0039/ (6927 bytes)
+2026-05-13 17:41:55,064 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0040/ (118732 bytes)
+2026-05-13 17:41:55,108 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0041/ (24200530 bytes)
+=== Session start 2026-05-13T17:43:18.336449 ===
+2026-05-13 17:43:18,499 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 17:43:18,504 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 17:43:18,506 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 17:43:18,560 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:43:18,570 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 17:43:18,741 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 17:43:18,742 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 17:43:18,743 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 17:43:43,613 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 17:43:43,668 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 17:43:43,698 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 17:43:43,699 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 17:43:46,193 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 17:43:46,405 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 17:43:46,440 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 17:43:46,440 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 17:43:46,441 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 17:43:46,454 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 17:43:46,543 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 17:43:46,563 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 17:43:46,581 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 17:43:46,581 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 17:43:48,560 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 17:43:48,786 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 17:43:48,821 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 17:43:48,821 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 17:43:48,822 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 17:43:48,836 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 17:44:23,283 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0041 (remaining: 0040, 0039, 0090, 0066, 0064, 0063)
+2026-05-13 17:44:23,284 [INFO] overlay_coordinator: Overlay 0041 removed and state cleaned
+2026-05-13 17:44:36,879 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0039 (remaining: 0040, 0090, 0066, 0064, 0063)
+2026-05-13 17:44:36,880 [INFO] overlay_coordinator: Overlay 0039 removed and state cleaned
+2026-05-13 17:44:39,108 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0040 (remaining: 0090, 0066, 0064, 0063)
+2026-05-13 17:44:39,109 [INFO] overlay_coordinator: Overlay 0040 removed and state cleaned
+2026-05-13 17:44:41,047 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0063 (remaining: 0090, 0066, 0064)
+2026-05-13 17:44:41,048 [INFO] overlay_coordinator: Overlay 0063 removed and state cleaned
+2026-05-13 17:44:43,836 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0064 (remaining: 0090, 0066)
+2026-05-13 17:44:43,837 [INFO] overlay_coordinator: Overlay 0064 removed and state cleaned
+2026-05-13 17:44:46,227 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0066 (remaining: 0090)
+2026-05-13 17:44:46,228 [INFO] overlay_coordinator: Overlay 0066 removed and state cleaned
+2026-05-13 17:44:48,596 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0090
+2026-05-13 17:44:48,597 [INFO] overlay_coordinator: Overlay 0090 removed and state cleaned
+2026-05-13 17:44:51,097 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 17:44:51,115 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 17:44:51,133 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 17:44:51,133 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 17:44:53,047 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 17:44:53,277 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 17:44:53,311 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 17:44:53,311 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 17:44:53,312 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 17:44:53,325 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 17:44:53,961 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:44:54,240 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=15 mount=89 edits applied (75/439 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 17:44:56,161 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:44:56,445 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=0 region=0 mount=14 edits applied (14/439 mount-entries had dur>0 or cool>0; patched: Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1)
+2026-05-13 17:44:59,743 [INFO] gui.tabs.field_edit: make_killable (dmm_parser): attackable+=407 vincible+=402 skipped=439
+2026-05-13 17:45:04,373 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 17:45:04,373 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 17:45:04,373 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 17:45:04,373 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 17:45:04,373 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 17:45:04,381 [INFO] gui.tabs.field_edit:   characterinfo    : clean (24200530 B, no changes)
+2026-05-13 17:45:04,381 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 17:45:04,381 [INFO] gui.tabs.field_edit:   allygroupinfo    : NOT LOADED
+2026-05-13 17:45:04,381 [INFO] gui.tabs.field_edit:   relationinfo     : NOT LOADED
+2026-05-13 17:45:04,381 [INFO] gui.tabs.field_edit:   factionrelationgroup : NOT LOADED
+2026-05-13 17:45:04,381 [WARNING] gui.tabs.field_edit: field_edit apply: NO buffers are dirty — pack_mod will produce an empty overlay!
+2026-05-13 17:45:04,382 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 17:45:04,391 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 17:45:05,653 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 17:45:05,665 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0039/ (6927 bytes)
+2026-05-13 17:45:05,675 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0040/ (118732 bytes)
+2026-05-13 17:45:05,717 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0041/ (24200530 bytes)
+2026-05-13 17:45:28,029 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 17:45:28,031 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 17:47:10,441 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:47:10,799 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=0 region=0 mount=14 edits applied (14/439 mount-entries had dur>0 or cool>0; patched: Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1)
+2026-05-13 17:47:15,520 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:47:15,812 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=0 region=0 mount=14 edits applied (14/439 mount-entries had dur>0 or cool>0; patched: Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1)
+2026-05-13 17:47:23,191 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 17:47:23,464 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=0 region=0 mount=14 edits applied (14/439 mount-entries had dur>0 or cool>0; patched: Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1)
+2026-05-13 17:47:33,131 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 17:47:33,132 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 17:47:33,132 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 17:47:33,132 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 17:47:33,132 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 17:47:33,141 [INFO] gui.tabs.field_edit:   characterinfo    : clean (24200530 B, no changes)
+2026-05-13 17:47:33,141 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 17:47:33,141 [INFO] gui.tabs.field_edit:   allygroupinfo    : NOT LOADED
+2026-05-13 17:47:33,141 [INFO] gui.tabs.field_edit:   relationinfo     : NOT LOADED
+2026-05-13 17:47:33,141 [INFO] gui.tabs.field_edit:   factionrelationgroup : NOT LOADED
+2026-05-13 17:47:33,141 [WARNING] gui.tabs.field_edit: field_edit apply: NO buffers are dirty — pack_mod will produce an empty overlay!
+2026-05-13 17:47:33,142 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 17:47:33,150 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 17:47:34,427 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 17:47:34,436 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0039/ (6927 bytes)
+2026-05-13 17:47:34,445 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0040/ (118732 bytes)
+2026-05-13 17:47:34,488 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0041/ (24200530 bytes)
+2026-05-13 17:47:39,646 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 17:47:40,070 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 17:47:40,134 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 17:47:40,250 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 17:47:40,272 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 17:47:41,207 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 17:47:41,217 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 17:52:05,560 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 17:52:34,338 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+=== Session start 2026-05-13T18:02:59.542588 ===
+2026-05-13 18:02:59,684 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:02:59,686 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:02:59,686 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:02:59,737 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:02:59,747 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:02:59,950 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:02:59,954 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:03:00,012 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:03:07,090 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:03:07,108 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:03:07,125 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:03:07,125 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:03:08,947 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:03:09,146 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:03:09,181 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:03:09,181 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:03:09,182 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:03:09,195 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:03:11,926 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 18:03:12,196 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=187 mount=89 edits applied (75/439 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 18:03:13,502 [INFO] gui.tabs.field_edit: Loaded pet_catalog: 216 pet keys across 4 groups
+2026-05-13 18:03:48,066 [INFO] gui.tabs.field_edit: mesh swap PRE-apply: _charinfo_data has 0 bytes differing from vanilla (mount cooldown/killable/invincible)
+2026-05-13 18:03:49,931 [INFO] character_mesh_swap: mesh swap: applied 1 field edits, serialized 24200530 bytes via dmm_parser
+2026-05-13 18:03:51,133 [INFO] gui.tabs.field_edit: mesh swap: queue=1 applied=1 diff_bytes=4
+2026-05-13 18:03:51,497 [INFO] gui.tabs.field_edit: mesh swap POST-apply: _charinfo_data has 4 bytes differing from vanilla (combined: mesh swap + prior edits)
+2026-05-13 18:03:51,501 [INFO] gui.tabs.field_edit: mesh swap: Kliff (1) <- Yahn (2): off=0x0 0x017C3F22 -> 0x06B25D03
+2026-05-13 18:03:51,502 [ERROR] gui.tabs.field_edit: mount overlay deploy failed
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3821, in _field_edit_apply_mesh_swaps
+    overlay_msg = self._deploy_mount_overlays(game_path, needs_overlay)
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3841, in _deploy_mount_overlays
+    from rider_bone_injector import inject_rider_bone, has_rider_bone, \
+        _write_scaled_appearance
+ModuleNotFoundError: No module named 'rider_bone_injector'
+2026-05-13 18:03:51,519 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 18:03:51,519 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 18:03:51,519 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 18:03:51,519 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 18:03:51,519 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 18:03:51,891 [INFO] gui.tabs.field_edit:   characterinfo    : DIRTY (24200530 B, 4 bytes diff vs vanilla)
+2026-05-13 18:03:51,891 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 18:03:51,891 [INFO] gui.tabs.field_edit:   allygroupinfo    : NOT LOADED
+2026-05-13 18:03:51,892 [INFO] gui.tabs.field_edit:   relationinfo     : NOT LOADED
+2026-05-13 18:03:51,892 [INFO] gui.tabs.field_edit:   factionrelationgroup : NOT LOADED
+2026-05-13 18:03:51,892 [INFO] gui.tabs.field_edit: field_edit apply: 1 dirty buffer(s) will be packed: characterinfo
+2026-05-13 18:03:51,892 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 18:03:51,900 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 18:03:53,277 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 18:03:53,296 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0039/ (6927 bytes)
+2026-05-13 18:03:53,312 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0040/ (118732 bytes)
+2026-05-13 18:03:53,375 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0041/ (24200530 bytes)
+2026-05-13 18:07:55,009 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:07:55,030 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:07:55,047 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:07:55,048 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:07:56,781 [ERROR] gui.tabs.field_edit: Could not load characterinfo mounts
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 838, in _field_edit_load
+    self._charinfo_dmm_vanilla = _copy.deepcopy(self._charinfo_dmm_items)
+                                 ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\copy.py", line 131, in deepcopy
+    y = copier(x, memo)
+  File "C:\Program Files\Python314\Lib\copy.py", line 177, in _deepcopy_list
+    append(deepcopy(a, memo))
+           ~~~~~~~~^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\copy.py", line 131, in deepcopy
+    y = copier(x, memo)
+  File "C:\Program Files\Python314\Lib\copy.py", line 202, in _deepcopy_dict
+    y[deepcopy(key, memo)] = deepcopy(value, memo)
+                             ~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\copy.py", line 131, in deepcopy
+    y = copier(x, memo)
+  File "C:\Program Files\Python314\Lib\copy.py", line 177, in _deepcopy_list
+    append(deepcopy(a, memo))
+           ~~~~~~~~^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\copy.py", line 131, in deepcopy
+    y = copier(x, memo)
+  File "C:\Program Files\Python314\Lib\copy.py", line 201, in _deepcopy_dict
+    for key, value in x.items():
+                      ~~~~~~~^^
+TypeError: 'tuple' object is not an iterator
+2026-05-13 18:07:56,843 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:08:01,056 [INFO] gui.tabs.field_edit: make_killable (dmm_parser): attackable+=407 vincible+=402 skipped=439
+2026-05-13 18:08:03,234 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 18:08:03,310 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=187 mount=89 edits applied (75/0 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 18:08:06,923 [INFO] gui.tabs.field_edit: Alliance loaded via dmm_parser: ally=51 relation=47 faction=5
+2026-05-13 18:08:15,043 [INFO] gui.tabs.field_edit: mesh swap PRE-apply: _charinfo_data has 0 bytes differing from vanilla (mount cooldown/killable/invincible)
+2026-05-13 18:08:16,945 [INFO] character_mesh_swap: mesh swap: applied 1 field edits, serialized 24200530 bytes via dmm_parser
+2026-05-13 18:08:18,112 [INFO] gui.tabs.field_edit: mesh swap: queue=1 applied=1 diff_bytes=4
+2026-05-13 18:08:18,497 [INFO] gui.tabs.field_edit: mesh swap POST-apply: _charinfo_data has 4 bytes differing from vanilla (combined: mesh swap + prior edits)
+2026-05-13 18:08:18,501 [INFO] gui.tabs.field_edit: mesh swap: Kliff (1) <- Yahn (2): off=0x0 0x017C3F22 -> 0x06B25D03
+2026-05-13 18:08:18,502 [ERROR] gui.tabs.field_edit: mount overlay deploy failed
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3821, in _field_edit_apply_mesh_swaps
+    overlay_msg = self._deploy_mount_overlays(game_path, needs_overlay)
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3841, in _deploy_mount_overlays
+    from rider_bone_injector import inject_rider_bone, has_rider_bone, \
+        _write_scaled_appearance
+ModuleNotFoundError: No module named 'rider_bone_injector'
+2026-05-13 18:08:18,518 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 18:08:18,518 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 18:08:18,519 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 18:08:18,519 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 18:08:18,519 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 18:08:18,895 [INFO] gui.tabs.field_edit:   characterinfo    : DIRTY (24200530 B, 4 bytes diff vs vanilla)
+2026-05-13 18:08:18,895 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 18:08:18,895 [INFO] gui.tabs.field_edit:   allygroupinfo    : clean (14006 B, no changes)
+2026-05-13 18:08:18,895 [INFO] gui.tabs.field_edit:   relationinfo     : clean (1405 B, no changes)
+2026-05-13 18:08:18,895 [INFO] gui.tabs.field_edit:   factionrelationgroup : clean (214 B, no changes)
+2026-05-13 18:08:18,896 [INFO] gui.tabs.field_edit: field_edit apply: 1 dirty buffer(s) will be packed: characterinfo
+2026-05-13 18:08:18,896 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 18:08:18,904 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 18:08:20,149 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 18:08:20,159 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0039/ (6927 bytes)
+2026-05-13 18:08:20,167 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0040/ (118732 bytes)
+2026-05-13 18:08:20,219 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0041/ (24200530 bytes)
+2026-05-13 18:08:24,850 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 18:08:24,852 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 18:08:24,952 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 18:08:25,224 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 18:08:25,240 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 18:08:25,354 [WARNING] gui.tabs.buffs_v319: Could not load gimmick names: can't concat int to bytes
+2026-05-13 18:08:25,361 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 18:08:26,317 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:08:26,320 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:12:42,726 [INFO] gui.tabs.world: Loaded 863 terrain spawn entries via dmm_parser
+2026-05-13 18:12:43,354 [INFO] gui.tabs.world: Loaded 7027 character names via dmm_parser
+2026-05-13 18:12:43,357 [INFO] gui.tabs.world: Loaded 822 spawn rates via dmm_parser (spline.raw_g)
+2026-05-13 18:12:43,511 [INFO] gui.tabs.world: Loaded 914 factionnode operator schedules via dmm_parser
+=== Session start 2026-05-13T18:14:56.839576 ===
+2026-05-13 18:14:56,986 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:14:56,988 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:14:56,989 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:14:57,040 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:14:57,050 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:14:57,211 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:14:57,212 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:14:57,213 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:15:09,569 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0090 (remaining: 0041, 0040, 0039)
+2026-05-13 18:15:09,570 [INFO] overlay_coordinator: Overlay 0090 removed and state cleaned
+2026-05-13 18:19:45,969 [INFO] overlay_coordinator: Overlay 0041 - Copy removed and state cleaned
+2026-05-13 18:21:14,549 [INFO] gui.tabs.world: Loaded 863 terrain spawn entries via dmm_parser
+2026-05-13 18:21:15,344 [INFO] gui.tabs.world: Loaded 7027 character names via dmm_parser
+2026-05-13 18:21:15,345 [INFO] gui.tabs.world: Loaded 822 spawn rates via dmm_parser (spline.raw_g)
+2026-05-13 18:21:15,433 [INFO] gui.tabs.world: Loaded 914 factionnode operator schedules via dmm_parser
+2026-05-13 18:21:21,911 [INFO] gui.tabs.world: Loaded 140 spawning pool entries via dmm_parser
+2026-05-13 18:25:36,871 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 18:25:57,557 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 18:28:57,371 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 18:28:57,384 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 18:28:57,486 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 18:28:58,029 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 18:28:58,045 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+=== Session start 2026-05-13T18:30:02.763540 ===
+2026-05-13 18:30:02,912 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:30:02,914 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:30:02,914 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:30:02,969 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:30:02,979 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:30:03,182 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:30:03,183 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:30:03,183 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:30:09,313 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+2026-05-13 18:32:33,032 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:32:33,051 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:32:33,070 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:32:33,072 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:32:34,959 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:32:35,156 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:32:35,193 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:32:35,194 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:32:35,196 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:32:35,208 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:33:01,559 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 18:33:01,562 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 18:33:01,689 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 18:33:02,014 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 18:33:02,030 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 18:33:02,144 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 18:33:02,149 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 18:33:03,081 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:33:03,085 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:33:08,988 [INFO] gui.tabs.buffs_v319: Kliff gun fix staged: upperAC=0x69540EF2 from Damian, gamePlay=0x1F46DC9B from Oongka
+=== Session start 2026-05-13T18:38:33.786563 ===
+2026-05-13 18:38:34,087 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:38:34,089 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:38:34,090 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:38:34,147 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:38:34,157 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:38:34,358 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:38:34,358 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:38:34,359 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:38:41,316 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 18:38:41,320 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 18:38:41,446 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 18:38:41,772 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 18:38:41,789 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 18:38:41,909 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 18:38:41,917 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 18:38:42,874 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:38:42,927 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:38:50,633 [INFO] gui.tabs.buffs_v319: Kliff gun fix staged: upperAC=0x69540EF2 from Damian, gamePlay=0x1F46DC9B from Oongka
+2026-05-13 18:39:08,489 [INFO] gui.main_window: Pristine backup created: C:\Users\Coding\AppData\Local\Pearl Abyss/CD/save\57173764\slot100\backups\save.save.PRISTINE.bak
+2026-05-13 18:39:08,772 [INFO] parc_inserter2: Parsing full save structure (2305028 bytes)...
+2026-05-13 18:39:10,684 [INFO] parc_inserter2: Parsed: 74 types, 193 TOC entries, 193 object blocks
+2026-05-13 18:39:10,838 [INFO] parc_inserter2: Offset positions: 61702 collected, 61702 verified, 0 bad; trailing sizes: 61702 collected
+2026-05-13 18:39:10,840 [INFO] gui.main_window: PARC parse cache warmed
+2026-05-13 18:39:43,114 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 18:39:59,051 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:39:59,062 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:39:59,087 [INFO] gui.tabs.buffs_v319: ApplyToGame Infinity Durability: patched 0 items
+2026-05-13 18:39:59,193 [INFO] gui.tabs.buffs_v319: Rebuilt iteminfo: 5604972 bytes, pabgh 6253 entries
+2026-05-13 18:40:01,401 [INFO] armor_catalog: apply_swaps_to_blob: fresh catalog has 5362 items for 2 queued swap(s)
+2026-05-13 18:40:01,401 [INFO] armor_catalog: swap 1002366 -> 1163044: target=Inytium_Leather_Armor hashes=[('0x3b9d90', '0xf55eef1e')]
+2026-05-13 18:40:01,401 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Armor hashes=[('0x3431cb', '0xb0be394c')]
+2026-05-13 18:40:01,401 [INFO] armor_catalog:   build_swap_changes produced 1 patch(es)
+2026-05-13 18:40:01,401 [INFO] armor_catalog:     [swap] off=0x3b9d90 orig=0xf55eef1e -> 0xb0be394c (Inytium_Leather_Armor <- Old_Kliff_PlateArmor_Armor)
+2026-05-13 18:40:01,401 [INFO] armor_catalog: swap 240020 -> 200021: target=Leinstead_OneHandSword hashes=[('0x4edc95', '0x5d5521fa'), ('0x4edc99', '0xd907c952')]
+2026-05-13 18:40:01,402 [INFO] armor_catalog:   source=Kiehrius_TwoHandSword hashes=[('0x554f26', '0xcb86bc81'), ('0x554f2a', '0x6506c079')]
+2026-05-13 18:40:01,402 [INFO] armor_catalog:   build_swap_changes produced 1 patch(es)
+2026-05-13 18:40:01,402 [INFO] armor_catalog:     [swap] off=0x4edc95 orig=0x5d5521fa -> 0xcb86bc81 (Leinstead_OneHandSword <- Kiehrius_TwoHandSword)
+2026-05-13 18:40:01,413 [INFO] gui.tabs.buffs_v319: Transmog: applied 2 byte patches for 2 queued swap(s)
+
+==============================================================================
+=== Pipeline report 2026-05-13T18:39:59.082903 ===
+==============================================================================
+[STAGE] input: flags: stacks=True inf_dura=True buff_modified=True cd_patches=0 transmog_swaps=2
+[STAGE] max_stacks: set max_stack_count=999999 on 2142 items
+[EXPECT] max_stacks: 2 entries
+[STAGE] inf_durability: set max_endurance=65535 on 0 items
+[EXPECT] inf_dura: 2 entries
+[STAGE] rust_serialize: 5604972 bytes
+[STAGE] transmog: 2 byte patches for 2 swap(s)
+[EXPECT] transmog: 2 entries
+[VERIFY] max_stacks (max_stack_count=999999): OK ok=2142 bad=0 missing=0
+[VERIFY] inf_dura (max_endurance=65535): EMPTY ok=0 bad=0 missing=0
+[VERIFY] transmog: FAIL ok=0 bad=2 samples(tgt_key,expected,actual)=[(1163044, None, 2965256524), (200021, None, 1565860346)]
+2026-05-13 18:40:13,234 [INFO] gui.tabs.buffs_v319: Weapon equip cache: 13 skills with tag=63, 11 weapon hashes
+2026-05-13 18:40:13,248 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,248 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,248 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,248 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,248 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_HPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_MPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,249 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_SPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Combo_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AbyssGrass_Immune: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Hyena_PoisonImmune: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Immune_Bismuth: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DAM_UP_RotationBash: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_SPRecover_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LandMash_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SoulStrike_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CrowAttack_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FlashCombo_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SwordAura_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FrostBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FireBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LightningBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_EnlightenmentWave_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DarkenRobe_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DogClaw_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Forgotten_General: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Ogre: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Antumbra_Spear: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CrowStorm_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SmashStorm_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_1_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_2_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_3_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,250 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AbsoluteDefense_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_ArrowRain_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Merrick: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LightningStab_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Antumbra_TwoHandRod: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_TarandusWarrior_WarHammer: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Bastier: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Karanda: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FrostDeath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Primus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DarkChase_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Leebur: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_QueenSpider: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Praevus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Priscus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Skevald: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AtorDrone_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_PhantomStab_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LanFord: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_ImpBoss: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Catfish_BodySlam_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Titan: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_EnergyBurst_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Muscan: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Legendary_Titan_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: AbyssReward_WhiteHorn_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: AbyssReward_EastWitch_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Antumbra_King_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Tiger_Tooth_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Antumbra_DarkDeacon_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,251 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Ancient_People_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Detail_Gold_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Red_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pattern_Silver_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Faded_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Old_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pattern_Copper_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: riding_Leather_Helm: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: riding_Leather_Boots: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Riding_Fabric_Cloak: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Twich_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Bilibili_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Greymane_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Hernand_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pailune_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Demeniss_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Delesyian_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Tashkalpan_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Demeniss_Cross_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe_II: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: ItemCatch_FishingRod: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:13,252 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Mining_Drill: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:40:17,694 [INFO] gui.tabs.buffs_v319: Apply to Game: bundled pabgh (50026 bytes, 6253 entries)
+2026-05-13 18:40:17,698 [INFO] gui.tabs.buffs_v319: Built 0058: pamt=174 bytes, pamt_checksum=0x229ED48D
+2026-05-13 18:40:17,705 [INFO] gui.tabs.buffs_v319: equipslotinfo deployed to 0059/ (pabgb=15074, pabgh=114, checksum=0x45418792)
+2026-05-13 18:40:17,746 [INFO] gui.tabs.buffs_v319: characterinfo deployed to 0065/ (pabgb=24200530, pabgh=56218, checksum=0x9B0249A5)
+2026-05-13 18:40:36,495 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:40:36,518 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:40:36,536 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:40:36,538 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:40:38,785 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:40:38,991 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:40:39,025 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:40:39,026 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:40:39,027 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:40:39,040 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+=== Session start 2026-05-13T18:44:46.789375 ===
+2026-05-13 18:44:47,374 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:44:47,379 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:44:47,389 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:44:47,442 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:44:47,451 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:44:47,654 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:44:47,655 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:44:47,656 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:44:51,454 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:44:51,473 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:44:51,490 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:44:51,490 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:44:53,298 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:44:53,486 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:44:53,521 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:44:53,521 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:44:53,522 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:44:53,536 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:45:06,964 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 18:45:07,242 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=187 mount=89 edits applied (75/439 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 18:45:09,237 [INFO] gui.tabs.field_edit: make_killable (dmm_parser): attackable+=407 vincible+=402 skipped=439
+2026-05-13 18:45:11,861 [INFO] gui.tabs.field_edit: Loaded pet_catalog: 216 pet keys across 4 groups
+2026-05-13 18:45:45,161 [INFO] gui.tabs.field_edit: mesh swap PRE-apply: _charinfo_data has 0 bytes differing from vanilla (mount cooldown/killable/invincible)
+2026-05-13 18:45:47,034 [INFO] character_mesh_swap: mesh swap: applied 2 field edits, serialized 24200530 bytes via dmm_parser
+2026-05-13 18:45:48,210 [INFO] gui.tabs.field_edit: mesh swap: queue=2 applied=2 diff_bytes=8
+2026-05-13 18:45:48,571 [INFO] gui.tabs.field_edit: mesh swap POST-apply: _charinfo_data has 8 bytes differing from vanilla (combined: mesh swap + prior edits)
+2026-05-13 18:45:48,575 [INFO] gui.tabs.field_edit: mesh swap: Kliff (1) <- Yahn (2): off=0x0 0x017C3F22 -> 0x06B25D03
+2026-05-13 18:45:48,575 [INFO] gui.tabs.field_edit: mesh swap: Animal_Black_Horse_Wild_31378 (31378) <- Riding_Cucubird_2 (1002059): off=0x0 0xBFEB865D -> 0xCA60932E
+2026-05-13 18:45:48,576 [ERROR] gui.tabs.field_edit: mount overlay deploy failed
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3821, in _field_edit_apply_mesh_swaps
+    overlay_msg = self._deploy_mount_overlays(game_path, needs_overlay)
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3841, in _deploy_mount_overlays
+    from rider_bone_injector import inject_rider_bone, has_rider_bone, \
+        _write_scaled_appearance
+ModuleNotFoundError: No module named 'rider_bone_injector'
+2026-05-13 18:45:48,593 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 18:45:48,593 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 18:45:48,593 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 18:45:48,593 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 18:45:48,594 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 18:45:48,963 [INFO] gui.tabs.field_edit:   characterinfo    : DIRTY (24200530 B, 8 bytes diff vs vanilla)
+2026-05-13 18:45:48,972 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 18:45:48,973 [INFO] gui.tabs.field_edit:   allygroupinfo    : NOT LOADED
+2026-05-13 18:45:48,979 [INFO] gui.tabs.field_edit:   relationinfo     : NOT LOADED
+2026-05-13 18:45:48,988 [INFO] gui.tabs.field_edit:   factionrelationgroup : NOT LOADED
+2026-05-13 18:45:48,989 [INFO] gui.tabs.field_edit: field_edit apply: 1 dirty buffer(s) will be packed: characterinfo
+2026-05-13 18:45:48,990 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 18:45:48,997 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 18:45:50,217 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 18:45:50,229 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0099/ (6927 bytes)
+2026-05-13 18:45:50,240 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0100/ (118732 bytes)
+2026-05-13 18:45:50,283 [INFO] gui.tabs.field_edit: FieldEdit deployed characterinfo to 0101/ (24200530 bytes)
+2026-05-13 18:47:37,071 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0101 (remaining: 0100, 0065, 0059, 0058, 0036, 0061, 0037, 0066, 0064, 0063, 0090, 0041, 0040, 0039)
+2026-05-13 18:47:37,072 [INFO] overlay_coordinator: Overlay 0101 removed and state cleaned
+2026-05-13 18:47:40,018 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0100 (remaining: 0065, 0059, 0058, 0036, 0061, 0037, 0066, 0064, 0063, 0090, 0041, 0040, 0039)
+2026-05-13 18:47:40,019 [INFO] overlay_coordinator: Overlay 0100 removed and state cleaned
+2026-05-13 18:47:51,698 [INFO] gui.tabs.load_manager: PAPGT remove: PAPGT: removed 0065 (remaining: 0059, 0058, 0036, 0061, 0037, 0066, 0064, 0063, 0090, 0041, 0040, 0039)
+2026-05-13 18:47:51,699 [INFO] overlay_coordinator: Overlay 0065 removed and state cleaned
+=== Session start 2026-05-13T18:54:27.382783 ===
+2026-05-13 18:54:27,528 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 18:54:27,530 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 18:54:27,530 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 18:54:27,581 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:54:27,591 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 18:54:27,832 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 18:54:27,833 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 18:54:27,834 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 18:54:39,437 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:54:39,456 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:54:39,473 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:54:39,473 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:54:41,252 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:54:41,436 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:54:41,469 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:54:41,470 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:54:41,471 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:54:41,483 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:54:41,553 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 18:54:41,602 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 18:54:41,620 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 18:54:41,621 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 18:54:43,469 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 18:54:43,666 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 18:54:43,701 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 18:54:43,701 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 18:54:43,702 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 18:54:43,715 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 18:54:49,214 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 18:54:49,216 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 18:54:49,312 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 18:54:49,327 [WARNING] gui.tabs.buffs_v319: Overlay 0058/ iteminfo (5604972 bytes) differs from vanilla (5486576 bytes) by 118396 bytes — stale overlay from old game version. Falling back to vanilla.
+2026-05-13 18:54:49,573 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 18:54:49,590 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 18:54:49,699 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 18:54:49,704 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 18:54:50,654 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:54:50,657 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:54:55,969 [INFO] gui.tabs.buffs_v319: Kliff gun fix staged: upperAC=0x69540EF2 from Damian, gamePlay=0x1F46DC9B from Oongka
+2026-05-13 18:55:09,028 [INFO] gui.main_window: Pristine backup created: C:\Users\Coding\AppData\Local\Pearl Abyss/CD/save\57173764\slot100\backups\save.save.PRISTINE.bak
+2026-05-13 18:55:09,389 [INFO] parc_inserter2: Parsing full save structure (2349929 bytes)...
+2026-05-13 18:55:11,814 [INFO] parc_inserter2: Parsed: 75 types, 200 TOC entries, 200 object blocks
+2026-05-13 18:55:11,963 [INFO] parc_inserter2: Offset positions: 62338 collected, 62338 verified, 0 bad; trailing sizes: 62338 collected
+2026-05-13 18:55:11,965 [INFO] gui.main_window: PARC parse cache warmed
+2026-05-13 18:55:46,662 [INFO] gui.tabs.buffs_v319: Applying preset: {'name': 'Lightning Weapon', 'passives': [{'skill': 91101, 'level': 3}, {'skill': 91104, 'level': 3}, {'skill': 91105, 'level': 3}], 'gimmick_info': 1001961, 'cooltime': 1, 'item_charge_type': 0, 'max_charged_useable_count': 100, 'respawn_time_seconds': 0, 'docking_child_data': {'gimmick_info_key': 1001961, 'character_key': 0, 'item_key': 0, 'attach_parent_socket_name': 'Gimmick_Weapon_00_Socket', 'attach_child_socket_name': '', 'docking_tag_name_hash': [3365725887, 0, 0, 0], 'docking_equip_slot_no': 65535, 'spawn_distance_level': 4294967295, 'is_item_equip_docking_gimmick': 1, 'send_damage_to_parent': 0, 'is_body_part': 0, 'docking_type': 0, 'is_summoner_team': 0, 'is_player_only': 0, 'is_npc_only': 0, 'is_sync_break_parent': 0, 'hit_part': 0, 'detected_by_npc': 0, 'is_bag_docking': 0, 'enable_collision': 0, 'disable_collision_with_other_gimmick': 1, 'docking_slot_key': '', 'inherit_summoner': 0, 'summon_tag_name_hash': [0, 0, 0, 0]}}
+2026-05-13 18:55:47,949 [INFO] gui.tabs.buffs_v319: Weapon equip cache: 13 skills with tag=63, 11 weapon hashes
+2026-05-13 18:56:03,672 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 18:56:03,676 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 18:56:03,685 [INFO] gui.tabs.buffs_v319: ApplyToGame Infinity Durability: patched 0 items
+2026-05-13 18:56:03,790 [INFO] gui.tabs.buffs_v319: Rebuilt iteminfo: 5605008 bytes, pabgh 6253 entries
+2026-05-13 18:56:06,012 [INFO] armor_catalog: apply_swaps_to_blob: fresh catalog has 5362 items for 3 queued swap(s)
+2026-05-13 18:56:06,012 [INFO] armor_catalog: swap 1002366 -> 1163044: target=Inytium_Leather_Armor hashes=[('0x3b9d90', '0xf55eef1e')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Armor hashes=[('0x3431cb', '0xb0be394c')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   build_swap_changes produced 1 patch(es)
+2026-05-13 18:56:06,013 [INFO] armor_catalog:     [swap] off=0x3b9d90 orig=0xf55eef1e -> 0xb0be394c (Inytium_Leather_Armor <- Old_Kliff_PlateArmor_Armor)
+2026-05-13 18:56:06,013 [INFO] armor_catalog: swap 1002367 -> 1000296: target=Inytium_Leather_Cloak hashes=[('0x3bac3a', '0xf55eef1e')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Cloak hashes=[('0x34350e', '0xb0be394c')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   build_swap_changes produced 1 patch(es)
+2026-05-13 18:56:06,013 [INFO] armor_catalog:     [swap] off=0x3bac3a orig=0xf55eef1e -> 0xb0be394c (Inytium_Leather_Cloak <- Old_Kliff_PlateArmor_Cloak)
+2026-05-13 18:56:06,013 [INFO] armor_catalog: swap 1000747 -> 200021: target=Leinstead_OneHandSword hashes=[('0x4edcad', '0x5d5521fa'), ('0x4edcb1', '0xd907c952')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4e6bcb', '0x1db34756'), ('0x4e6bcf', '0x6c7928b4')]
+2026-05-13 18:56:06,013 [INFO] armor_catalog:   build_swap_changes produced 1 patch(es)
+2026-05-13 18:56:06,013 [INFO] armor_catalog:     [swap] off=0x4edcad orig=0x5d5521fa -> 0x1db34756 (Leinstead_OneHandSword <- Goblin_Boss_OneHandSword)
+2026-05-13 18:56:06,028 [INFO] gui.tabs.buffs_v319: Transmog: applied 3 byte patches for 3 queued swap(s)
+
+==============================================================================
+=== Pipeline report 2026-05-13T18:56:03.679692 ===
+==============================================================================
+[STAGE] input: flags: stacks=True inf_dura=True buff_modified=True cd_patches=0 transmog_swaps=3
+[STAGE] max_stacks: set max_stack_count=999999 on 2142 items
+[EXPECT] max_stacks: 2 entries
+[STAGE] inf_durability: set max_endurance=65535 on 0 items
+[EXPECT] inf_dura: 2 entries
+[STAGE] rust_serialize: 5605008 bytes
+[STAGE] transmog: 3 byte patches for 3 swap(s)
+[EXPECT] transmog: 3 entries
+[VERIFY] max_stacks (max_stack_count=999999): OK ok=2142 bad=0 missing=0
+[VERIFY] inf_dura (max_endurance=65535): EMPTY ok=0 bad=0 missing=0
+[VERIFY] transmog: FAIL ok=0 bad=3 samples(tgt_key,expected,actual)=[(1163044, None, 2965256524), (1000296, None, 2965256524), (200021, None, 1565860346)]
+2026-05-13 18:56:09,318 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,318 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,318 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Stat_AbyssGear_StaminaRegen_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,319 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_PlateArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_LeatherArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddCriticalRateByMaterialKey_FabricArmor_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AddKillSkillLevel_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddHorseExp_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Equip_AddPetFriendly_LV3: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_HPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_MPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_SPRecover_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Combo_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AbyssGrass_Immune: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Hyena_PoisonImmune: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Immune_Bismuth: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DAM_UP_RotationBash: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Attack_SPRecover_LV2: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LandMash_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SoulStrike_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CrowAttack_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FlashCombo_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SwordAura_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,320 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FrostBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FireBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LightningBreath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_EnlightenmentWave_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DarkenRobe_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DogClaw_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Forgotten_General: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Ogre: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Antumbra_Spear: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CrowStorm_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_SmashStorm_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_1_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_2_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_CresecentAura_3_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AbsoluteDefense_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_ArrowRain_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Merrick: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LightningStab_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Antumbra_TwoHandRod: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_TarandusWarrior_WarHammer: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Bastier: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Karanda: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_FrostDeath_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Primus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,321 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_DarkChase_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Leebur: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_QueenSpider: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Praevus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Priscus: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Skevald: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_AtorDrone_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_PhantomStab_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_LanFord: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_ImpBoss: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Catfish_BodySlam_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Titan: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_EnergyBurst_LV1: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Item_Skill_AbyssGear_Muscan: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Legendary_Titan_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: AbyssReward_WhiteHorn_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: AbyssReward_EastWitch_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Antumbra_King_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Tiger_Tooth_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,322 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Antumbra_DarkDeacon_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Ancient_People_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Detail_Gold_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Red_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pattern_Silver_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Faded_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Old_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pattern_Copper_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: riding_Leather_Helm: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: riding_Leather_Boots: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Riding_Fabric_Cloak: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Twich_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,323 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Bilibili_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Greymane_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Hernand_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Pailune_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Demeniss_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Delesyian_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Tashkalpan_Nobility_Degree_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Demeniss_Cross_Ring: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe_I: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Equip_Pickaxe_II: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: ItemCatch_FishingRod: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:09,324 [WARNING] gui.tabs.buffs_v319: Weapon-buff warning: Mining_Drill: 1 weapon-passive buff(s) on non-weapon item — may cause infinite loading
+2026-05-13 18:56:10,352 [INFO] gui.tabs.buffs_v319: Apply to Game: bundled pabgh (50026 bytes, 6253 entries)
+2026-05-13 18:56:10,356 [INFO] gui.tabs.buffs_v319: Built 0058: pamt=174 bytes, pamt_checksum=0x0349E815
+2026-05-13 18:56:10,363 [INFO] gui.tabs.buffs_v319: equipslotinfo deployed to 0059/ (pabgb=15074, pabgh=114, checksum=0x45418792)
+2026-05-13 18:56:18,295 [INFO] gui.utils: Merged characterinfo: 1 prior edits from 0041/ preserved into 0065/
+2026-05-13 18:56:22,541 [ERROR] gui.tabs.buffs_v319: Apply to Game: characterinfo 0065 deploy failed
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\buffs_v319.py", line 13246, in _buff_apply_to_game
+    self._buff_deploy_charinfo_0065(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        game_path,
+        ^^^^^^^^^^
+        staged_charinfo['characterinfo.pabgb'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        staged_charinfo['characterinfo.pabgh'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\buffs_v319.py", line 8250, in _buff_deploy_charinfo_0065
+    deploy_merged_pabgb(
+    ~~~~~~~~~~~~~~~~~~~^
+        game_path, 'character_info', 'characterinfo',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        new_pabgb, new_pabgh, GROUP, "ItemBuffs Kliff Gun Fix",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        parent=self)
+        ^^^^^^^^^^^^
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\utils.py", line 289, in deploy_merged_pabgb
+    crimson_rs.write_papgt_file(papgt_path, papgt)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+TypeError: argument 'data': 'str' object cannot be cast as 'dict'
+2026-05-13 18:56:31,358 [INFO] gui.tabs.world: Store loaded via dmm_parser: 292 stores
+=== Session start 2026-05-13T19:05:11.989264 ===
+2026-05-13 19:05:12,137 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 19:05:12,139 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 19:05:12,139 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 19:05:12,191 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:05:12,201 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:05:12,452 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 19:05:12,452 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 19:05:12,453 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+=== Session start 2026-05-13T19:10:46.307399 ===
+2026-05-13 19:10:46,827 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 19:10:46,829 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 19:10:46,829 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 19:10:46,883 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:10:46,893 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:10:47,100 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 19:10:47,100 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 19:10:47,101 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+=== Session start 2026-05-13T19:10:59.528820 ===
+2026-05-13 19:10:59,674 [INFO] gui_i18n: gui_i18n: install(lang='en') called; current_lang='en'
+2026-05-13 19:10:59,676 [INFO] gui_i18n: gui_i18n: patched 93 Qt setter(s)
+2026-05-13 19:10:59,677 [INFO] gui_i18n: gui_i18n self-test: QPushButton('Set Stack')->'Set Stack'  QLabel.setText('Inventory')->'Inventory'
+2026-05-13 19:10:59,728 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:10:59,737 [INFO] item_db: Loaded 6022 items from SQLite
+2026-05-13 19:10:59,934 [INFO] gui.tabs.buffs_v319: Loaded 188 passive skills from skill_english_names.json
+2026-05-13 19:10:59,935 [INFO] gui.tabs.buffs_v319: Loaded 283 buffs from buff_database.json (total: 283)
+2026-05-13 19:10:59,935 [INFO] gui.tabs.buffs_v319: Applied 30 English buff names
+2026-05-13 19:11:03,805 [INFO] gui.tabs.field_edit: dmm_parser: loaded 34 vehicleinfo entries (field-level)
+2026-05-13 19:11:03,825 [INFO] gui.tabs.field_edit: Loaded 646 gameplaytrigger entries
+2026-05-13 19:11:03,841 [INFO] gui.tabs.field_edit: dmm_parser: loaded 1004 regioninfo entries (field-level)
+2026-05-13 19:11:03,842 [INFO] gui.tabs.field_edit: Loaded 1004 regioninfo entries via dmm_parser
+2026-05-13 19:11:05,665 [INFO] gui.tabs.field_edit: dmm_parser: loaded 7027 characterinfo entries (field-level)
+2026-05-13 19:11:05,878 [INFO] gui.tabs.field_edit: Loaded 439 mount entries from dmm_parser
+2026-05-13 19:11:05,914 [INFO] stringinfo_resolver: StringResolver loaded 30206 hash→string entries from game
+2026-05-13 19:11:05,934 [INFO] gui.tabs.field_edit: StringResolver loaded 30206 hash→string entries
+2026-05-13 19:11:05,940 [INFO] gui.tabs.field_edit: Loaded 2 player chars for runtime weapon edits
+2026-05-13 19:11:05,955 [INFO] gui.tabs.field_edit: Loaded wantedinfo: 560 bytes
+2026-05-13 19:11:27,977 [INFO] gui.tabs.field_edit: === enable_mounts: starting ===
+2026-05-13 19:11:28,271 [INFO] gui.tabs.field_edit: enable_mounts: vehicle=17 region=187 mount=89 edits applied (75/439 mount-entries had dur>0 or cool>0; patched: Animal_Bear_Wild_30048, Animal_Domestic_Bear_Domestic_30191, Animal_Grizzly_Bear_Wild_30111, Animal_Black_Bear_Wild_30108, Animal_Ride_Bear_Wild_30116, Riding_Bear_1, Animal_Trained_Bear_59006, Riding_Wolf_2083, Animal_Wolf_Wild_30019, Animal_Wolf_Wild_30020, Animal_Wolf_Wild_30021, Animal_Wolf_Wild_30022, Animal_Wolf_Wild_30023, Animal_Wolf_Wild_30024, Animal_Wolf_Wild_30025, Animal_Wolf_Wild_30026, Animal_Wolf_Wild_30027, Animal_Wolf_Wild_30028, Animal_Wolf_Wild_30029, Animal_Wolf_Wild_30030, Animal_Wolf_Wild_30031, Animal_Wolf_Wild_30032, Animal_Wolf_Wild_30033, Animal_Wolf_Wild_30034, Animal_White_Wolf_Wild_30034, Animal_White_Wolf_Wild_30035, Riding_Wolf_1, Riding_Wolf_2, Riding_Wolf_3, Riding_Wolf_4, Riding_Wolf_5, Riding_Wolf_6, Animal_Lion_Wild_30374, Animal_Lion_Domestic_30374, Animal_Lion_Circus_32349, Animal_Tiger_Wild_1, Riding_Warthog_1, Animal_Ride_Battle_Boar_30271, Animal_Ride_Battle_Boar_30272, Animal_Ride_Battle_Boar_30273, Animal_Ride_Battle_Boar_30274, Animal_Ride_Battle_Boar_30275, Animal_Ride_Battle_Boar_30276, Animal_AlpineIbex_10, Riding_Balloon_Summoner_1, Riding_Balloon_Summoner_2, Riding_Balloon_Summoner_3, Riding_Bear_1001, Riding_Warthog_1000, Riding_Wolf_1001, Riding_Deer_1001, Riding_AlpineIbex_1000, Riding_Camel_1000, Riding_Cucubird_1000, Riding_Deer_1, Riding_Iguana_2, Riding_Iguana_1, Riding_CarmaBirdsaurus_1, Riding_Machine_Bear_1, Riding_Machine_CarmaBirdsaurus_1, Riding_WarMachine_Unique_1, Riding_ATAG_1, Riding_ATAG_2, Riding_ATAG_3, Riding_ATAG_5, Riding_ATAG_6, Riding_ATAG_7, Riding_ATAG_4, Riding_Dragon_1, Riding_Bear_1000, Riding_Wolf_1000, Riding_Deer_1000, Riding_SandfangBandits_Wolf_2083, Animal_Tiger_Wild_2, Riding_AlpineIbex_1)
+2026-05-13 19:11:30,029 [INFO] gui.tabs.field_edit: make_killable (dmm_parser): attackable+=407 vincible+=402 skipped=439
+2026-05-13 19:11:30,746 [INFO] gui.tabs.field_edit: Alliance loaded via dmm_parser: ally=51 relation=47 faction=5
+2026-05-13 19:11:31,873 [INFO] gui.tabs.field_edit: path_b (dmm_parser): cleared 237 ally hashes
+2026-05-13 19:11:32,613 [INFO] gui.tabs.field_edit: Loaded pet_catalog: 216 pet keys across 4 groups
+2026-05-13 19:14:20,650 [INFO] gui.tabs.field_edit: mesh swap PRE-apply: _charinfo_data has 0 bytes differing from vanilla (mount cooldown/killable/invincible)
+2026-05-13 19:14:22,383 [INFO] character_mesh_swap: mesh swap: applied 3 field edits, serialized 24200530 bytes via dmm_parser
+2026-05-13 19:14:23,475 [INFO] gui.tabs.field_edit: mesh swap: queue=3 applied=3 diff_bytes=12
+2026-05-13 19:14:23,831 [INFO] gui.tabs.field_edit: mesh swap POST-apply: _charinfo_data has 12 bytes differing from vanilla (combined: mesh swap + prior edits)
+2026-05-13 19:14:23,836 [INFO] gui.tabs.field_edit: mesh swap: Kliff (1) <- Yahn (2): off=0x0 0x017C3F22 -> 0x06B25D03
+2026-05-13 19:14:23,836 [INFO] gui.tabs.field_edit: mesh swap: Animal_Black_Horse_Wild_31378 (31378) <- Riding_Cucubird_2 (1002059): off=0x0 0xBFEB865D -> 0xCA60932E
+2026-05-13 19:14:23,836 [INFO] gui.tabs.field_edit: mesh swap: Riding_AlpineIbex_1000 (1003915) <- Riding_Cucubird_2 (1002059): off=0x0 0x061B8D84 -> 0xCA60932E
+2026-05-13 19:14:23,837 [ERROR] gui.tabs.field_edit: mount overlay deploy failed
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3821, in _field_edit_apply_mesh_swaps
+    overlay_msg = self._deploy_mount_overlays(game_path, needs_overlay)
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 3843, in _deploy_mount_overlays
+    from rider_bone_injector import inject_rider_bone, has_rider_bone, \
+        _write_scaled_appearance
+ModuleNotFoundError: No module named 'rider_bone_injector'
+2026-05-13 19:14:23,853 [INFO] gui.tabs.field_edit: === field_edit apply pipeline: dirty-buffer summary ===
+2026-05-13 19:14:23,853 [INFO] gui.tabs.field_edit:   fieldinfo        : clean (854 B, no changes)
+2026-05-13 19:14:23,853 [INFO] gui.tabs.field_edit:   vehicleinfo      : clean (6927 B, no changes)
+2026-05-13 19:14:23,853 [INFO] gui.tabs.field_edit:   gameplaytrigger  : clean (50628 B, no changes)
+2026-05-13 19:14:23,854 [INFO] gui.tabs.field_edit:   regioninfo       : clean (118732 B, no changes)
+2026-05-13 19:14:24,240 [INFO] gui.tabs.field_edit:   characterinfo    : DIRTY (24200530 B, 12 bytes diff vs vanilla)
+2026-05-13 19:14:24,240 [INFO] gui.tabs.field_edit:   wantedinfo       : clean (560 B, no changes)
+2026-05-13 19:14:24,241 [INFO] gui.tabs.field_edit:   allygroupinfo    : DIRTY (13058 B, 12450 bytes diff vs vanilla)
+2026-05-13 19:14:24,241 [INFO] gui.tabs.field_edit:   relationinfo     : clean (1405 B, no changes)
+2026-05-13 19:14:24,241 [INFO] gui.tabs.field_edit:   factionrelationgroup : clean (214 B, no changes)
+2026-05-13 19:14:24,241 [INFO] gui.tabs.field_edit: field_edit apply: 2 dirty buffer(s) will be packed: characterinfo, allygroupinfo
+2026-05-13 19:14:28,602 [INFO] gui.tabs.field_edit: vehicleinfo: serialized via dmm_parser (6927 bytes)
+2026-05-13 19:14:28,610 [INFO] gui.tabs.field_edit: regioninfo: serialized via dmm_parser (118732 bytes)
+2026-05-13 19:14:29,834 [INFO] gui.tabs.field_edit: characterinfo: serialized via dmm_parser (24200530 bytes)
+2026-05-13 19:14:29,845 [INFO] gui.tabs.field_edit: FieldEdit deployed allygroupinfo to 0039/ (13058 bytes)
+2026-05-13 19:14:29,855 [INFO] gui.tabs.field_edit: FieldEdit deployed vehicleinfo to 0040/ (6927 bytes)
+2026-05-13 19:14:29,866 [INFO] gui.tabs.field_edit: FieldEdit deployed regioninfo to 0041/ (118732 bytes)
+Traceback (most recent call last):
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\tabs\field_edit.py", line 4245, in _field_edit_apply
+    deploy_merged_pabgb(
+    ~~~~~~~~~~~~~~~~~~~^
+        game_path, 'character_info', 'characterinfo',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        _charinfo_pabgb, ci_pabgh, ci_grp,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "FieldEdit mounts/mesh", parent=self)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Coding\CrimsonDesertModding\CrimsonGameMods_Clean\gui\utils.py", line 230, in deploy_merged_pabgb
+    ext_items = dmm_parser.parse_table(table_name, bytes(existing_pabgb), new_pabgh)
+pyo3_runtime.PanicException: range end index 1136363 out of range for slice of length 1135254
+2026-05-13 19:14:37,497 [INFO] paz_patcher: Found iteminfo.pabgb via PAMT: paz=C:\Program Files (x86)\Steam\steamapps\common\Crimson Desert\0008\0.paz offset=0x86E690 comp=831813 orig=5486576 pamt_comp_off=0xA0185
+2026-05-13 19:14:37,500 [INFO] paz_patcher: PAZ slot capacity: 753344 bytes (known)
+2026-05-13 19:14:37,650 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 19:14:37,659 [WARNING] gui.tabs.buffs_v319: Overlay 0058/ iteminfo (5605008 bytes) differs from vanilla (5486576 bytes) by 118432 bytes — stale overlay from old game version. Falling back to vanilla.
+2026-05-13 19:14:38,123 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 19:14:38,148 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 19:14:38,258 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 19:14:38,266 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 19:14:39,997 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 19:14:40,002 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 19:15:10,897 [INFO] gui.tabs.buffs_v319: Kliff gun fix staged: upperAC=0x69540EF2 from Damian, gamePlay=0x1F46DC9B from Oongka
+2026-05-13 19:15:29,280 [INFO] gui.main_window: Pristine backup created: C:\Users\Coding\AppData\Local\Pearl Abyss/CD/save\57173764\slot100\backups\save.save.PRISTINE.bak
+2026-05-13 19:15:29,569 [INFO] parc_inserter2: Parsing full save structure (2319146 bytes)...
+2026-05-13 19:15:31,535 [INFO] parc_inserter2: Parsed: 75 types, 190 TOC entries, 190 object blocks
+2026-05-13 19:15:31,684 [INFO] parc_inserter2: Offset positions: 61924 collected, 61924 verified, 0 bad; trailing sizes: 61924 collected
+2026-05-13 19:15:31,686 [INFO] gui.main_window: PARC parse cache warmed
+2026-05-13 19:16:18,885 [INFO] gui.tabs.buffs_v319: Transmog: applied 5 field-level swap(s) to rust items
+2026-05-13 19:16:27,845 [INFO] gui.tabs.buffs_v319: Applying preset: {'name': 'Lightning Weapon', 'passives': [{'skill': 91101, 'level': 3}, {'skill': 91104, 'level': 3}, {'skill': 91105, 'level': 3}], 'gimmick_info': 1001961, 'cooltime': 1, 'item_charge_type': 0, 'max_charged_useable_count': 100, 'respawn_time_seconds': 0, 'docking_child_data': {'gimmick_info_key': 1001961, 'character_key': 0, 'item_key': 0, 'attach_parent_socket_name': 'Gimmick_Weapon_00_Socket', 'attach_child_socket_name': '', 'docking_tag_name_hash': [3365725887, 0, 0, 0], 'docking_equip_slot_no': 65535, 'spawn_distance_level': 4294967295, 'is_item_equip_docking_gimmick': 1, 'send_damage_to_parent': 0, 'is_body_part': 0, 'docking_type': 0, 'is_summoner_team': 0, 'is_player_only': 0, 'is_npc_only': 0, 'is_sync_break_parent': 0, 'hit_part': 0, 'detected_by_npc': 0, 'is_bag_docking': 0, 'enable_collision': 0, 'disable_collision_with_other_gimmick': 1, 'docking_slot_key': '', 'inherit_summoner': 0, 'summon_tag_name_hash': [0, 0, 0, 0]}}
+2026-05-13 19:16:28,672 [INFO] gui.tabs.buffs_v319: Weapon equip cache: 13 skills with tag=63, 11 weapon hashes
+2026-05-13 19:16:44,289 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 19:16:44,292 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 19:16:44,301 [INFO] gui.tabs.buffs_v319: ApplyToGame Infinity Durability: patched 0 items
+2026-05-13 19:16:44,403 [INFO] gui.tabs.buffs_v319: Rebuilt iteminfo: 5605035 bytes, pabgh 6253 entries
+2026-05-13 19:16:46,451 [INFO] armor_catalog: apply_swaps_to_blob: fresh catalog has 5362 items for 5 queued swap(s)
+2026-05-13 19:16:46,451 [INFO] armor_catalog: swap 1002366 -> 1163044: target=Inytium_Leather_Armor hashes=[('0x3b9d90', '0xb0be394c')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Armor hashes=[('0x3431cb', '0xb0be394c')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:16:46,451 [INFO] armor_catalog: swap 1002367 -> 1000296: target=Inytium_Leather_Cloak hashes=[('0x3bac3a', '0xb0be394c')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Cloak hashes=[('0x34350e', '0xb0be394c')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:16:46,451 [INFO] armor_catalog: swap 1000747 -> 200021: target=Leinstead_OneHandSword hashes=[('0x4edcad', '0x1db34756'), ('0x4edcb1', '0x6c7928b4')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4e6bcb', '0x1db34756'), ('0x4e6bcf', '0x6c7928b4')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:16:46,451 [INFO] armor_catalog: swap 1000747 -> 1163042: target=Wolf_OneHandSword hashes=[('0x4efc56', '0x1db34756'), ('0x4efc5a', '0x6c7928b4')]
+2026-05-13 19:16:46,451 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4e6bcb', '0x1db34756'), ('0x4e6bcf', '0x6c7928b4')]
+2026-05-13 19:16:46,452 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:16:46,452 [INFO] armor_catalog: swap 1000747 -> 240026: target=Rayhorn_TwoHandSword hashes=[('0x555c8e', '0x1db34756'), ('0x555c92', '0x6c7928b4')]
+2026-05-13 19:16:46,452 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4e6bcb', '0x1db34756'), ('0x4e6bcf', '0x6c7928b4')]
+2026-05-13 19:16:46,452 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:16:46,452 [ERROR] armor_catalog: apply_swaps_to_blob: ZERO patches applied for 5 queued swap(s) — transmog will not take effect in-game
+2026-05-13 19:16:46,463 [INFO] gui.tabs.buffs_v319: Transmog: applied 0 byte patches for 5 queued swap(s)
+
+==============================================================================
+=== Pipeline report 2026-05-13T19:16:44.296123 ===
+==============================================================================
+[STAGE] input: flags: stacks=True inf_dura=True buff_modified=True cd_patches=0 transmog_swaps=5
+[STAGE] max_stacks: set max_stack_count=999999 on 2142 items
+[EXPECT] max_stacks: 2 entries
+[STAGE] inf_durability: set max_endurance=65535 on 0 items
+[EXPECT] inf_dura: 2 entries
+[STAGE] rust_serialize: 5605035 bytes
+[STAGE] transmog: 0 byte patches for 5 swap(s)
+[EXPECT] transmog: 5 entries
+[VERIFY] max_stacks (max_stack_count=999999): OK ok=2142 bad=0 missing=0
+[VERIFY] inf_dura (max_endurance=65535): EMPTY ok=0 bad=0 missing=0
+[VERIFY] transmog: FAIL ok=0 bad=5 samples(tgt_key,expected,actual)=[(1163044, None, 2965256524), (1000296, None, 2965256524), (200021, None, 498288470), (1163042, None, 498288470), (240026, None, 498288470)]
+2026-05-13 19:17:26,555 [INFO] paz_patcher: Extracted iteminfo.pabgb via crimson_rs: 831813 -> 5486576 bytes
+2026-05-13 19:17:26,821 [INFO] gui.tabs.buffs_v319: Stored 6253 items, lookup=6253
+2026-05-13 19:17:26,837 [INFO] gui.iteminfo_index: Index built: 6253 items, 101 passives, 93 buffs
+2026-05-13 19:17:26,979 [INFO] gui.tabs.buffs_v319: Loaded 12976 gimmick names for effect catalog
+2026-05-13 19:17:26,984 [INFO] gui.tabs.buffs_v319: Effect catalog built: 950 effects from 6253 items (scanned 950 gimmicks)
+2026-05-13 19:17:27,904 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 19:17:28,645 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 19:17:30,475 [INFO] gui.tabs.buffs_v319: Transmog: applied 5 field-level swap(s) to rust items
+2026-05-13 19:17:37,540 [INFO] paz_patcher: Structural parser found 6248 items
+2026-05-13 19:17:37,543 [INFO] paz_patcher: Parsed 6248 items from iteminfo.pabgb (structural)
+2026-05-13 19:17:37,550 [INFO] gui.tabs.buffs_v319: ApplyToGame Infinity Durability: patched 121 items
+2026-05-13 19:17:37,652 [INFO] gui.tabs.buffs_v319: Rebuilt iteminfo: 5486583 bytes, pabgh 6253 entries
+2026-05-13 19:17:39,760 [INFO] armor_catalog: apply_swaps_to_blob: fresh catalog has 5362 items for 5 queued swap(s)
+2026-05-13 19:17:39,760 [INFO] armor_catalog: swap 1002366 -> 1163044: target=Inytium_Leather_Armor hashes=[('0x3a5ac8', '0xb0be394c')]
+2026-05-13 19:17:39,760 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Armor hashes=[('0x333607', '0xb0be394c')]
+2026-05-13 19:17:39,760 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:17:39,761 [INFO] armor_catalog: swap 1002367 -> 1000296: target=Inytium_Leather_Cloak hashes=[('0x3a691a', '0xb0be394c')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   source=Old_Kliff_PlateArmor_Cloak hashes=[('0x33391e', '0xb0be394c')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:17:39,761 [INFO] armor_catalog: swap 1000747 -> 200021: target=Leinstead_OneHandSword hashes=[('0x4d29c1', '0x1db34756'), ('0x4d29c5', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4cba77', '0x1db34756'), ('0x4cba7b', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:17:39,761 [INFO] armor_catalog: swap 1000747 -> 1163042: target=Wolf_OneHandSword hashes=[('0x4d4856', '0x1db34756'), ('0x4d485a', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4cba77', '0x1db34756'), ('0x4cba7b', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:17:39,761 [INFO] armor_catalog: swap 1000747 -> 240026: target=Rayhorn_TwoHandSword hashes=[('0x538dd2', '0x1db34756'), ('0x538dd6', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   source=Goblin_Boss_OneHandSword hashes=[('0x4cba77', '0x1db34756'), ('0x4cba7b', '0x6c7928b4')]
+2026-05-13 19:17:39,761 [INFO] armor_catalog:   build_swap_changes produced 0 patch(es)
+2026-05-13 19:17:39,761 [ERROR] armor_catalog: apply_swaps_to_blob: ZERO patches applied for 5 queued swap(s) — transmog will not take effect in-game
+2026-05-13 19:17:39,763 [INFO] gui.tabs.buffs_v319: Transmog: applied 0 byte patches for 5 queued swap(s)
+
+==============================================================================
+=== Pipeline report 2026-05-13T19:17:37.546402 ===
+==============================================================================
+[STAGE] input: flags: stacks=True inf_dura=True buff_modified=True cd_patches=0 transmog_swaps=5
+[STAGE] max_stacks: set max_stack_count=999999 on 2142 items
+[EXPECT] max_stacks: 2 entries
+[STAGE] inf_durability: set max_endurance=65535 on 121 items
+[EXPECT] inf_dura: 2 entries
+[STAGE] rust_serialize: 5486583 bytes
+[STAGE] transmog: 0 byte patches for 5 swap(s)
+[EXPECT] transmog: 5 entries
+[VERIFY] max_stacks (max_stack_count=999999): OK ok=2142 bad=0 missing=0
+[VERIFY] inf_dura (max_endurance=65535): OK ok=121 bad=0 missing=0
+[VERIFY] transmog: FAIL ok=0 bad=5 samples(tgt_key,expected,actual)=[(1163044, None, 2965256524), (1000296, None, 2965256524), (200021, None, 498288470), (1163042, None, 498288470), (240026, None, 498288470)]

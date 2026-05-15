@@ -4,6 +4,24 @@ import logging
 import os
 import struct
 from data_db import get_connection
+
+DMM_TABLE_NAME = 'store_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_TABLE_NAME, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_all_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_TABLE_NAME, items))
+    except Exception:
+        return None
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 

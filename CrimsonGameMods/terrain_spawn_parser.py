@@ -1,7 +1,30 @@
+import logging
 import struct
 import json
 import sys
 import os
+
+log = logging.getLogger(__name__)
+
+DMM_TABLE_NAME = 'terrain_region_auto_spawn_info'
+DMM_POOL_TABLE = 'spawning_pool_auto_spawn_info'
+DMM_FACTIONSPAWN_TABLE = 'faction_node_spawn_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes, table_name: str = DMM_TABLE_NAME):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(table_name, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_all_dmm(items: list, table_name: str = DMM_TABLE_NAME) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(table_name, items))
+    except Exception:
+        return None
 
 
 def _u32(D, p):

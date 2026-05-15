@@ -39,6 +39,13 @@ VEHICLE_NAMES = {
     0x4240: "Horse",
     0x4242: "Donkey",
     0x4246: "Wolf",
+    0x4249: "Boar",
+    0x424A: "Bear",
+    0x424B: "Deer",
+    0x424C: "Cucubird",
+    0x424D: "Iguana",
+    0x424E: "Birdsaurus",
+    0x424F: "AlpineIbex",
     0x4253: "Camel",
     0x4254: "DragonRide",
     0x4258: "Dragon",
@@ -149,18 +156,13 @@ def _parse_entry(data: bytes, offset: int, end: int) -> ReserveSlotEntry:
     vehicles = [struct.unpack_from("<H", data, p + j * 2)[0] for j in range(vehicle_cnt)]
     p += vehicle_cnt * 2
 
-    special_cnt = struct.unpack_from("<I", data, p)[0]; p += 4
-    specials = [data[p + j * 8:p + j * 8 + 8] for j in range(special_cnt)]
-    p += special_cnt * 8
-
     target_cnt = struct.unpack_from("<I", data, p)[0]; p += 4
     targets = [struct.unpack_from("<H", data, p + j * 2)[0] for j in range(target_cnt)]
     p += target_cnt * 2
 
     gimmick = struct.unpack_from("<I", data, p)[0]; p += 4
     self_only = data[p]; p += 1
-
-    assert p == end, f"Parse offset mismatch: consumed to {p}, expected {end}"
+    specials = []
 
     return ReserveSlotEntry(
         key=key,

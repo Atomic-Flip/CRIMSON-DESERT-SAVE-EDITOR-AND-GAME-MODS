@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import struct
 from typing import Iterable
 
 log = logging.getLogger(__name__)
@@ -9,13 +8,17 @@ log = logging.getLogger(__name__)
 
 def apply_mesh_swaps(pabgb_data: bytes | bytearray,
                      pabgh_data: bytes | bytearray,
-                     swaps: Iterable[dict]) -> tuple[bytearray, int, list[dict]]:
-    from characterinfo_full_parser import parse_all_entries
+                     swaps: Iterable[dict]) -> tuple[bytes, int, list[dict]]:
+    """Apply mesh swaps via dmm_parser field-level edits.
 
-    entries = parse_all_entries(bytes(pabgb_data), bytes(pabgh_data))
-    by_key = {int(e.get('entry_key', 0)): e for e in entries}
+    Replaces the target character's appearance hash (lookup_22 = _appearanceName)
+    with the source character's value, then re-serializes via dmm_parser.
+    """
+    import dmm_parser
 
-    out = bytearray(pabgb_data)
+    items = dmm_parser.parse_table('character_info', bytes(pabgb_data), bytes(pabgh_data))
+    by_key = {it['key']: it for it in items}
+
     applied = 0
     report: list[dict] = []
     missing_tgt: list[int] = []
@@ -39,36 +42,31 @@ def apply_mesh_swaps(pabgb_data: bytes | bytearray,
             missing_src.append(src_key)
             continue
 
-        tgt_off = tgt.get('_appearanceName_stream_offset')
-        src_val = src.get('_appearanceName_key')
-        if tgt_off is None or src_val is None:
-            log.warning(
-                "mesh swap %d->%d: entry parsed but no appearance offset/key",
-                tgt_key, src_key)
+        old_val = tgt.get('lookup_22', 0)
+        new_val = src.get('lookup_22', 0)
+        if old_val == new_val:
             continue
 
-        old_val = struct.unpack_from('<I', out, tgt_off)[0]
-        struct.pack_into('<I', out, tgt_off, int(src_val))
+        tgt['lookup_22'] = new_val
         applied += 1
         report.append({
             'tgt': tgt_key,
             'src': src_key,
-            'tgt_offset': tgt_off,
+            'tgt_offset': 0,
             'old_key': old_val,
-            'new_key': int(src_val),
-            'tgt_name': tgt.get('name', ''),
-            'src_name': src.get('name', ''),
+            'new_key': new_val,
+            'tgt_name': tgt.get('string_key', ''),
+            'src_name': src.get('string_key', ''),
         })
 
     if missing_tgt:
-        log.warning("mesh swap: target character(s) not found in pabgb: %s",
-                    missing_tgt)
+        log.warning("mesh swap: target character(s) not found: %s", missing_tgt)
     if missing_src:
-        log.warning("mesh swap: source character(s) not found in pabgb: %s",
-                    missing_src)
+        log.warning("mesh swap: source character(s) not found: %s", missing_src)
 
-    log.info("mesh swap: applied %d byte-patches for %d queued swap(s)",
-             applied, sum(1 for _ in swaps) if hasattr(swaps, '__len__') else applied)
+    out = bytes(dmm_parser.serialize_table('character_info', items))
+    log.info("mesh swap: applied %d field edits, serialized %d bytes via dmm_parser",
+             applied, len(out))
     return out, applied, report
 
 
@@ -126,12 +124,7 @@ def _guess_xml_path(source_entry: dict, catalog: list[dict]) -> str | None:
 
 def build_scale_override_mod(swaps, game_path: str, charinfo_data: bytes,
                              charinfo_header: bytes, out_dir: str) -> dict:
-    """Generate a crimson_sharp_mod_v1 mod that overrides CharacterScale for
-    each swap whose entry has a positive 'scale' value.
-
-    swaps: iterable of {'src': int, 'tgt': int, 'scale': float, ...}
-    Returns a summary dict: {written: [paths], skipped: [{src, reason}]}.
-    """
+    """Generate a crimson_sharp_mod_v1 mod that overrides CharacterScale."""
     import json
     import os
     import re
@@ -142,9 +135,9 @@ def build_scale_override_mod(swaps, game_path: str, charinfo_data: bytes,
     except Exception as e:
         return {'written': [], 'skipped': [], 'error': 'crimson_rs not importable: ' + str(e)}
 
-    from characterinfo_full_parser import parse_all_entries
-    entries = parse_all_entries(bytes(charinfo_data), bytes(charinfo_header))
-    by_key = {int(e.get('entry_key', 0)): e for e in entries}
+    import dmm_parser
+    items = dmm_parser.parse_table('character_info', bytes(charinfo_data), bytes(charinfo_header))
+    by_key = {it['key']: it for it in items}
 
     catalog = _load_appearance_paths()
     if not catalog:

@@ -58,6 +58,8 @@ OUR_GROUPS = {
     "0061": "Reserved",
     "0062": "Stacker (merged items)",
     "0063": "Stacker (equipslot) / SkillTree",
+    "0065": "Kliff Gun Fix (characterinfo)",
+    "0066": "ItemBuffs (index files)",
 }
 DMM_PREFIXES = ("dmmsa", "dmmgen", "dmmequ", "dmmlang")
 

@@ -6,6 +6,8 @@ UI strings confirm three type names: UI_MercenaryTypeName_Mercenary / _Pet
 / _Vehicle. Each row in mercenaryinfo.pabgb is a category config with
 active/owned/max caps + behavior flags.
 
+dmm_parser: mercenary_info — 24 fields, 100% round-trip.
+
 Binary layout (from IDA decompile of sub_143A533C0_0_72):
     u8  _key
     u32 _stringKey.size  + _stringKey.bytes[size]
@@ -33,6 +35,24 @@ pabgh is `u16 count + N × (u8 key + u32 offset)` — 5 bytes per entry.
 from __future__ import annotations
 import struct
 import logging
+
+DMM_TABLE_NAME = 'mercenary_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_TABLE_NAME, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_all_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_TABLE_NAME, items))
+    except Exception:
+        return None
 from typing import Optional
 
 log = logging.getLogger(__name__)
@@ -61,12 +81,10 @@ class MercenaryRecord:
         'key', 'string_key',
         'is_blocked',
         'default_summon_count', 'default_hire_count', 'max_hire_count',
-        'far_from_leader_option', 'combat_targeting_flags',
-        'is_controllable', 'is_playable',
+        'far_from_leader_option', 'is_controllable',
         'set_new_mercenary_is_main', 'main_mercenary_per_tribe',
         'is_force_stackable', 'is_sellable', 'use_camp_level',
         'apply_equip_item_stat', 'spawn_position_type',
-        'parent_mercenary_group_info', 'hired_skill_info_list',
     )
 
     def __init__(self):
@@ -77,9 +95,7 @@ class MercenaryRecord:
         self.default_hire_count: int = 0
         self.max_hire_count: int = -1
         self.far_from_leader_option: int = 0
-        self.combat_targeting_flags: int = 0
         self.is_controllable: int = 0
-        self.is_playable: int = 0
         self.set_new_mercenary_is_main: int = 0
         self.main_mercenary_per_tribe: int = 0
         self.is_force_stackable: int = 0
@@ -87,8 +103,6 @@ class MercenaryRecord:
         self.use_camp_level: int = 0
         self.apply_equip_item_stat: int = 0
         self.spawn_position_type: int = 0
-        self.parent_mercenary_group_info: int = 0
-        self.hired_skill_info_list: list = []
 
     @staticmethod
     def from_stream(data: bytes, pos: int) -> tuple['MercenaryRecord', int]:
@@ -101,9 +115,7 @@ class MercenaryRecord:
         r.default_hire_count = struct.unpack_from('<i', data, pos)[0]; pos += 4
         r.max_hire_count = struct.unpack_from('<i', data, pos)[0]; pos += 4
         r.far_from_leader_option = data[pos]; pos += 1
-        r.combat_targeting_flags = struct.unpack_from('<I', data, pos)[0]; pos += 4
         r.is_controllable = data[pos]; pos += 1
-        r.is_playable = data[pos]; pos += 1
         r.set_new_mercenary_is_main = data[pos]; pos += 1
         r.main_mercenary_per_tribe = data[pos]; pos += 1
         r.is_force_stackable = data[pos]; pos += 1
@@ -111,13 +123,6 @@ class MercenaryRecord:
         r.use_camp_level = data[pos]; pos += 1
         r.apply_equip_item_stat = data[pos]; pos += 1
         r.spawn_position_type = data[pos]; pos += 1
-        r.parent_mercenary_group_info = data[pos]; pos += 1
-        skill_count = struct.unpack_from('<I', data, pos)[0]; pos += 4
-        r.hired_skill_info_list = []
-        for _ in range(skill_count):
-            sk_key = struct.unpack_from('<I', data, pos)[0]; pos += 4
-            sk_lvl = struct.unpack_from('<I', data, pos)[0]; pos += 4
-            r.hired_skill_info_list.append((sk_key, sk_lvl))
         return r, pos
 
     def to_bytes(self) -> bytes:
@@ -128,18 +133,12 @@ class MercenaryRecord:
         out += struct.pack('<i', self.default_summon_count)
         out += struct.pack('<i', self.default_hire_count)
         out += struct.pack('<i', self.max_hire_count)
-        out += bytes([self.far_from_leader_option])
-        out += struct.pack('<I', self.combat_targeting_flags)
         out += bytes([
-            self.is_controllable, self.is_playable,
+            self.far_from_leader_option, self.is_controllable,
             self.set_new_mercenary_is_main, self.main_mercenary_per_tribe,
             self.is_force_stackable, self.is_sellable, self.use_camp_level,
             self.apply_equip_item_stat, self.spawn_position_type,
-            self.parent_mercenary_group_info,
         ])
-        out += struct.pack('<I', len(self.hired_skill_info_list))
-        for sk_key, sk_lvl in self.hired_skill_info_list:
-            out += struct.pack('<II', sk_key, sk_lvl)
         return out
 
 

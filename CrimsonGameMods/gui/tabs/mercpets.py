@@ -106,10 +106,10 @@ class MercPetsTab(QWidget):
         top_row.addWidget(QLabel("Overlay:"))
         self._overlay_spin = QSpinBox()
         self._overlay_spin.setRange(1, 9999)
-        self._overlay_spin.setValue(self._config.get("mercpets_overlay_dir", 65))
+        self._overlay_spin.setValue(self._config.get("mercpets_overlay_dir", 90))
         self._overlay_spin.setFixedWidth(70)
         self._overlay_spin.setToolTip(
-            "Overlay group number (0065 = default). Change if another mod\n"
+            "Overlay group number (0090 = default). Change if another mod\n"
             "already owns this slot. Apply writes to <game>/NNNN/;\n"
             "Restore removes the same NNNN/.")
         self._overlay_spin.valueChanged.connect(
@@ -173,9 +173,20 @@ class MercPetsTab(QWidget):
             QMessageBox.critical(self, "Load", f"Extract failed:\n{e}")
             return
 
-        if not mip.roundtrip_test(h, b):
-            QMessageBox.warning(self, "Load",
-                "Parser roundtrip mismatch — aborting. File format may have changed.")
+        try:
+            import dmm_parser
+            import copy as _copy
+            dmm_items = dmm_parser.parse_table('mercenary_info', bytes(b), bytes(h))
+            dmm_out = bytes(dmm_parser.serialize_table('mercenary_info', dmm_items))
+            if dmm_out != bytes(b):
+                QMessageBox.warning(self, "Load",
+                    "dmm_parser roundtrip mismatch — file format may have changed.")
+                return
+            self._mercpets_dmm_items = dmm_items
+            self._mercpets_dmm_vanilla = _copy.deepcopy(dmm_items)
+        except Exception as e:
+            log.exception("MercPets dmm_parser load failed")
+            QMessageBox.critical(self, "Load", f"dmm_parser failed: {e}")
             return
 
         self._vanilla_pabgh = h
@@ -262,16 +273,11 @@ class MercPetsTab(QWidget):
                 "Camp level gates available count.")
             apply_stat_cb = _check("Apply EquipStat", rec.apply_equip_item_stat,
                 "Equipped item stats apply to this summon.")
-            far_cb = _check("FarFromLeader opt", rec.far_from_leader_option,
-                "Behavior when far from leader (recall, despawn, etc.)")
             spawn_cb = _check("SpawnPos Type", rec.spawn_position_type,
                 "Spawn-position behavior flag.")
-            playable_cb = _check("Playable", rec.is_playable,
-                "Player can switch to this mercenary as a playable character.")
 
-            for cb in (is_blocked_cb, is_ctrl_cb, playable_cb, new_main_cb,
-                       per_tribe_cb, stack_cb, sell_cb, camp_cb,
-                       apply_stat_cb, far_cb, spawn_cb):
+            for cb in (is_blocked_cb, is_ctrl_cb, new_main_cb, per_tribe_cb,
+                       stack_cb, sell_cb, camp_cb, apply_stat_cb, spawn_cb):
                 flag_row.addWidget(cb)
             flag_row.addStretch()
             vbox.addLayout(flag_row)
@@ -280,11 +286,10 @@ class MercPetsTab(QWidget):
                 'rec': rec,
                 'summon': summon_spin, 'hire': hire_spin, 'max': max_spin,
                 'blocked': is_blocked_cb, 'ctrl': is_ctrl_cb,
-                'playable': playable_cb,
                 'new_main': new_main_cb, 'per_tribe': per_tribe_cb,
                 'stack': stack_cb, 'sell': sell_cb,
                 'camp': camp_cb, 'apply_stat': apply_stat_cb,
-                'far': far_cb, 'spawn': spawn_cb,
+                'spawn': spawn_cb,
             })
 
             self._rows_layout.insertWidget(self._rows_layout.count() - 1, box)
@@ -337,20 +342,62 @@ class MercPetsTab(QWidget):
             r.is_sellable = int(row['sell'].isChecked())
             r.use_camp_level = int(row['camp'].isChecked())
             r.apply_equip_item_stat = int(row['apply_stat'].isChecked())
-            r.far_from_leader_option = int(row['far'].isChecked())
             r.spawn_position_type = int(row['spawn'].isChecked())
-            r.is_playable = int(row['playable'].isChecked())
 
     def _serialize(self) -> tuple[bytes, bytes]:
-        import mercenaryinfo_parser as mip
+        """Serialize using dmm_parser items directly. Applies UI edits
+        by comparing old parser records to vanilla and writing only
+        changed fields to the dmm_parser dict."""
         self._collect_edits()
-        return mip.serialize_all(self._records)
+        import dmm_parser, copy
+
+        dmm_items = getattr(self, '_mercpets_dmm_items', None)
+        dmm_vanilla = getattr(self, '_mercpets_dmm_vanilla', None)
+        if not dmm_items or not dmm_vanilla:
+            raise RuntimeError("dmm_parser items not loaded — click Load first")
+
+        items = copy.deepcopy(dmm_vanilla)
+        dmm_by_key = {it['key']: it for it in items}
+
+        _FIELD_MAP = {
+            'default_summon_count': 'default_limit_summon_count',
+            'default_hire_count': 'default_limit_hire_count',
+            'max_hire_count': 'max_limit_hire_count',
+            'is_blocked': 'is_blocked',
+            'is_controllable': 'is_controllable',
+            'set_new_mercenary_is_main': 'set_new_mercenary_is_main',
+            'main_mercenary_per_tribe': 'main_mercenary_per_tribe',
+            'is_force_stackable': 'is_force_stackable',
+            'is_sellable': 'is_sellable',
+            'use_camp_level': 'use_camp_level',
+            'apply_equip_item_stat': 'apply_equip_item_stat',
+            'spawn_position_type': 'spawn_position_type',
+        }
+
+        import mercenaryinfo_parser as mip
+        vanilla_recs = mip.parse_all(self._vanilla_pabgh, self._vanilla_pabgb)
+        van_by_key = {r.key: r for r in vanilla_recs}
+
+        for rec in self._records:
+            dit = dmm_by_key.get(rec.key)
+            van = van_by_key.get(rec.key)
+            if not dit or not van:
+                continue
+            for rec_attr, dmm_field in _FIELD_MAP.items():
+                cur_val = getattr(rec, rec_attr, None)
+                van_val = getattr(van, rec_attr, None)
+                if cur_val is not None and cur_val != van_val:
+                    v = cur_val & 0xFFFFFFFF if isinstance(cur_val, int) else cur_val
+                    dit[dmm_field] = v
+
+        new_pabgb = bytes(dmm_parser.serialize_table('mercenary_info', items))
+        return self._vanilla_pabgh, new_pabgb
 
     def get_staged_files(self) -> dict[str, bytes]:
         if not self._records or not self._modified:
             return {}
         try:
-            pabgb, pabgh = self._serialize()
+            pabgh, pabgb = self._serialize()
             return {"mercenaryinfo.pabgb": bytes(pabgb), "mercenaryinfo.pabgh": bytes(pabgh)}
         except Exception:
             return {}
@@ -366,9 +413,17 @@ class MercPetsTab(QWidget):
             QMessageBox.warning(self, "Apply", "Set the game install path first.")
             return
 
+        from gui.utils import resolve_overlay_group
+        requested = self._overlay_spin.value()
+        group_num = resolve_overlay_group(gp, requested, "MercPets", parent=self)
+        if group_num is None:
+            return
+        if group_num != requested:
+            self._overlay_spin.setValue(group_num)
+
         new_h, new_b = self._serialize()
         INTERNAL_DIR = "gamedata/binary__/client/bin"
-        overlay_group = f"{self._overlay_spin.value():04d}"
+        overlay_group = f"{group_num:04d}"
 
         try:
             with tempfile.TemporaryDirectory() as tmp_dir:

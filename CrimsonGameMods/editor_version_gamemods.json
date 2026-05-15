@@ -1,5 +1,5 @@
 {
-  "version": "1.1.4",
-  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/tag/gamemods-v1.1.4",
-  "notes": "MercPets tab + summon limit, inventory-only sockets, scale multiplier fix, parser fixes"
+  "version": "2.0.0",
+  "url": "https://github.com/NattKh/CRIMSON-DESERT-SAVE-EDITOR-AND-GAME-MODS/releases/tag/gamemods-v2.0.0",
+  "notes": "Quest Mods, Load Manager, NPC Swap, massive FieldEdit/Stacker/World/ItemBuffs upgrades, 55+ pabgb parsers"
 }

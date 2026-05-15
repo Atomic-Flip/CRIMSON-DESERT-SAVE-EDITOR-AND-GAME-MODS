@@ -1,6 +1,27 @@
+import logging
 import struct
 import sys
 import os
+
+log = logging.getLogger(__name__)
+
+DMM_TABLE_NAME = 'field_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_TABLE_NAME, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_all_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_TABLE_NAME, items))
+    except Exception:
+        return None
 
 
 def _u8(D, p):

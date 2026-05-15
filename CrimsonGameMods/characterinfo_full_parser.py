@@ -7,6 +7,24 @@ import logging
 
 log = logging.getLogger(__name__)
 
+DMM_TABLE_NAME = 'character_info'
+
+
+def parse_all_dmm(pabgb: bytes, pabgh: bytes):
+    try:
+        import dmm_parser
+        return dmm_parser.parse_table(DMM_TABLE_NAME, pabgb, pabgh)
+    except Exception:
+        return None
+
+
+def serialize_all_dmm(items: list) -> bytes | None:
+    try:
+        import dmm_parser
+        return bytes(dmm_parser.serialize_table(DMM_TABLE_NAME, items))
+    except Exception:
+        return None
+
 
 def parse_pabgh_index(pabgh_data):
     count = struct.unpack_from('<H', pabgh_data, 0)[0]
@@ -44,6 +62,18 @@ def _read_locstr_with_hash(data, p):
     slen = struct.unpack_from('<I', data, p)[0]
     p += 4 + slen
     return hv, p
+
+
+def _find_bool_block(data, search_start, end):
+    """Scan for the bool block: 8+ consecutive bytes that are all 0 or 1.
+    Starts searching from search_start (after the hash fields area)."""
+    limit = min(end, search_start + 300)
+    for bp in range(search_start, limit - 8):
+        if all(data[bp + j] in (0, 1) for j in range(8)):
+            extended = data[bp:bp + 20] if bp + 20 <= end else data[bp:end]
+            if sum(1 for b in extended if b in (0, 1)) >= min(15, len(extended)):
+                return bp
+    return None
 
 
 def parse_entry(data, offset, end):
@@ -113,49 +143,29 @@ def parse_entry(data, offset, end):
         p += 28
 
         try:
-            p += 4
-            p += 8
-            p += 4
-            p += 4
-            p += 4
-            p += 4
-            p += 4
-            p += 1
-            p += 1
+            bool_start = _find_bool_block(data, p, end)
+            if bool_start is not None and bool_start + 40 <= end:
+                bool_fields = {}
+                for bi in range(40):
+                    bool_fields[bi] = data[bool_start + bi]
 
-            p += 1
+                result['_invincibility_offset'] = bool_start + 0
+                result['_invincibility'] = data[bool_start + 0]
 
-            p += 1
+                result['_isAttackable_offset'] = bool_start + 1
+                result['_isAttackable'] = data[bool_start + 1]
 
-            p = _read_locstr(data, p)
+                result['_isAggroTargetable_offset'] = bool_start + 2
+                result['_isAggroTargetable'] = data[bool_start + 2]
 
-            p += 4
+                result['_isValid_offset'] = bool_start + 3
+                result['_isValid'] = data[bool_start + 3]
 
-            p += 1
-            p += 2
+                result['_boolBlock'] = bool_fields
+                result['_parsed_bytes'] = (bool_start + 40) - offset
+            else:
+                result['_partial_parse'] = True
 
-            bool_start = p
-            bool_fields = {}
-            for bi in range(40):
-                bool_fields[bi] = data[p + bi]
-
-            result['_isAttackable_offset'] = bool_start + 3
-            result['_isAttackable'] = data[bool_start + 3]
-
-            result['_isAggroTargetable_offset'] = bool_start + 4
-            result['_isAggroTargetable'] = data[bool_start + 4]
-
-            result['_sendKillEventOnDead_offset'] = bool_start + 17
-            result['_sendKillEventOnDead'] = data[bool_start + 17]
-
-            result['_invincibility_offset'] = bool_start + 20
-            result['_invincibility'] = data[bool_start + 20]
-
-            result['_boolBlock'] = bool_fields
-
-            p += 40
-
-            result['_parsed_bytes'] = p - offset
             result['_entry_size'] = end - offset
         except (struct.error, IndexError) as e:
             log.debug("Partial parse for %s (post-name fields skipped): %s", result.get('name', '?'), e)
@@ -171,14 +181,35 @@ def parse_entry(data, offset, end):
 
 MOUNT_VEHICLE_TYPES = {
     16960: 'Horse',
+    16961: 'Cannon',
+    16962: 'Boar',
+    16963: 'Ballista',
+    16964: 'Boat',
+    16965: 'GolemHorse',
     16966: 'Wolf',
+    16967: 'Singijeon',
+    16975: 'Wyvern',
     16978: 'Camel',
-    16984: 'Dragon',
+    16979: 'Bear',
+    16980: 'Deer',
+    16982: 'Cucubird',
+    16983: 'Elephant',
+    16985: 'Iguana',
+    16986: 'Birdsaurus',
     16988: 'WarMachine/ATAG',
+    16991: 'Monorail',
+    16993: 'AlpineIbex',
     16994: 'Domestic',
+    16995: 'Balloon1',
+    16996: 'Balloon2',
+    16997: 'Balloon3',
     16998: 'MachineBear',
     16999: 'MachineBird',
+    17000: 'FixedCrossbow',
+    17001: 'FreightWagon',
+    17002: 'LuggageWagon',
     17003: 'Wagon',
+    17004: 'TwoHorseWagon',
 }
 
 

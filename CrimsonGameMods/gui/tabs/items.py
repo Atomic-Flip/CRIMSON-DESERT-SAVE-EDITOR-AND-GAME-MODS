@@ -3,7 +3,6 @@ from __future__ import annotations
 import json as _json
 import logging
 import os
-import sys
 import struct
 import threading
 
@@ -54,6 +53,7 @@ class DatabaseBrowserTab(QWidget):
         goto_quest_fn: Optional[Callable] = None,
         app_dir_fn: Optional[Callable[[], str]] = None,
         show_guide_fn: Optional[Callable] = None,
+        config: Optional[dict] = None,
         parent=None,
     ):
         super().__init__(parent)
@@ -67,6 +67,7 @@ class DatabaseBrowserTab(QWidget):
         self._show_goto_quest = goto_quest_fn is not None
         self._app_dir_fn = app_dir_fn or (lambda: ".")
         self._show_guide_fn = show_guide_fn or (lambda k: None)
+        self._config = config or {}
         self._build_ui()
 
     def update_icons(self, enabled: bool) -> None:
@@ -102,6 +103,21 @@ class DatabaseBrowserTab(QWidget):
         sync_btn = QPushButton(tr("Sync from GitHub"))
         sync_btn.clicked.connect(self._sync_github)
         top.addWidget(sync_btn)
+
+        sync_local_btn = QPushButton("Sync Items Local")
+        sync_local_btn.setToolTip(
+            "Extract item database directly from your game installation.\n"
+            "Reads iteminfo + English localization from game PAZ files.\n"
+            "Requires game path to be set.")
+        sync_local_btn.clicked.connect(self._sync_items_local)
+        top.addWidget(sync_local_btn)
+
+        self._db_freshness_badge = QLabel("")
+        self._db_freshness_badge.setStyleSheet(
+            f"color: white; background: {COLORS['accent']}; "
+            f"border-radius: 4px; padding: 2px 8px; font-weight: bold; font-size: 11px;")
+        self._db_freshness_badge.setVisible(False)
+        top.addWidget(self._db_freshness_badge)
 
         self._db_show_icons_btn = QPushButton("Hide Icons" if self._icons_enabled else "Show Icons")
         self._db_show_icons_btn.setToolTip(tr("Download and display all item icons from GitHub.\nFirst time requires internet. Icons cached locally."))
@@ -362,7 +378,7 @@ class DatabaseBrowserTab(QWidget):
         }
 
         with open(path, "w", encoding="utf-8") as f:
-            _json.dump(pack, f, indent=2)
+            json.dump(pack, f, indent=2)
 
         self.status_message.emit(f"Exported {len(items)} items as DropSet pack: {os.path.basename(path)}")
         QMessageBox.information(self, tr("Pack Exported"),
@@ -384,6 +400,70 @@ class DatabaseBrowserTab(QWidget):
         self.status_message.emit(msg)
         QMessageBox.information(self, tr("GitHub Sync"), msg)
 
+    def _sync_items_local(self) -> None:
+        game_path = self._config.get("game_install_path", "")
+        if not game_path or not os.path.isdir(game_path):
+            QMessageBox.warning(
+                self, "Sync Items Local",
+                "Game path not set.\nSet your game installation path first.")
+            return
+
+        self.status_message.emit("Extracting items from game client...")
+        QApplication.processEvents()
+
+        ok, msg = self._name_db.sync_from_local_game(game_path)
+        if ok:
+            self._populate_database()
+            for item in self._get_items_fn():
+                item.name = self._name_db.get_name(item.item_key)
+                item.category = self._name_db.get_category(item.item_key)
+            self.items_changed.emit()
+        self.status_message.emit(msg.split('\n')[0] if msg else "")
+        self._check_item_db_freshness()
+        QMessageBox.information(self, "Sync Items Local", msg)
+
+    def _check_item_db_freshness(self) -> None:
+        if not hasattr(self, '_db_freshness_badge'):
+            return
+        game_path = self._config.get("game_install_path", "")
+        if not game_path or not os.path.isdir(game_path):
+            self._db_freshness_badge.setVisible(False)
+            return
+        try:
+            import crimson_rs
+            dp = "gamedata/binary__/client/bin"
+            pabgh = crimson_rs.extract_file(game_path, "0008", dp, "iteminfo.pabgh")
+            game_count = struct.unpack_from('<H', pabgh, 0)[0]
+            local_count = len(self._name_db.items)
+            diff = game_count - local_count
+            if diff > 0:
+                self._db_freshness_badge.setText(f"{diff} new items in game")
+                self._db_freshness_badge.setStyleSheet(
+                    f"color: white; background: {COLORS['accent']}; "
+                    f"border-radius: 4px; padding: 2px 8px; font-weight: bold; font-size: 11px;")
+                self._db_freshness_badge.setToolTip(
+                    f"Game has {game_count} items, your database has {local_count}.\n"
+                    f"Click 'Sync Items Local' to update.")
+                self._db_freshness_badge.setVisible(True)
+            elif diff < 0:
+                self._db_freshness_badge.setText(f"DB has {-diff} extra items")
+                self._db_freshness_badge.setStyleSheet(
+                    "color: white; background: #FF8800; "
+                    "border-radius: 4px; padding: 2px 8px; font-weight: bold; font-size: 11px;")
+                self._db_freshness_badge.setToolTip(
+                    f"Game has {game_count} items, your database has {local_count}.\n"
+                    f"Database may include items from mods or a newer game version.")
+                self._db_freshness_badge.setVisible(True)
+            else:
+                self._db_freshness_badge.setText("Up to date")
+                self._db_freshness_badge.setStyleSheet(
+                    "color: white; background: #4CAF50; "
+                    "border-radius: 4px; padding: 2px 8px; font-weight: bold; font-size: 11px;")
+                self._db_freshness_badge.setToolTip(
+                    f"Item database matches game ({game_count} items).")
+                self._db_freshness_badge.setVisible(True)
+        except Exception:
+            self._db_freshness_badge.setVisible(False)
 
     def _sync_all_icons(self) -> None:
         import json as _json

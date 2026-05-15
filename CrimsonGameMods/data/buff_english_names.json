@@ -1707,5 +1707,53 @@
     "internal_name": "BuffLevel_PuplePoison",
     "suffix": "PuplePoison",
     "size": 589
+  },
+  "1000275": {
+    "buff_key": 1000275,
+    "internal_name": "BuffLevel_Equip_Set_Stealth_Faction_Flame_Knights",
+    "suffix": "Equip_Set_Stealth_Faction_Flame_Knights",
+    "size": 0
+  },
+  "1000276": {
+    "buff_key": 1000276,
+    "internal_name": "BuffLevel_Difficulty",
+    "suffix": "Difficulty",
+    "size": 0
+  },
+  "1000277": {
+    "buff_key": 1000277,
+    "internal_name": "BuffLevel_Difficulty_Boss",
+    "suffix": "Difficulty_Boss",
+    "size": 0
+  },
+  "1000278": {
+    "buff_key": 1000278,
+    "internal_name": "BuffLevel_Difficulty_PC",
+    "suffix": "Difficulty_PC",
+    "size": 0
+  },
+  "1000279": {
+    "buff_key": 1000279,
+    "internal_name": "BuffLevel_WildSpirit_Boar_Angry",
+    "suffix": "WildSpirit_Boar_Angry",
+    "size": 0
+  },
+  "1000280": {
+    "buff_key": 1000280,
+    "internal_name": "BuffLevel_Equipment_FireResistance",
+    "suffix": "Equipment_FireResistance",
+    "size": 0
+  },
+  "1000281": {
+    "buff_key": 1000281,
+    "internal_name": "BuffLevel_Equipment_IceResistance",
+    "suffix": "Equipment_IceResistance",
+    "size": 0
+  },
+  "1000282": {
+    "buff_key": 1000282,
+    "internal_name": "BuffLevel_Equipment_ElectricityResistance",
+    "suffix": "Equipment_ElectricityResistance",
+    "size": 0
   }
 }

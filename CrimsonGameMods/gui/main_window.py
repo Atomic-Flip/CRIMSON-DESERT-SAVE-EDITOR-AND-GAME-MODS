@@ -128,8 +128,8 @@ from gui.tabs.patches import GamePatchesTab
 from gui.tabs.field_edit import FieldEditTab
 from gui.tabs.bagspace import BagSpaceTab
 from gui.tabs.skill_tree import SkillTreeTab
-from gui.tabs.reserveslot import ReserveSlotTab
-from gui.tabs.load_manager import LoadManagerTab
+from gui.tabs.pas_editor import PasEditorTab
+from gui.tabs.quest_mods import QuestModsTab
 from gui.dialogs import (
     _FloatingTabWindow, DetachableTabWidget,
     GiveItemDialog, AddItemDialog, QuestEditorWindow,
@@ -481,7 +481,8 @@ class MainWindow(QMainWindow):
             f"padding: 8px; "
             f"border-bottom: 1px solid {COLORS['border']};"
         )
-        self._center_status.setFixedHeight(36)
+        self._center_status.setMaximumHeight(36)
+        self._center_status.setVisible(False)  # hidden in gamemods variant
         right_layout.addWidget(self._center_status)
 
         self._global_info_widget = QWidget()
@@ -694,17 +695,6 @@ class MainWindow(QMainWindow):
         self._items_tabs.setTabPosition(QTabWidget.South)
         self._tabs.addTab(self._items_tabs, tr("tab.items"))
 
-        self._load_manager_tab = LoadManagerTab(config=self._config)
-        self._load_manager_tab.status_message.connect(self._update_status)
-        self._load_manager_tab.config_save_requested.connect(self._save_config)
-        _saved_gp_lm = self._config.get("game_install_path", "")
-        if _saved_gp_lm:
-            try:
-                self._load_manager_tab.set_game_path(_saved_gp_lm)
-            except Exception:
-                pass
-        self._tabs.addTab(self._load_manager_tab, "Load Manager")
-
         self._save_tabs = QTabWidget()
         self._world_tabs = QTabWidget()
 
@@ -795,25 +785,25 @@ class MainWindow(QMainWindow):
                 pass
         self._mods_tabs.addTab(self._stacker_tab, "Stacker Tool")
 
-        # self._store_tab = StoreEditorTab(
-        #     name_db=self._name_db,
-        #     icon_cache=self._icon_cache,
-        #     config=self._config,
-        #     rebuild_papgt_fn=self._rebuild_papgt_without,
-        #     show_guide_fn=self._show_guide,
-        # )
-        # self._store_tab.status_message.connect(self._update_status)
-        # self._store_tab.config_save_requested.connect(self._save_config)
-        # self._store_tab.paz_refresh_requested.connect(
-        #     lambda: self._patches_tab._paz_refresh_status() if hasattr(self, "_patches_tab") else None
-        # )
-        # _saved_gp = self._config.get("game_install_path", "")
-        # if _saved_gp:
-        #     try:
-        #         self._store_tab.set_game_path(_saved_gp)
-        #     except Exception:
-        #         pass
-        # self._mods_tabs.addTab(self._store_tab, tr("tab.stores"))
+        self._store_tab = StoreEditorTab(
+            name_db=self._name_db,
+            icon_cache=self._icon_cache,
+            config=self._config,
+            rebuild_papgt_fn=self._rebuild_papgt_without,
+            show_guide_fn=self._show_guide,
+        )
+        self._store_tab.status_message.connect(self._update_status)
+        self._store_tab.config_save_requested.connect(self._save_config)
+        self._store_tab.paz_refresh_requested.connect(
+            lambda: self._patches_tab._paz_refresh_status() if hasattr(self, "_patches_tab") else None
+        )
+        _saved_gp = self._config.get("game_install_path", "")
+        if _saved_gp:
+            try:
+                self._store_tab.set_game_path(_saved_gp)
+            except Exception:
+                pass
+        self._mods_tabs.addTab(self._store_tab, tr("tab.stores"))
 
         self._bagspace_tab = BagSpaceTab(
             config=self._config,
@@ -856,14 +846,29 @@ class MainWindow(QMainWindow):
                 pass
         self._mods_tabs.addTab(self._skill_tree_tab, "SkillTree")
 
-        self._reserveslot_tab = ReserveSlotTab(
-            config=self._config,
-            game_path_getter=lambda: self._config.get("game_install_path", ""),
-            rebuild_papgt_fn=self._rebuild_papgt_without,
-        )
-        self._reserveslot_tab.status_message.connect(self._update_status)
-        self._reserveslot_tab.config_save_requested.connect(self._save_config)
-        self._mods_tabs.addTab(self._reserveslot_tab, "ReserveSlot")
+        # PAS Editor disabled — uses byte-level npc_swap, needs migration to field-level.
+        # self._pas_editor_tab = PasEditorTab(
+        #     config=self._config,
+        #     game_path_getter=lambda: self._config.get("game_install_path", ""),
+        #     rebuild_papgt_fn=self._rebuild_papgt_without,
+        # )
+        # self._pas_editor_tab.status_message.connect(self._update_status)
+        # self._pas_editor_tab.config_save_requested.connect(self._save_config)
+        # self._mods_tabs.addTab(self._pas_editor_tab, "PAS Editor")
+
+        self._quest_mods_tab = QuestModsTab(config=self._config)
+        self._quest_mods_tab.status_message.connect(self._update_status)
+        self._quest_mods_tab.config_save_requested.connect(self._save_config)
+        self._mods_tabs.addTab(self._quest_mods_tab, "Quest Mods")
+
+        try:
+            from gui.tabs.load_manager import LoadManagerTab
+            self._load_manager_tab = LoadManagerTab(config=self._config)
+            self._load_manager_tab.status_message.connect(self._update_status)
+            self._load_manager_tab.config_save_requested.connect(self._save_config)
+            self._mods_tabs.addTab(self._load_manager_tab, "Load Manager")
+        except Exception as e:
+            log.warning("LoadManager tab load failed: %s", e)
 
         try:
             from gui.tabs.mercpets import MercPetsTab
@@ -888,6 +893,7 @@ class MainWindow(QMainWindow):
             goto_quest_fn=None,
             app_dir_fn=self._app_dir,
             show_guide_fn=self._show_guide,
+            config=self._config,
         )
         self._database_tab.toggle_icons_requested.connect(self._toggle_icons)
         self._database_tab.status_message.connect(self._update_status)
@@ -897,22 +903,24 @@ class MainWindow(QMainWindow):
 
         self._tabs = _real_tabs
         self._real_tabs = _real_tabs
-
-        if hasattr(self, '_stacker_tab'):
-            _mt = {}
-            if hasattr(self, '_mercpets_tab'):
-                _mt['mercpets'] = self._mercpets_tab
-            if hasattr(self, '_bagspace_tab'):
-                _mt['bagspace'] = self._bagspace_tab
-            if hasattr(self, '_skill_tree_tab'):
-                _mt['skilltree'] = self._skill_tree_tab
-            if hasattr(self, '_reserveslot_tab'):
-                _mt['reserveslot'] = self._reserveslot_tab
-            if hasattr(self, '_field_edit_tab_obj'):
-                _mt['fieldedit'] = self._field_edit_tab_obj
-            self._stacker_tab._mod_tabs = _mt
-
         self._update_experimental_tabs()
+
+        # Register all tabs with the stacker for Pull All Edits
+        if hasattr(self, '_stacker_tab'):
+            _st = self._stacker_tab
+            for _key, _attr in [
+                ('mercpets',    '_mercpets_tab'),
+                ('bagspace',    '_bagspace_tab'),
+                ('skilltree',   '_skill_tree_tab'),
+                ('fieldedit',   '_field_edit_tab_obj'),
+                ('spawnedit',   '_spawn_tab'),
+                ('dropsets',    '_dropset_tab'),
+                ('questmods',   '_quest_mods_tab'),
+            ]:
+                _tab = getattr(self, _attr, None)
+                if _tab is not None:
+                    _st.register_tab(_key, _tab)
+
         self._pack_browser_refresh()
 
         if hasattr(self, '_view_menu'):
@@ -1803,12 +1811,12 @@ class MainWindow(QMainWindow):
             act.triggered.connect(lambda checked, u=url: __import__('webbrowser').open(u))
             guides_menu.addAction(act)
 
-        dev_menu = menu_bar.addMenu("Dev")
-        self._experimental_action = QAction("Enable Experimental Mode", self)
+        self._experimental_action = QAction("Enable Experimental / Dev Mode", self)
         self._experimental_action.setCheckable(True)
         self._experimental_action.setChecked(self._experimental_mode)
         self._experimental_action.triggered.connect(self._toggle_experimental_mode)
-        dev_menu.addAction(self._experimental_action)
+        view_menu.addSeparator()
+        view_menu.addAction(self._experimental_action)
 
 
     def _rebuild_view_tab_list(self) -> None:
@@ -2462,6 +2470,8 @@ QCheckBox::indicator {{
             self._bagspace_tab.set_game_path(path)
         if hasattr(self, '_load_manager_tab'):
             self._load_manager_tab.set_game_path(path)
+        if hasattr(self, '_quest_mods_tab'):
+            self._quest_mods_tab.set_game_path(path)
 
     def _validate_game_path(self, path: str) -> bool:
         paz = os.path.join(path, "0008", "0.paz")
